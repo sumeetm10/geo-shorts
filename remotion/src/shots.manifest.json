@@ -1,0 +1,26 @@
+[
+ {
+  "id": "GeoList",
+  "durationInSeconds": 20,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "GeoWalk",
+  "durationInSeconds": 40,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "ShortWalkIndiaUsa",
+  "durationInSeconds": 43,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ }
+]

@@ -1,0 +1,65 @@
+Atlas On Foot (geo-shorts)
+Copyright (c) 2026 sumeetm10. All rights reserved.
+
+This repository is public so that it can be seen. It is NOT open source, and no
+licence to use it is granted, except as written below.
+
+
+1. WHAT YOU MAY DO WITHOUT ASKING
+
+   View this repository and fork it on GitHub, to the extent GitHub's Terms of
+   Service allow for every public repository. Nothing more.
+
+
+2. WHAT NEEDS WRITTEN PERMISSION
+
+   Everything else. Without prior written permission from the copyright holder
+   you may not, in whole or in part:
+
+   - copy, download, install or run this code, or use it to make videos;
+   - modify it, translate it, or build anything based on it;
+   - publish, redistribute, sublicense, rent or sell it;
+   - use it, or anything it produces, for any channel, product or service;
+   - use the name "Atlas On Foot", or the logo, banner or character in brand/.
+
+
+3. HOW TO ASK
+
+   Open an issue in this repository titled "Permission request", saying who you
+   are and exactly what you want to do. Permission counts only if it is given
+   in writing by the copyright holder, and only covers what it names.
+
+
+4. PARTS THAT ARE NOT OURS
+
+   These keep their own licences. Nothing in this file restricts them.
+
+   a) Files from "claude-faceless-shorts-creator" by Hasan Aboul Hasan, under
+      the MIT License (full text in LICENSE-upstream). As they appear in that
+      project, these files are MIT-licensed:
+        remotion/package.json          remotion/remotion.config.ts
+        remotion/tsconfig.json         remotion/scripts/frames.mjs
+        remotion/scripts/gen-registry.mjs
+        remotion/scripts/render-all.mjs
+        remotion/src/brand.ts          remotion/src/fonts.ts
+        remotion/src/index.ts          remotion/src/Root.tsx
+        remotion/src/lib/map.tsx       remotion/src/lib/shorts.tsx
+        remotion/src/lib/geo/world.ts
+      remotion/src/registry.gen.tsx and remotion/src/shots.manifest.json began
+      as that project's files; our changes to them are ours.
+
+   b) assets/bluemarble.jpg - NASA Blue Marble imagery, public domain.
+
+   c) assets/ne10m.geojson and assets/places.geojson - Natural Earth data,
+      public domain.
+
+   d) Country flag images - public domain, downloaded from flagcdn.com.
+
+   e) npm and Python packages installed at build time - their own licences.
+
+
+5. NO WARRANTY
+
+   Provided "as is", without warranty of any kind. In no event shall the
+   copyright holder be liable for any claim, damages or other liability arising
+   from the use of this repository.

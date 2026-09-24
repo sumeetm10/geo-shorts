@@ -1,0 +1,26 @@
+# secrets - never commit
+token*.json
+client_secret*.json
+.env
+
+# build output and caches
+__pycache__/
+*.pyc
+data/*
+!data/state.json
+!data/geograph.pkl
+media/jobs/
+media/projects/
+remotion/node_modules/
+remotion/out/
+remotion/build/
+*.mp4
+*.wav
+*.mp3
+brand/*_preview.png
+
+# local-only: prototypes and the Windows scheduler (the cloud uses post.yml)
+make_voice.py
+make_legs.py
+build_detail.py
+daily_*.bat
