@@ -164,5 +164,6 @@ if __name__ == "__main__":
         print(f"[auth] token written to {TOKEN}. Make sure you picked the GEO channel.")
         w = whoami()
         print(f"[auth] this token posts to: {w['title'] if w else '(no channel)'}")
+        print("[auth] next: python push_secrets.py   (copies it to GitHub for the daily runs)")
     else:
         ap.print_help()
