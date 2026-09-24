@@ -270,6 +270,18 @@ const LegView: React.FC<{ leg: WalkLeg; t: number; zoom: number }> = ({ leg, t, 
   );
 };
 
+// The arrow is drawn, not typed: the Linux machine that renders in the cloud
+// has no font with "→", and the first cloud render read "India   USA".
+const HookArrow: React.FC = () => (
+  <svg viewBox="0 0 64 32" style={{
+    width: '0.9em', height: '0.45em', margin: '0 0.2em', verticalAlign: '0.14em',
+    overflow: 'visible', filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.85))',
+  }}>
+    <path d="M4 16 H54 M40 4 L58 16 L40 28" fill="none" stroke="currentColor"
+      strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 const GeoWalk: React.FC<Partial<WalkProps>> = ({
   legs = [], vo = [], hook = { top: '', bottom: '' }, card, durationInSeconds = 40,
 }) => {
@@ -307,7 +319,9 @@ const GeoWalk: React.FC<Partial<WalkProps>> = ({
         color: '#fff', textShadow: '0 6px 30px rgba(0,0,0,0.85)',
         opacity: 1 - prog(f, cue(1), cue(1) + 12),
       }}>
-        {hook.top}<br />
+        {hook.top.split('→').map((part, i, all) => (
+          <React.Fragment key={i}>{part.trim()}{i < all.length - 1 && <HookArrow />}</React.Fragment>
+        ))}<br />
         <span style={{ color: ROUTE }}>{hook.bottom}</span>
       </div>
 

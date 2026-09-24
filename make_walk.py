@@ -103,7 +103,9 @@ NOTES = {
 # Named regions (lon0, lon1, lat0, lat1). A leg that stays inside one huge
 # country ("more of Russia", twice) needs somewhere to be, not a repeat.
 REGIONS = [
-    ("the Himalayas", 72, 97, 27, 36), ("the Hindu Kush", 66, 75, 34, 39),
+    # the range runs diagonally, so two boxes; one rectangle took in Delhi's plains
+    ("the Himalayas", 73, 81, 30.3, 35.5), ("the Himalayas", 81, 97, 27.6, 29.6),
+    ("the Hindu Kush", 66, 75, 34, 39),
     ("the Tibetan Plateau", 78, 100, 30, 37), ("the Gobi Desert", 90, 115, 38, 46),
     ("the Kazakh steppe", 50, 85, 43, 52), ("Siberia", 60, 180, 50, 78),
     ("the Russian Far East", 130, 180, 42, 70), ("the Arabian Desert", 35, 60, 15, 32),
@@ -444,7 +446,7 @@ def _beats(route, legs, built):
     """One beat per line: the facts that line has to carry, nothing else."""
     o, d = geo.short(route["origin"]), geo.short(route["dest"])
     beats = [("hook", 0, f"Ask whether you could walk from {o} to {d}. Name both.")]
-    seen = set()
+    seen = {route["origin"]}                  # you start there; you do not "enter" it
     for i, leg in enumerate(legs):
         if leg["kind"] == "gap":
             gap = route["gap"]
@@ -573,21 +575,31 @@ Return ONLY JSON: {{"lines": ["line 1", ...]}}"""
             last = f"{type(e).__name__}: {str(e)[:90]}"
             print(f"      [script] error: {last}")
     print(f"      [script] using the plain template ({last})")
-    return [_template(k, txt, route) for k, _, txt in beats], beats
+    lines = []
+    for k, _, txt in beats:
+        line = _template(k, txt, route)
+        if lines and line == lines[-1]:       # two legs in one region read the same
+            line = {"cold": "The cold never lets up.", "hot": "The heat never lets up."}.get(
+                k, "Days pass, and it still goes on.")
+        lines.append(line)
+    return lines, beats
+
+
+def _article(short):
+    """'the UK', 'the USA' - short names that need an article in a sentence."""
+    return f"the {short}" if short in ("UK", "USA", "UAE", "DR Congo", "Philippines", "Netherlands",
+                                       "Central African Republic", "Czech Republic") else short
 
 
 def _the(country):
-    """'the UK', 'the USA' - short names that need an article in a sentence."""
-    s = geo.short(country)
-    return f"the {s}" if s in ("UK", "USA", "UAE", "DR Congo", "Philippines", "Netherlands",
-                               "Central African Republic", "Czech Republic") else s
+    return _article(geo.short(country))
 
 
 def _template(kind, beat, route):
     """A plain, always-true line per beat for when the model cannot be trusted."""
     o, d = geo.short(route["origin"]), geo.short(route["dest"])
     if kind == "hook":
-        return f"Could you walk from {o} to {d}?"
+        return f"Could you walk from {_the(route['origin'])} to {_the(route['dest'])}?"
     if kind == "payoff":
         return beat.replace("The answer: ", "").strip()
     if kind == "stop":
@@ -599,10 +611,20 @@ def _template(kind, beat, route):
             return f"{_the(gap['to'])} is about {gap['said']:,} km away, across the sea and islands."
         return f"{gap['said']:,} km of {gap['what']} to {_the(gap['to'])}, and no road across."
     m = re.search(r"Countries you enter: (.+?)[.]", beat)
+    r = re.search(r"Region: (.+?)[.]", beat)
     if m:
-        return f"Next you walk into {m.group(1)}."
-    m = re.search(r"Region: (.+?)[.]", beat)
-    return f"On through {m.group(1)}." if m else "You keep walking."
+        names = [_article(n) for n in m.group(1).split(", ")]
+        into = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+        where = f"into {into}"
+    elif r:
+        regs = r.group(1).split(", ")
+        where = "on through " + (" and ".join(regs))
+    else:
+        still = re.search(r"Still inside (.+?)[.]", beat)
+        where = f"on, still inside {_article(still.group(1))}" if still else "on and on"
+    if "HYPOTHETICAL" in beat:                # after the water: it never happens
+        return f"Even if you got across, you would walk {where}."
+    return f"Next you walk {where}." if m else f"You keep walking {where}."
 
 
 # ------------------------------------------------------------------ build
