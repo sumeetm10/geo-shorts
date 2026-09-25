@@ -615,7 +615,8 @@ RULES
   use the word "feeling", never copy the beat wording - turn the facts into
   something you would actually say. Name the region when one is given.
 - Places: mention only the places in each beat's "Route in order", in exactly
-  that order, and never put a place in the wrong country.
+  that order, and never put a place in the wrong country. At most 3 places in
+  a line - pick the most vivid ones; a line that lists every country is dull.
 - Write numbers as digits. Use ONLY the numbers given in the beats. Never add a
   distance, temperature, time or statistic that is not written above.
 - No "subscribe" (a closing line is added separately). The only question is

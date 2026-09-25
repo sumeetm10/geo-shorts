@@ -27,6 +27,9 @@ CHECK_MODELS = ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-flash-lates
 MATCH = 0.85                     # word similarity the whole take needs
 GAP = 0.26                       # silence after each line, as narrate.py
 TEMPO = 1.05                     # acted takes breathe; keep the Shorts pace
+# Line-break finder weights (see _cuts). Tuned offline on a real take plus
+# synthetic worst cases: pause length leads, the rest breaks ties.
+POS_W, GAP_W, FIT_W = 1.0, 2.5, 0.15
 
 STYLE = {
     "walk": (
@@ -91,8 +94,8 @@ def _client():
 
 def _take(client, lines, style, dest):
     from google.genai import types
-    prompt = (f"Voice {STYLE[style]}. Keep a brisk pace for a YouTube Short, and pause "
-              f"for about one second between lines. Speak only the script below, word "
+    prompt = (f"Voice {STYLE[style]}. Keep a brisk pace for a YouTube Short, and leave a "
+              f"clear pause of about two seconds between lines. Speak only the script below, word "
               f"for word exactly as written (it is captioned on screen), and never read "
               f"these directions aloud.\n\nScript:\n\n" + "\n\n".join(lines))
     last = None
@@ -137,14 +140,78 @@ def _heard(client, wav):
     raise VoiceUnavailable(f"could not transcribe the take ({str(last)[:80]})")
 
 
-def _cuts(islands, n):
-    """Cut points between lines: the n-1 longest pauses, in time order."""
-    gaps = [(islands[k + 1][0] - islands[k][1], k) for k in range(len(islands) - 1)]
-    big = sorted(k for g, k in sorted(gaps, reverse=True)[:n - 1] if g >= 0.2)
-    if len(big) != n - 1:
-        raise VoiceUnavailable(f"only {len(big) + 1} clear pauses for {n} lines")
+def _syllables(line):
+    """Spoken length of a line: syllables of its words, numbers spelled out."""
+    count = 0
+    for w in _words(line):
+        count += max(1, len(re.findall(r"[aeiouy]+", w)))
+    return count
+
+
+def _inner_pauses(line):
+    """Pauses a performer takes INSIDE a line: at its commas, full stops, dashes."""
+    return len(re.findall(r"[,.;:?!\u2014\u2013](?=\s)", line.strip()))
+
+
+def _cuts(islands, lines):
+    """Where one line ends and the next begins.
+
+    Taking the longest pauses failed on the first real script: "You leave
+    India, climb the Himalayas, cross the Tibetan Plateau, enter China..."
+    breathes at every comma, longer than between some lines, and line 1 came
+    out 12 seconds long. Two things the script tells us decide instead:
+      * where each break should fall - the syllables so far, in voiced time
+        (which ignores how long the pauses are);
+      * how many pauses belong inside each line - one per comma or full stop.
+    A longer pause is still slightly preferred.
+    """
+    n = len(lines)
+    if n == 1:
+        return [(islands[0][0], islands[-1][1])]
+    gaps = [(k, islands[k + 1][0] - islands[k][1]) for k in range(len(islands) - 1)]
+    cand = [(k, g) for k, g in gaps if g >= 0.15]
+    m = len(cand)
+    if m < n - 1:
+        raise VoiceUnavailable(f"only {m + 1} pauses for {n} lines")
+    voiced, acc = [], 0.0
+    for a, b in islands:
+        acc += b - a
+        voiced.append(acc)                      # voiced seconds up to the end of island k
+    weight = [_syllables(line) + 1 for line in lines]
+    expected = [acc * sum(weight[:j + 1]) / sum(weight) for j in range(n - 1)]
+    inner = [_inner_pauses(line) for line in lines]
+
+    def here(j, c):                             # break j placed at candidate pause c
+        k, g = cand[c]
+        return POS_W * abs(voiced[k] - expected[j]) - GAP_W * min(g, 2.5)
+
+    def fits(j, between):                       # line j holding this many pauses inside
+        return FIT_W * abs(between - inner[j])
+
+    inf = float("inf")
+    best = [[inf] * m for _ in range(n - 1)]
+    back = [[-1] * m for _ in range(n - 1)]
+    for c in range(m):
+        best[0][c] = here(0, c) + fits(0, c)
+    for j in range(1, n - 1):
+        for c in range(j, m):
+            for c0 in range(j - 1, c):
+                if best[j - 1][c0] == inf:
+                    continue
+                v = best[j - 1][c0] + here(j, c) + fits(j, c - c0 - 1)
+                if v < best[j][c]:
+                    best[j][c], back[j][c] = v, c0
+    total = [best[n - 2][c] + fits(n - 1, m - 1 - c) for c in range(m)]
+    c = min(range(m), key=lambda i: total[i])
+    if total[c] == inf:
+        raise VoiceUnavailable("no way to place the line breaks")
+    chosen = []
+    for j in range(n - 2, -1, -1):
+        chosen.append(cand[c][0])
+        c = back[j][c]
+    chosen.reverse()
     bounds, start = [], islands[0][0]
-    for k in big:
+    for k in chosen:
         bounds.append((start, islands[k][1]))
         start = islands[k + 1][0]
     bounds.append((start, islands[-1][1]))
@@ -170,7 +237,7 @@ def perform(lines, style, out_dir):
     if score < MATCH:
         raise VoiceUnavailable(f"take does not match the script ({score:.2f})")
 
-    bounds = _cuts(timing.speech_islands(raw), len(lines))
+    bounds = _cuts(timing.speech_islands(raw), lines)
     wavs, vo, t = [], [], 0.0
     for i, ((a, b), text) in enumerate(zip(bounds, lines), 1):
         wav = takes / f"{i:02d}.wav"
