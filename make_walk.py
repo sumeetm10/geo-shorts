@@ -445,7 +445,8 @@ def _llm():
 def _beats(route, legs, built):
     """One beat per line: the facts that line has to carry, nothing else."""
     o, d = geo.short(route["origin"]), geo.short(route["dest"])
-    beats = [("hook", 0, f"Ask whether you could walk from {o} to {d}. Name both.")]
+    beats = [("hook", 0, f"Ask whether you could walk from {_the(route['origin'])} to "
+                         f"{_the(route['dest'])}. Name both.")]
     seen = {route["origin"]}                  # you start there; you do not "enter" it
     for i, leg in enumerate(legs):
         if leg["kind"] == "gap":
@@ -466,9 +467,11 @@ def _beats(route, legs, built):
         new = [geo.short(c) for c in leg["walked"] if c not in seen]
         seen.update(leg["walked"])
         facts = []
-        if leg["kind"] == "after" and legs[i - 1]["kind"] == "gap":
-            facts.append("HYPOTHETICAL - you cannot actually cross, so say 'even if you got "
-                         "across' or similar, never that you did cross")
+        if leg["kind"] == "after":
+            # everything past the water is imagined: the answer is already "no"
+            facts.append("HYPOTHETICAL - you cannot actually cross, so this line must stay "
+                         "imagined: 'even if you got across', 'you would', never that you did "
+                         "cross or that you finally arrive")
         if new:
             facts.append("Countries you enter: " + ", ".join(new))
         else:
@@ -526,6 +529,9 @@ def _gate(lines, beats, route):
                                                                "you cross the strait",
                                                                "after you cross")):
             return "a line says you crossed water that cannot be crossed"
+    for line, (_, _, txt) in zip(lines, beats):
+        if "HYPOTHETICAL" in txt and not re.search(r"\b(would|if|could|imagine)\b", line.lower()):
+            return f"'{line}' is past the water but does not say it is imagined"
     hook = lines[0].lower()
     for c in (route["origin"], route["dest"]):
         names = [geo.short(c).lower(), c.lower()] + ALIASES.get(c, [])
