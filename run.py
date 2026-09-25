@@ -102,6 +102,13 @@ def run(kind, test=False):
         return 2
 
     s = load_state()
+    # GitHub's timer is best-effort, so each slot has backup triggers; the first
+    # one that runs posts, the rest find it done and stop here.
+    today = datetime.now().strftime("%Y-%m-%d")
+    if any(h.get("kind") == kind and h.get("youtube_id") and h.get("date", "").startswith(today)
+           for h in s["history"]):
+        print(f"[skip  ] today's {kind} is already posted")
+        return 0
     fails = s.setdefault("fails", {})
     key_next = "walk_next" if kind == "walk" else "question_next"
     pool = topics.WALKS if kind == "walk" else topics.QUESTIONS

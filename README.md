@@ -10,7 +10,8 @@ See [LICENSE](LICENSE). To ask for permission, open an issue titled
 ## How it runs
 
 GitHub Actions ([post.yml](.github/workflows/post.yml)) builds and posts two
-Shorts a day: a walk at 05:15 UTC and a map question at 13:15 UTC. It needs two
+Shorts a day: a walk around 05:23 UTC and a map question around 13:23 UTC,
+each with two backup triggers in case GitHub skips one. It needs two
 repository secrets:
 
 - `GEMINI_API_KEY` - writes the walk narration (checked against computed facts)

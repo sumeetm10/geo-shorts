@@ -1,13 +1,20 @@
 name: post
 
-# Two Shorts a day. GitHub runs schedules in UTC and may start them late when
-# busy, which is fine for Shorts. Nepal is UTC+5:45:
-#   05:15 UTC = 11:00 Nepal -> walk
-#   13:15 UTC = 19:00 Nepal -> question
+# Two Shorts a day. GitHub runs schedules in UTC, and only best-effort: on
+# 2026-09-25 the 05:15 run never started at all. So each slot has two backup
+# triggers, on odd minutes (the busy ones are :00 and :15). The first run that
+# gets through posts; later ones see today's video is up and stop.
+# Nepal is UTC+5:45:
+#   walk      05:23 / 05:53 / 06:37 UTC  (~11:08 Nepal)
+#   question  13:23 / 13:53 / 14:37 UTC  (~19:08 Nepal)
 on:
   schedule:
-    - cron: "15 5 * * *"
-    - cron: "15 13 * * *"
+    - cron: "23 5 * * *"
+    - cron: "53 5 * * *"
+    - cron: "37 6 * * *"
+    - cron: "23 13 * * *"
+    - cron: "53 13 * * *"
+    - cron: "37 14 * * *"
   workflow_dispatch:
     inputs:
       kind:
@@ -39,7 +46,10 @@ jobs:
         id: pick
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            if [ "${{ github.event.schedule }}" = "15 5 * * *" ]; then kind=walk; else kind=question; fi
+            case "${{ github.event.schedule }}" in
+              "23 5 * * *"|"53 5 * * *"|"37 6 * * *") kind=walk ;;
+              *) kind=question ;;
+            esac
             mode=post
           else
             kind="${{ inputs.kind }}"; mode="${{ inputs.mode }}"
