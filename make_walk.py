@@ -110,13 +110,43 @@ REGIONS = [
     ("the Tibetan Plateau", 78, 100, 30, 37), ("the Gobi Desert", 90, 115, 38, 46),
     ("the Kazakh steppe", 50, 85, 43, 52), ("Siberia", 60, 180, 50, 78),
     ("the Russian Far East", 130, 180, 42, 70), ("the Arabian Desert", 35, 60, 15, 32),
-    ("the Sahara", -15, 35, 16, 32), ("the Alps", 5, 15, 44, 47.5),
+    ("the Sahara", -15, 35, 16, 32), ("the Alps", 5, 16, 43.8, 47.45),
     ("Alaska", -168.5, -130, 54, 72), ("the Canadian Rockies", -125, -110, 49, 60),
     ("the Great Plains", -105, -95, 33, 49), ("the Rocky Mountains", -115, -104, 35, 49),
     ("the Amazon", -75, -50, -12, 5), ("Patagonia", -75, -63, -55, -38),
     ("the Andes", -78, -66, -40, 5), ("the Congo rainforest", 12, 30, -5, 5),
     ("the Australian outback", 115, 145, -32, -18), ("Central America", -92, -77, 7, 18),
 ]
+# A region only counts while the walker is in one of its countries. The boxes
+# alone put "the Kazakh steppe" and "Siberia" in the mouth of a walker who was
+# in southern Russia and northern Kazakhstan respectively.
+REGION_COUNTRIES = {
+    "the Himalayas": {"India", "Nepal", "China", "Bhutan", "Pakistan"},
+    "the Hindu Kush": {"Afghanistan", "Pakistan"},
+    "the Tibetan Plateau": {"China", "India"},
+    "the Gobi Desert": {"Mongolia", "China"},
+    "the Kazakh steppe": {"Kazakhstan"},
+    "Siberia": {"Russia"},
+    "the Russian Far East": {"Russia"},
+    "the Arabian Desert": {"Saudi Arabia", "Yemen", "Oman", "United Arab Emirates", "Qatar",
+                           "Kuwait", "Jordan", "Iraq"},
+    "the Sahara": {"Morocco", "Algeria", "Tunisia", "Libya", "Egypt", "Mauritania", "Mali",
+                   "Niger", "Chad", "Sudan", "W. Sahara"},
+    "the Alps": {"France", "Switzerland", "Italy", "Austria", "Germany", "Slovenia",
+                 "Liechtenstein"},
+    "Alaska": {"United States of America"},
+    "the Canadian Rockies": {"Canada"},
+    "the Great Plains": {"United States of America", "Canada"},
+    "the Rocky Mountains": {"United States of America"},
+    "the Amazon": {"Brazil", "Peru", "Colombia", "Venezuela", "Ecuador", "Bolivia"},
+    "Patagonia": {"Argentina", "Chile"},
+    "the Andes": {"Chile", "Argentina", "Peru", "Bolivia", "Ecuador", "Colombia", "Venezuela"},
+    "the Congo rainforest": {"Dem. Rep. Congo", "Congo", "Gabon", "Cameroon",
+                             "Central African Rep."},
+    "the Australian outback": {"Australia"},
+    "Central America": {"Guatemala", "Belize", "Honduras", "El Salvador", "Nicaragua",
+                        "Costa Rica", "Panama"},
+}
 ALIASES = {
     "United States of America": ["usa", "united states", "america", "u.s."],
     "United Kingdom": ["uk", "britain", "united kingdom", "england", "london"],
@@ -291,15 +321,44 @@ def _split(pts, names, k):
     return [c for c in chunks if len(c) >= 2] or [dense]
 
 
+def _in_region(name, box, lon, lat, who):
+    a, b, c, d = box
+    return a <= lon <= b and c <= lat <= d and (who is None or who in REGION_COUNTRIES[name])
+
+
 def _regions(points):
     seen = []
     for pt in points[::3]:
         lon = ((pt[0] + 180) % 360) - 180
-        lat = pt[1]
-        for name, a, b, c, d in REGIONS:
-            if a <= lon <= b and c <= lat <= d and name not in seen:
+        who = pt[2] if len(pt) > 2 else None
+        for name, *box in REGIONS:
+            if name not in seen and _in_region(name, box, lon, pt[1], who):
                 seen.append(name)
     return seen
+
+
+def _journey(points, before, first):
+    """The leg's places in the order the walker meets them.
+
+    A flat list ("Countries: Belarus. Region: Siberia") let the script say
+    "you cross Belarus, braving Siberia" - Siberia comes first on that walk.
+    """
+    steps, cur, regs = [], None, set()
+    for pt in points[::3] + [points[-1]]:
+        lon = ((pt[0] + 180) % 360) - 180
+        who = pt[2]
+        if who != cur:
+            cur = who
+            if not steps:
+                steps.append(("from " if first else "still in " if who in before else "into ")
+                             + _the(who))
+            else:
+                steps.append("into " + _the(who))
+        for name, *box in REGIONS:
+            if name not in regs and _in_region(name, box, lon, pt[1], who):
+                regs.add(name)
+                steps.append(name)
+    return steps
 
 
 def _in_boxes(lon, lat, boxes):
@@ -314,7 +373,7 @@ def plan_legs(route):
     k1 = min(4, max(2, round(route["km1"] / 3000))) if not route["walkable"] \
         else min(5, max(3, round(route["km1"] / 2800)))
     for chunk in _split(s1, route["countries1"], k1):
-        legs.append({"kind": "walk", "points": [c[:2] for c in chunk],
+        legs.append({"kind": "walk", "points": [c[:2] for c in chunk], "points_tagged": chunk,
                      "walked": list(dict.fromkeys(c[2] for c in chunk)),
                      "regions": _regions(chunk)})
     if not route["walkable"]:
@@ -326,7 +385,7 @@ def plan_legs(route):
         if len(s2) >= 2:
             k2 = 1 if route["km2"] < 3500 else 2
             for chunk in _split(s2, route["countries2"], k2):
-                legs.append({"kind": "after", "points": [c[:2] for c in chunk],
+                legs.append({"kind": "after", "points": [c[:2] for c in chunk], "points_tagged": chunk,
                              "walked": list(dict.fromkeys(c[2] for c in chunk)),
                              "regions": _regions(chunk)})
 
@@ -467,7 +526,7 @@ def _beats(route, legs, built):
             note = NOTES.get(frozenset({gap["from"], gap["to"]}))
             beats.append(("detail", i, detail + (f" {note}" if note else "")))
             continue
-        new = [geo.short(c) for c in leg["walked"] if c not in seen]
+        steps = _journey(leg["points_tagged"], seen, first=(i == 0))
         seen.update(leg["walked"])
         facts = []
         if leg["kind"] == "after":
@@ -475,12 +534,7 @@ def _beats(route, legs, built):
             facts.append("HYPOTHETICAL - you cannot actually cross, so this line must stay "
                          "imagined: 'even if you got across', 'you would', never that you did "
                          "cross or that you finally arrive")
-        if new:
-            facts.append("Countries you enter: " + ", ".join(new))
-        else:
-            facts.append("Still inside " + geo.short(leg["walked"][-1]))
-        if leg["regions"]:
-            facts.append("Region: " + ", ".join(leg["regions"][:2]))
+        facts.append("Route in order: " + " | ".join(steps))
         facts.append({"hot": "Heat and dry desert", "cold": "Bitter cold",
                       "walk": "Long days on foot", "tired": "Exhausted, still far to go",
                       "cheer": "You finally make it"}[leg["mood"]])
@@ -560,6 +614,8 @@ RULES
 - Every line must sound different. Never start two lines the same way, never
   use the word "feeling", never copy the beat wording - turn the facts into
   something you would actually say. Name the region when one is given.
+- Places: mention only the places in each beat's "Route in order", in exactly
+  that order, and never put a place in the wrong country.
 - Write numbers as digits. Use ONLY the numbers given in the beats. Never add a
   distance, temperature, time or statistic that is not written above.
 - No "subscribe" (a closing line is added separately). The only question is
@@ -626,21 +682,23 @@ def _template(kind, beat, route):
         if gap.get("islands"):
             return f"{_the(gap['to'])} is about {gap['said']:,} km away, across the sea and islands."
         return f"{gap['said']:,} km of {gap['what']} to {_the(gap['to'])}, and no road across."
-    m = re.search(r"Countries you enter: (.+?)[.]", beat)
-    r = re.search(r"Region: (.+?)[.]", beat)
-    if m:
-        names = [_article(n) for n in m.group(1).split(", ")]
-        into = names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+    m = re.search(r"Route in order: (.*?)\.(?:\s|$)", beat)
+    steps = m.group(1).split(" | ") if m else []
+    countries = [s[5:] for s in steps if s.startswith("into ")]
+    regions = [s for s in steps if not s.startswith(("into ", "still in ", "from "))]
+    still = next((s[9:] for s in steps if s.startswith("still in ")), None)
+    if countries:
+        into = countries[0] if len(countries) == 1 else ", ".join(countries[:-1]) + " and " + countries[-1]
         where = f"into {into}"
-    elif r:
-        regs = r.group(1).split(", ")
-        where = "on through " + (" and ".join(regs))
+    elif regions:
+        where = "on through " + " and ".join(regions)
+    elif still:
+        where = f"on, still inside {still}"
     else:
-        still = re.search(r"Still inside (.+?)[.]", beat)
-        where = f"on, still inside {_article(still.group(1))}" if still else "on and on"
+        where = "on and on"
     if "HYPOTHETICAL" in beat:                # after the water: it never happens
         return f"Even if you got across, you would walk {where}."
-    return f"Next you walk {where}." if m else f"You keep walking {where}."
+    return f"Next you walk {where}." if countries else f"You keep walking {where}."
 
 
 # ------------------------------------------------------------------ build

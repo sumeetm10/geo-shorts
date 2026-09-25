@@ -14,6 +14,7 @@ always gets made; it just is not always acted.
 import difflib
 import re
 import subprocess
+import time
 import wave
 from pathlib import Path
 
@@ -22,7 +23,7 @@ import timing
 
 VOICE = "Puck"                   # Gemini's "upbeat" voice; the story channel uses Fenrir
 TTS_MODELS = ["gemini-3.1-flash-tts-preview", "gemini-2.5-flash-preview-tts"]
-CHECK_MODELS = ["gemini-3.5-flash-lite", "gemini-3.6-flash"]
+CHECK_MODELS = ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-flash-latest"]
 MATCH = 0.85                     # word similarity the whole take needs
 GAP = 0.26                       # silence after each line, as narrate.py
 TEMPO = 1.05                     # acted takes breathe; keep the Shorts pace
@@ -117,16 +118,23 @@ def _take(client, lines, style, dest):
 
 
 def _heard(client, wav):
+    """The take, transcribed. Retried: a busy model (503) once cost a good take."""
     from google.genai import types
+    last = None
     for model in CHECK_MODELS:
-        try:
-            r = client.models.generate_content(model=model, contents=[
-                types.Part.from_bytes(data=Path(wav).read_bytes(), mime_type="audio/wav"),
-                "Transcribe exactly the words spoken. Output only the words."])
-            return (r.text or "").strip()
-        except Exception:
-            continue
-    raise VoiceUnavailable("could not transcribe the take")
+        for attempt in range(3):
+            try:
+                r = client.models.generate_content(model=model, contents=[
+                    types.Part.from_bytes(data=Path(wav).read_bytes(), mime_type="audio/wav"),
+                    "Transcribe exactly the words spoken. Output only the words."])
+                if (r.text or "").strip():
+                    return r.text.strip()
+            except Exception as e:
+                last = e
+                if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                    break                     # this model is done for today
+            time.sleep(8 * (attempt + 1))
+    raise VoiceUnavailable(f"could not transcribe the take ({str(last)[:80]})")
 
 
 def _cuts(islands, n):

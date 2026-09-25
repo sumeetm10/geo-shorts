@@ -18,6 +18,9 @@ export const EndCard: React.FC<{ from: number; text: string }> = ({ from, text }
   const t = EASE_OUT(prog(f, from, from + 12));
   const pulse = 1 + 0.035 * Math.sin((f - from) / 4.5);
   return (
+    <>
+    {/* dim the map so the card reads over any flag or label */}
+    <div style={{ position: 'absolute', inset: 0, background: 'rgba(3,5,9,0.5)', opacity: t }} />
     <div style={{
       position: 'absolute', left: 0, right: 0, top: 930,
       display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -35,8 +38,9 @@ export const EndCard: React.FC<{ from: number; text: string }> = ({ from, text }
       </div>
       <div style={{
         marginTop: 24, fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, fontSize: 48,
-        color: '#fff', textShadow: '0 4px 22px rgba(0,0,0,0.95)',
+        color: '#fff', background: 'rgba(5,7,11,0.78)', borderRadius: 16, padding: '8px 22px',
       }}>{text}</div>
     </div>
+    </>
   );
 };
