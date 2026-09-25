@@ -1,6 +1,6 @@
 {
   "walk_next": 1,
-  "question_next": 0,
+  "question_next": 1,
   "history": [
     {
       "date": "2026-09-25 07:27",
@@ -8,6 +8,14 @@
       "title": "Can You Walk from India to USA? 🌍🚶",
       "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-09-25-walk-india-to-usa.mp4",
       "youtube_id": "Ex4m-oWXw6Y",
+      "privacy": "public"
+    },
+    {
+      "date": "2026-09-25 18:00",
+      "kind": "question",
+      "title": "Countries That Only Border ONE Country 🌍 How Many Can You Name?",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-09-25-question-one-neighbour-1.mp4",
+      "youtube_id": "U_OBMMwCtR8",
       "privacy": "public"
     }
   ],
