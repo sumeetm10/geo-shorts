@@ -16,9 +16,9 @@ on:
         options: [walk, question]
         default: walk
       mode:
-        description: "test = build only and keep the video as a download; post = build and upload"
+        description: "test = build only and keep the video as a download; post = build and upload; check = only confirm the YouTube login"
         type: choice
-        options: [test, post]
+        options: [test, post, check]
         default: test
 
 permissions:
@@ -88,7 +88,9 @@ jobs:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
           PYTHONUNBUFFERED: "1"
         run: |
-          if [ "${{ steps.pick.outputs.mode }}" = "test" ]; then
+          if [ "${{ steps.pick.outputs.mode }}" = "check" ]; then
+            python upload_geo.py --whoami
+          elif [ "${{ steps.pick.outputs.mode }}" = "test" ]; then
             python run.py "${{ steps.pick.outputs.kind }}" --test
           else
             python run.py "${{ steps.pick.outputs.kind }}"
