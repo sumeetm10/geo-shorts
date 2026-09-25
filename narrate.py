@@ -29,6 +29,19 @@ VOICE_POLISH = ("highpass=f=80,"
                 "acompressor=threshold=-20dB:ratio=2.5:attack=8:release=120:makeup=1.5,"
                 "loudnorm=I=-16:TP=-1.5:LRA=7")
 
+
+def finish(concat_list, voice):
+    """Join the takes and polish them. If this ffmpeg lacks a filter in the
+    chain, fall back to loudness alone: an unpolished video still posts."""
+    base = ["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(concat_list)]
+    tail = ["-ar", "48000", "-b:a", "192k", str(voice)]
+    try:
+        subprocess.run(base + ["-af", VOICE_POLISH] + tail, check=True)
+    except subprocess.CalledProcessError:
+        print("      [voice] polish failed on this ffmpeg - loudness only")
+        subprocess.run(base + ["-af", "loudnorm=I=-16"] + tail, check=True)
+    return voice
+
 # delivery per kind of line: (rate, pitch)
 DELIVERY = {
     "hook": ("+4%", "+4Hz"),
@@ -98,7 +111,5 @@ def narrate(lines, kinds, out_dir, style=None):
         t += d
     lst = out_dir / "concat.txt"
     lst.write_text("".join(f"file '{w.resolve().as_posix()}'\n" for w in wavs), encoding="utf-8")
-    voice = out_dir / "voice.mp3"
-    subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst),
-                    "-af", VOICE_POLISH, "-ar", "48000", "-b:a", "192k", str(voice)], check=True)
+    voice = finish(lst, out_dir / "voice.mp3")
     return vo, voice

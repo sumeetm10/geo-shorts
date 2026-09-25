@@ -230,7 +230,7 @@ def _duration(path):
 
 def perform(lines, style, out_dir):
     """(vo, voice_mp3) like narrate.narrate, from one acted take; or VoiceUnavailable."""
-    from narrate import VOICE_POLISH             # imported here: narrate imports us lazily
+    from narrate import finish                   # imported here: narrate imports us lazily
     out_dir = Path(out_dir)
     takes = out_dir / "acted"
     takes.mkdir(parents=True, exist_ok=True)
@@ -267,8 +267,6 @@ def perform(lines, style, out_dir):
         t += d
     lst = out_dir / "acted_concat.txt"
     lst.write_text("".join(f"file '{w.resolve().as_posix()}'\n" for w in wavs), encoding="utf-8")
-    voice = out_dir / "voice.mp3"
-    subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst),
-                    "-af", VOICE_POLISH, "-ar", "48000", "-b:a", "192k", str(voice)], check=True)
+    voice = finish(lst, out_dir / "voice.mp3")
     print(f"      [voice] acted: {len(lines)} lines, {t:.1f}s, matches script {score:.2f}")
     return vo, voice
