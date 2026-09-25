@@ -121,7 +121,7 @@ def make(topic_id, date=None):
     score.build_score(bed, secs + 0.5, tone="curious", seed=len(topic_id))
     OUT.mkdir(parents=True, exist_ok=True)
     final = OUT / f"{date}-question-{topic_id}.mp4"
-    mix.mix(silent, voice, bed, final, bed_db=-5)
+    mix.mix(silent, voice, bed, final, bed_db=-7)     # 2 dB under the old mix: a clearer voice
 
     found = seo.question_meta(topic, lines)
     meta = {

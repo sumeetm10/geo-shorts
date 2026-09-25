@@ -14,7 +14,7 @@ def duration(p):
     return float(r.stdout.strip())
 
 
-def mix(video, voice, bed, out, ambience=None, bed_db=-7, amb_db=-13):
+def mix(video, voice, bed, out, ambience=None, bed_db=-9, amb_db=-13):
     secs = duration(video)
     inputs = ["-i", str(video), "-i", str(voice), "-i", str(bed)]
     filt = (

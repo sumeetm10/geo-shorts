@@ -26,22 +26,26 @@ TTS_MODELS = ["gemini-3.1-flash-tts-preview", "gemini-2.5-flash-preview-tts"]
 CHECK_MODELS = ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-flash-latest"]
 MATCH = 0.85                     # word similarity the whole take needs
 GAP = 0.26                       # silence after each line, as narrate.py
-TEMPO = 1.05                     # acted takes breathe; keep the Shorts pace
+TEMPO = 1.0                      # no time-stretch: it blurred the voice a little
 # Line-break finder weights (see _cuts). Tuned offline on a real take plus
 # synthetic worst cases: pause length leads, the rest breaks ties.
 POS_W, GAP_W, FIT_W = 1.0, 2.5, 0.15
 
 STYLE = {
+    # expressive but smooth and clear: the first version's shivers and heavy
+    # sighs read as over-acted ("make it a bit smooth and clear")
     "walk": (
-        "a charismatic travel storyteller daring a friend to try an impossible walk. "
-        "Let the emotion follow the words: playful and teasing on the opening question, "
-        "determined and excited while walking, awed by mountains and deserts, tense "
-        "and shivering in the cold, a stunned stop when the land runs out, a heavy "
-        "sigh at the water, and warm and upbeat on the last line"),
+        "a warm, confident travel storyteller with clear, crisp articulation and a "
+        "smooth, flowing delivery. Expressive but natural, never over-acted: curious "
+        "and playful on the opening question, energetic while walking, a touch of awe "
+        "at mountains and deserts, a hint of chill in the cold, a surprised pause when "
+        "the land runs out, gentle disappointment at the water, and warm and upbeat on "
+        "the last line. No whispering, no breathy or shaky voice, no exaggerated sighs"),
     "question": (
-        "a lively quiz host with a grin in the voice. Tease the opening question, "
-        "reveal each country with a little punch of surprise, slow down for the "
-        "most surprising one, and finish warm and inviting"),
+        "a friendly, confident quiz host with clear, crisp articulation and a smooth, "
+        "flowing delivery. Playful on the opening question, a small lift of surprise on "
+        "each country, warm and inviting at the end. Natural, never over-acted, no "
+        "whispering or breathy voice"),
 }
 
 _ONES = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
@@ -226,6 +230,7 @@ def _duration(path):
 
 def perform(lines, style, out_dir):
     """(vo, voice_mp3) like narrate.narrate, from one acted take; or VoiceUnavailable."""
+    from narrate import VOICE_POLISH             # imported here: narrate imports us lazily
     out_dir = Path(out_dir)
     takes = out_dir / "acted"
     takes.mkdir(parents=True, exist_ok=True)
@@ -241,9 +246,13 @@ def perform(lines, style, out_dir):
     wavs, vo, t = [], [], 0.0
     for i, ((a, b), text) in enumerate(zip(bounds, lines), 1):
         wav = takes / f"{i:02d}.wav"
+        # keep the natural tail of each line and fade the cut edges: hard cuts
+        # at the island edges clicked and clipped breaths between lines
+        tempo = f"atempo={TEMPO}," if TEMPO != 1.0 else ""
         subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(raw), "-af",
-                        f"atrim={max(0.0, a - 0.05):.3f}:{b + 0.08:.3f},asetpts=PTS-STARTPTS,"
-                        f"atempo={TEMPO},apad=pad_dur={GAP}", "-ar", "24000", "-ac", "1",
+                        f"atrim={max(0.0, a - 0.06):.3f}:{b + 0.12:.3f},asetpts=PTS-STARTPTS,"
+                        f"afade=t=in:d=0.015,areverse,afade=t=in:d=0.06,areverse,"
+                        f"{tempo}apad=pad_dur={GAP}", "-ar", "24000", "-ac", "1",
                         str(wav)], check=True)
         d = _duration(wav)
         per_word = (d - GAP) / max(1, len(text.split()))
@@ -260,6 +269,6 @@ def perform(lines, style, out_dir):
     lst.write_text("".join(f"file '{w.resolve().as_posix()}'\n" for w in wavs), encoding="utf-8")
     voice = out_dir / "voice.mp3"
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst),
-                    "-af", "loudnorm=I=-16", "-ar", "48000", "-b:a", "192k", str(voice)], check=True)
+                    "-af", VOICE_POLISH, "-ar", "48000", "-b:a", "192k", str(voice)], check=True)
     print(f"      [voice] acted: {len(lines)} lines, {t:.1f}s, matches script {score:.2f}")
     return vo, voice

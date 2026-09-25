@@ -18,6 +18,16 @@ import timing  # noqa: E402
 
 VOICE = "en-US-AndrewMultilingualNeural"
 GAP = 0.26
+# Finishing chain for the joined narration (user, 2026-09-25: "a bit smooth and
+# clear"): cut rumble, a little less boom at 250 Hz, a little more presence at
+# 3.2 kHz for clarity, tame the "s" sounds, even the level with gentle
+# compression, then the usual loudness.
+VOICE_POLISH = ("highpass=f=80,"
+                "equalizer=f=250:t=q:w=1.0:g=-2,"
+                "equalizer=f=3200:t=q:w=1.2:g=2.5,"
+                "deesser=i=0.35,"
+                "acompressor=threshold=-20dB:ratio=2.5:attack=8:release=120:makeup=1.5,"
+                "loudnorm=I=-16:TP=-1.5:LRA=7")
 
 # delivery per kind of line: (rate, pitch)
 DELIVERY = {
@@ -90,5 +100,5 @@ def narrate(lines, kinds, out_dir, style=None):
     lst.write_text("".join(f"file '{w.resolve().as_posix()}'\n" for w in wavs), encoding="utf-8")
     voice = out_dir / "voice.mp3"
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst),
-                    "-af", "loudnorm=I=-16", "-ar", "48000", "-b:a", "192k", str(voice)], check=True)
+                    "-af", VOICE_POLISH, "-ar", "48000", "-b:a", "192k", str(voice)], check=True)
     return vo, voice
