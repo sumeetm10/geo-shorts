@@ -24,6 +24,7 @@ import geo
 import mix
 import narrate
 import routes
+import seo
 
 ROOT = Path(__file__).resolve().parent
 JOBS = ROOT / "data" / "jobs"
@@ -445,8 +446,10 @@ def _llm():
 def _beats(route, legs, built):
     """One beat per line: the facts that line has to carry, nothing else."""
     o, d = geo.short(route["origin"]), geo.short(route["dest"])
-    beats = [("hook", 0, f"Ask whether you could walk from {_the(route['origin'])} to "
-                         f"{_the(route['dest'])}. Name both.")]
+    beats = [("hook", 0, f"HOOK: the viewer decides in one second whether to keep watching. "
+                         f"Name both {_the(route['origin'])} and {_the(route['dest'])}, at most "
+                         f"12 words, and make them NEED the answer - a dare, a surprise or a "
+                         f"bold question. Never give the answer away.")]
     seen = {route["origin"]}                  # you start there; you do not "enter" it
     for i, leg in enumerate(legs):
         if leg["kind"] == "gap":
@@ -532,6 +535,8 @@ def _gate(lines, beats, route):
     for line, (_, _, txt) in zip(lines, beats):
         if "HYPOTHETICAL" in txt and not re.search(r"\b(would|if|could|imagine)\b", line.lower()):
             return f"'{line}' is past the water but does not say it is imagined"
+    if len(lines[0].split()) > 14:
+        return "the hook is too long to land in the first seconds"
     hook = lines[0].lower()
     for c in (route["origin"], route["dest"]):
         names = [geo.short(c).lower(), c.lower()] + ALIASES.get(c, [])
@@ -557,10 +562,15 @@ RULES
   something you would actually say. Name the region when one is given.
 - Write numbers as digits. Use ONLY the numbers given in the beats. Never add a
   distance, temperature, time or statistic that is not written above.
-- No "subscribe". The only question is the first line.
+- No "subscribe" (a closing line is added separately). The only question is
+  the first line.
 
-GOOD STYLE, for tone only:
-"Could you walk from India to America?"
+HOOKS THAT WORK (line 1, for tone only - never copy them):
+"India to the USA, on foot. Sounds impossible, right?"
+"I bet you can't walk from Nigeria to the UK."
+"Could you really walk from Egypt to China? Let's find out."
+
+GOOD STYLE for the rest, for tone only:
 "You cross into China and climb the roof of the world."
 "Siberia. Nothing but frozen forest for weeks."
 "And then the land just ends."
@@ -676,11 +686,15 @@ def make(origin, dest, date=None):
     print(f"[legs  ] {len(built)}: " + ", ".join(b["mood"] for b in built))
 
     lines, beats = write_script(route, legs, built)
+    # the call to action is ours, not the model's: one fixed line per video
+    closing = seo.cta("walk_yes" if route["walkable"] else "walk_no", slug)
+    lines = lines + [closing]
+    beats = beats + [("cta", len(legs) - 1, closing)]
     for i, l in enumerate(lines, 1):
         print(f"      {i:2d}. {l}")
 
     kinds = [k if k != "detail" else "payoff" for k, _, _ in beats]
-    vo, voice = narrate.narrate(lines, kinds, job)
+    vo, voice = narrate.narrate(lines, kinds, job, style="walk")
     first_line = {}
     for li, (_, leg_i, _) in enumerate(beats):
         first_line.setdefault(leg_i, li)
@@ -703,6 +717,7 @@ def make(origin, dest, date=None):
         "vo": vo,
         "hook": {"top": f"{geo.short(origin)} → {geo.short(dest)}", "bottom": "on foot?"},
         "card": card,
+        "cta": {"fromLine": len(lines) - 1, "text": "for more walks"},
         "durationInSeconds": secs,
     }
     props_path = job / "props.json"
@@ -730,15 +745,10 @@ def make(origin, dest, date=None):
     final = OUT / f"{date}-walk-{slug}.mp4"
     mix.mix(silent, voice, bed, final, ambience=amb)
 
-    o, d = geo.short(origin), geo.short(dest)
+    found = seo.walk_meta(route, lines)
     meta = {
         "kind": "walk", "file": str(final), "slug": slug, "date": date,
-        "title": f"Can You Walk from {o} to {d}? 🌍🚶",
-        "description": (f"Can you really walk from {o} to {d}? We traced the route on real "
-                        f"borders.\n\n" + " ".join(lines) + "\n\n"
-                        "#geography #maps #shorts #travel #didyouknow"),
-        "tags": ["geography", "maps", "walk", o, d, "geography facts", "map animation",
-                 "can you walk", "shorts"],
+        "title": found["title"], "description": found["description"], "tags": found["tags"],
         "facts": {"walkable": route["walkable"], "km1": round(route["km1"]),
                   "countries": route["countries1"] + route["countries2"],
                   "gap_km": round(route["gap"]["km"], 1) if route["gap"] else None,

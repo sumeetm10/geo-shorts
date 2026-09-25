@@ -2,6 +2,7 @@ import React from 'react';
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from 'remotion';
 import { Captions, EASE_INOUT, EASE_OUT, prog } from '../../lib/shorts';
 import type { VoLine } from '../../lib/shorts';
+import { EndCard } from './EndCard';
 
 // =============================================================================
 // "Does your country...?" — a question that stays on screen, and a quick zoom
@@ -39,6 +40,7 @@ export type ListProps = {
   items: ListItem[];
   vo: VoLine[];
   title: string;
+  cta?: { fromLine: number; text: string };
   durationInSeconds: number;
 };
 
@@ -81,7 +83,7 @@ const ItemView: React.FC<{ item: ListItem; t: number; zoom: number }> = ({ item,
   </AbsoluteFill>
 );
 
-const GeoList: React.FC<Partial<ListProps>> = ({ items = [], vo = [], title = '', durationInSeconds = 20 }) => {
+const GeoList: React.FC<Partial<ListProps>> = ({ items = [], vo = [], title = '', cta, durationInSeconds = 20 }) => {
   const f = useCurrentFrame();
   const END = Math.round(durationInSeconds * FPS);
   const cue = (i: number) => Math.round(((vo[i]?.start) ?? durationInSeconds) * FPS);
@@ -120,6 +122,8 @@ const GeoList: React.FC<Partial<ListProps>> = ({ items = [], vo = [], title = ''
           background: 'rgba(5,7,11,0.75)', borderRadius: 12, padding: '6px 16px',
         }}>{Math.min(count, items.length)} / {items.length}</div>
       )}
+
+      {cta && <EndCard from={cue(cta.fromLine)} text={cta.text} />}
 
       <Captions lines={vo} y={1560} accent={GOLD} maxWords={3} size={58} plate />
     </AbsoluteFill>

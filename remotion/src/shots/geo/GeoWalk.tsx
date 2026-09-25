@@ -2,6 +2,7 @@ import React from 'react';
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from 'remotion';
 import { Captions, EASE_INOUT, EASE_OUT, prog } from '../../lib/shorts';
 import type { VoLine } from '../../lib/shorts';
+import { EndCard } from './EndCard';
 
 // =============================================================================
 // "Can you walk from X to Y?" — one template for every route.
@@ -47,6 +48,7 @@ export type WalkProps = {
   vo: VoLine[];
   hook: { top: string; bottom: string };
   card?: { title: string; sub: string; fromLine: number; toLine: number };
+  cta?: { fromLine: number; text: string };
   durationInSeconds: number;
 };
 
@@ -283,7 +285,7 @@ const HookArrow: React.FC = () => (
 );
 
 const GeoWalk: React.FC<Partial<WalkProps>> = ({
-  legs = [], vo = [], hook = { top: '', bottom: '' }, card, durationInSeconds = 40,
+  legs = [], vo = [], hook = { top: '', bottom: '' }, card, cta, durationInSeconds = 40,
 }) => {
   const f = useCurrentFrame();
   const END = Math.round(durationInSeconds * FPS);
@@ -342,6 +344,8 @@ const GeoWalk: React.FC<Partial<WalkProps>> = ({
           }}>{card.sub}</div>
         </div>
       )}
+
+      {cta && <EndCard from={cue(cta.fromLine)} text={cta.text} />}
 
       <Captions lines={vo} y={1560} accent={ROUTE} maxWords={3} size={58} plate />
     </AbsoluteFill>

@@ -15,6 +15,7 @@ import geo
 import mix
 import narrate
 import routes
+import seo
 import topics
 from make_walk import render
 
@@ -71,8 +72,10 @@ def make(topic_id, date=None):
     g = routes.build()
     print(f"[topic ] {topic['title']}")
 
-    lines = [topic["hook"]] + [it["line"] for it in topic["items"]] + [topic["payoff"]]
-    kinds = ["question"] + ["list"] * len(topic["items"]) + ["reveal"]
+    closing = seo.cta("question", topic_id)
+    lines = ([topic["hook"]] + [it["line"] for it in topic["items"]] + [topic["payoff"]]
+             + [closing])
+    kinds = ["question"] + ["list"] * len(topic["items"]) + ["reveal", "cta"]
 
     items = []
     for i, it in enumerate(topic["items"]):
@@ -102,9 +105,10 @@ def make(topic_id, date=None):
         items.append({"id": f"item-{i + 1:02d}", "image": rel, "from": 0 if i == 0 else i + 1,
                       "flags": flags, "labels": labels, "pins": pins})
 
-    vo, voice = narrate.narrate(lines, kinds, job)
+    vo, voice = narrate.narrate(lines, kinds, job, style="question")
     secs = round(vo[-1]["end"] + 1.0, 2)
-    props = {"items": items, "vo": vo, "title": topic["title"], "durationInSeconds": secs}
+    props = {"items": items, "vo": vo, "title": topic["title"], "durationInSeconds": secs,
+             "cta": {"fromLine": len(lines) - 1, "text": "for more map facts"}}
     props_path = job / "props.json"
     props_path.write_text(json.dumps(props), encoding="utf-8")
 
@@ -119,12 +123,10 @@ def make(topic_id, date=None):
     final = OUT / f"{date}-question-{topic_id}.mp4"
     mix.mix(silent, voice, bed, final, bed_db=-5)
 
+    found = seo.question_meta(topic, lines)
     meta = {
         "kind": "question", "file": str(final), "slug": topic_id, "date": date,
-        "title": f"{topic['title']} 🌍",
-        "description": (f"{topic['hook']}\n\n" + "\n".join(it["line"] for it in topic["items"])
-                        + f"\n\n{topic['payoff']}\n\n#geography #maps #shorts #countries #didyouknow"),
-        "tags": ["geography", "maps", "countries", "borders", "geography facts", "shorts"],
+        "title": found["title"], "description": found["description"], "tags": found["tags"],
         "lines": lines,
     }
     (job / "meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False), encoding="utf-8")

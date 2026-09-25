@@ -32,6 +32,7 @@ DELIVERY = {
     "question": ("+3%", "+5Hz"),
     "reveal": ("-4%", "-3Hz"),
     "list": ("+6%", "+2Hz"),
+    "cta": ("+5%", "+4Hz"),
 }
 
 
@@ -53,9 +54,20 @@ async def _speak(text, kind, mp3):
             await asyncio.sleep(4 * (attempt + 1))
 
 
-def narrate(lines, kinds, out_dir):
-    """lines/kinds -> (vo list for Remotion, path to the joined voice mp3)."""
+def narrate(lines, kinds, out_dir, style=None):
+    """lines/kinds -> (vo list for Remotion, path to the joined voice mp3).
+
+    With a style ("walk" or "question") the script is first performed by the
+    acted voice (acted.py); any problem there falls back to edge-tts below.
+    """
     out_dir = Path(out_dir)
+    if style:
+        import acted
+        try:
+            return acted.perform(lines, style, out_dir)
+        except Exception as e:
+            print(f"      [voice] acted voice not used ({type(e).__name__}: {str(e)[:100]}) "
+                  f"- using edge-tts")
     takes = out_dir / "takes"
     takes.mkdir(parents=True, exist_ok=True)
     wavs, vo, t = [], [], 0.0
