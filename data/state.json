@@ -1,5 +1,15 @@
 {
-  "walk_next": 0,
+  "walk_next": 1,
   "question_next": 0,
-  "history": []
+  "history": [
+    {
+      "date": "2026-09-25 07:27",
+      "kind": "walk",
+      "title": "Can You Walk from India to USA? 🌍🚶",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-09-25-walk-india-to-usa.mp4",
+      "youtube_id": "Ex4m-oWXw6Y",
+      "privacy": "public"
+    }
+  ],
+  "fails": {}
 }
