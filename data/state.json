@@ -1,5 +1,5 @@
 {
-  "walk_next": 1,
+  "walk_next": 2,
   "question_next": 1,
   "history": [
     {
@@ -24,9 +24,16 @@
       "title": "Can You Walk from India to Portugal? 🌍🚶",
       "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-09-26-walk-india-to-portugal.mp4",
       "error": "upload: ResumableUploadError: <HttpError 400 when requesting None returned \"The request metadata specifies an invalid video description.\". Details: \"[{'message': 'The request metadata specif"
+    },
+    {
+      "date": "2026-09-26 10:27",
+      "kind": "walk",
+      "title": "Can You Walk from India to Portugal? 🌍🚶",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-09-26-walk-india-to-portugal.mp4",
+      "error": "upload: ResumableUploadError: <HttpError 400 when requesting None returned \"The request metadata specifies an invalid video description.\". Details: \"[{'message': 'The request metadata specif"
     }
   ],
   "fails": {
-    "walk:1": 1
+    "walk:1": 2
   }
 }
