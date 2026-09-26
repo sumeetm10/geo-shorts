@@ -1,5 +1,5 @@
 {
-  "walk_next": 1,
+  "walk_next": 2,
   "question_next": 1,
   "history": [
     {
@@ -38,6 +38,14 @@
       "title": "Can You Walk from Pakistan to the UK? 🌍🚶",
       "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-09-26-walk-pakistan-to-uk.mp4",
       "error": "upload: ResumableUploadError: <HttpError 400 when requesting None returned \"The request metadata specifies an invalid video description.\". Details: \"[{'message': 'The request metadata specif"
+    },
+    {
+      "date": "2026-09-26 14:14",
+      "kind": "walk",
+      "title": "Can You Walk from India to Portugal? 🌍🚶",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-09-26-walk-india-to-portugal.mp4",
+      "youtube_id": "F_s0at6kGho",
+      "privacy": "public"
     }
   ],
   "fails": {}
