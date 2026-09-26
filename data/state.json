@@ -1,6 +1,6 @@
 {
-  "walk_next": 2,
-  "question_next": 2,
+  "walk_next": 3,
+  "question_next": 3,
   "history": [
     {
       "date": "2026-09-25 07:27",
@@ -54,6 +54,26 @@
       "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-09-26-question-inside-another.mp4",
       "youtube_id": "KnRZhmV2q9s",
       "privacy": "public"
+    },
+    {
+      "date": "2026-09-26 21:17",
+      "kind": "walk",
+      "title": "Can You Walk from Pakistan to the UK? 🌍🚶",
+      "for_day": "2026-09-27",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-09-26-walk-pakistan-to-uk.mp4",
+      "youtube_id": "e1cjHjVtrZU",
+      "privacy": "public",
+      "publish_at": "2026-09-27 05:15 UTC"
+    },
+    {
+      "date": "2026-09-26 21:23",
+      "kind": "question",
+      "title": "Which Country Has the MOST Neighbours? 🌍",
+      "for_day": "2026-09-27",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-09-26-question-most-neighbours.mp4",
+      "youtube_id": "A6XwGtP0mQQ",
+      "privacy": "public",
+      "publish_at": "2026-09-27 13:15 UTC"
     }
   ],
   "fails": {}
