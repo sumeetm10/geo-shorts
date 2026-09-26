@@ -1,5 +1,5 @@
 {
-  "walk_next": 2,
+  "walk_next": 1,
   "question_next": 1,
   "history": [
     {
@@ -40,8 +40,5 @@
       "error": "upload: ResumableUploadError: <HttpError 400 when requesting None returned \"The request metadata specifies an invalid video description.\". Details: \"[{'message': 'The request metadata specif"
     }
   ],
-  "fails": {
-    "walk:1": 2,
-    "walk:2": 1
-  }
+  "fails": {}
 }

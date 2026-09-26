@@ -74,7 +74,7 @@ def walk_meta(route, lines):
     title = f"Can You Walk from {o} to {_the(said) if said in ('UK', 'USA') else said}? {GLOBE}{WALKER}"
 
     countries = route["countries1"] + route["countries2"]
-    path = " > ".join(dict.fromkeys(geo.short(c) for c in countries))
+    path = " → ".join(dict.fromkeys(geo.short(c) for c in countries))   # YouTube refuses < and >
     km = int(route["km1"] // 100 * 100) if route["km1"] < 10000 else int(route["km1"] // 1000 * 1000)
     if route["walkable"]:
         fact = (f"Yes: at least {km:,} km on foot, through {len(route['countries1'])} countries. "

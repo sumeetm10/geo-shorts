@@ -120,7 +120,14 @@ def _clamp_tags(tags, budget=460):
     return out
 
 
+def _clean(text):
+    """YouTube rejects a title or description containing < or > (HTTP 400,
+    'invalid video description') - a route line 'India > China' cost a day."""
+    return str(text).replace("<", "").replace(">", "→")
+
+
 def upload(path, meta, privacy="public"):
+    meta = dict(meta, title=_clean(meta["title"]), description=_clean(meta["description"]))
     who = assert_correct_channel()
     print(f"[upload] target channel: {who['title']} ({who['handle']})")
     yt = build("youtube", "v3", credentials=_credentials())
