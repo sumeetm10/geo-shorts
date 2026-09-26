@@ -126,7 +126,10 @@ def _clean(text):
     return str(text).replace("<", "").replace(">", "→")
 
 
-def upload(path, meta, privacy="public"):
+def upload(path, meta, privacy="public", publish_at=None):
+    """publish_at (aware UTC datetime): upload now as private and let YouTube
+    make it public at exactly that minute. GitHub's timer ran 4.5 hours late
+    on 2026-09-26; YouTube's does not."""
     meta = dict(meta, title=_clean(meta["title"]), description=_clean(meta["description"]))
     who = assert_correct_channel()
     print(f"[upload] target channel: {who['title']} ({who['handle']})")
@@ -142,6 +145,12 @@ def upload(path, meta, privacy="public"):
         },
         "status": {"privacyStatus": privacy, "selfDeclaredMadeForKids": False},
     }
+    if publish_at is not None:
+        import datetime as _dt
+        if publish_at > _dt.datetime.now(_dt.timezone.utc) + _dt.timedelta(minutes=5):
+            body["status"].update(privacyStatus="private",
+                                  publishAt=publish_at.strftime("%Y-%m-%dT%H:%M:%S.000Z"))
+            print(f"[upload] scheduled for {publish_at:%Y-%m-%d %H:%M} UTC")
     req = yt.videos().insert(part="snippet,status", body=body,
                              media_body=MediaFileUpload(str(path), chunksize=-1, resumable=True,
                                                         mimetype="video/mp4"))

@@ -3,6 +3,8 @@
     python run.py walk          build (and post, once the channel exists) the next route
     python run.py question      same, for the next "your country" question
     python run.py status        what has been made, what is next
+    python run.py nightly       build BOTH of the coming Nepal day's videos and
+                                schedule them on YouTube for 11:00 and 19:00
     python run.py walk --test   build the next one, post nothing, move nothing on
 
 Exit codes are real, not decorative: a run that exits 0 but made nothing is how
@@ -19,7 +21,7 @@ import subprocess
 import sys
 import time
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -80,7 +82,11 @@ def cleanup(days=3):
                 shutil.rmtree(d, ignore_errors=True)
 
 
-def run(kind, test=False):
+NEPAL = timedelta(hours=5, minutes=45)
+PUBLISH = {"walk": (11, 0), "question": (19, 0)}          # Nepal time, exact
+
+
+def run(kind, test=False, publish_at=None, day=None):
     import upload_geo
     if test:
         s = load_state()
@@ -105,9 +111,10 @@ def run(kind, test=False):
     # GitHub's timer is best-effort, so each slot has backup triggers; the first
     # one that runs posts, the rest find it done and stop here.
     today = datetime.now().strftime("%Y-%m-%d")
-    if any(h.get("kind") == kind and h.get("youtube_id") and h.get("date", "").startswith(today)
+    if any(h.get("kind") == kind and h.get("youtube_id") and
+           (h.get("for_day") == day if day else h.get("date", "").startswith(today))
            for h in s["history"]):
-        print(f"[skip  ] today's {kind} is already posted")
+        print(f"[skip  ] {kind} for {day or today} is already up or scheduled")
         return 0
     fails = s.setdefault("fails", {})
     key_next = "walk_next" if kind == "walk" else "question_next"
@@ -115,6 +122,8 @@ def run(kind, test=False):
     i = s[key_next] % len(pool)
     fkey = f"{kind}:{i}"
     entry = {"date": datetime.now().strftime("%Y-%m-%d %H:%M"), "kind": kind, "title": str(pool[i])}
+    if day:
+        entry["for_day"] = day
 
     def failed(why):
         """Keep the topic for the next run, unless it has now failed twice."""
@@ -144,8 +153,10 @@ def run(kind, test=False):
     if problem:
         return failed(f"check: {problem} - nothing posted")
     try:
-        entry["youtube_id"] = upload_geo.upload(meta["file"], meta, privacy())
+        entry["youtube_id"] = upload_geo.upload(meta["file"], meta, privacy(), publish_at=publish_at)
         entry["privacy"] = privacy()
+        if publish_at:
+            entry["publish_at"] = publish_at.strftime("%Y-%m-%d %H:%M UTC")
     except Exception as e:
         return failed(f"upload: {type(e).__name__}: {str(e)[:160]}")
 
@@ -155,6 +166,19 @@ def run(kind, test=False):
     save_state(s)
     cleanup()
     return 0
+
+
+def nightly():
+    """Both videos for the Nepal day now starting, scheduled to the minute."""
+    now = datetime.now(timezone.utc)
+    day = (now + NEPAL).date()
+    worst = 0
+    for kind in ("walk", "question"):
+        h, m = PUBLISH[kind]
+        at = datetime(day.year, day.month, day.day, h, m, tzinfo=timezone.utc) - NEPAL
+        print(f"=== {kind} for {day} at {h:02d}:{m:02d} Nepal")
+        worst = max(worst, run(kind, publish_at=at, day=day.isoformat()))
+    return worst
 
 
 def status():
@@ -174,6 +198,8 @@ if __name__ == "__main__":
     if what == "status":
         status()
         sys.exit(0)
+    if what == "nightly":
+        sys.exit(nightly())
     if what not in ("walk", "question"):
-        sys.exit("usage: python run.py walk|question|status [--test]")
+        sys.exit("usage: python run.py walk|question|nightly|status [--test]")
     sys.exit(run(what, test="--test" in sys.argv))

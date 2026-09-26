@@ -1,26 +1,23 @@
 name: post
 
-# Two Shorts a day. GitHub runs schedules in UTC, and only best-effort: on
-# 2026-09-25 the 05:15 run never started at all. So each slot has two backup
-# triggers, on odd minutes (the busy ones are :00 and :15). The first run that
-# gets through posts; later ones see today's video is up and stop.
-# Nepal is UTC+5:45:
-#   walk      05:23 / 05:53 / 06:37 UTC  (~11:08 Nepal)
-#   question  13:23 / 13:53 / 14:37 UTC  (~19:08 Nepal)
+# Two Shorts a day, published at EXACTLY 11:00 and 19:00 Nepal time.
+# GitHub's schedule is best-effort (one run never started; one day ran 4.5 h
+# late), so it does not decide the time: shortly after midnight Nepal time it
+# builds both of the day's videos and uploads them SCHEDULED - YouTube
+# publishes them to the minute. Two backup triggers cover a missed night; a run
+# that finds a video already scheduled for that day skips it.
+#   18:23 / 19:53 / 21:37 UTC = 00:08 / 01:38 / 03:22 Nepal
 on:
   schedule:
-    - cron: "23 5 * * *"
-    - cron: "53 5 * * *"
-    - cron: "37 6 * * *"
-    - cron: "23 13 * * *"
-    - cron: "53 13 * * *"
-    - cron: "37 14 * * *"
+    - cron: "23 18 * * *"
+    - cron: "53 19 * * *"
+    - cron: "37 21 * * *"
   workflow_dispatch:
     inputs:
       kind:
         description: "Which video"
         type: choice
-        options: [walk, question]
+        options: [nightly, walk, question]
         default: walk
       mode:
         description: "test = build only and keep the video as a download; post = build and upload; check = only confirm the YouTube login"
@@ -46,10 +43,7 @@ jobs:
         id: pick
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            case "${{ github.event.schedule }}" in
-              "23 5 * * *"|"53 5 * * *"|"37 6 * * *") kind=walk ;;
-              *) kind=question ;;
-            esac
+            kind=nightly
             mode=post
           else
             kind="${{ inputs.kind }}"; mode="${{ inputs.mode }}"
