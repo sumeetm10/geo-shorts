@@ -17,7 +17,16 @@
       "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-09-25-question-one-neighbour-1.mp4",
       "youtube_id": "U_OBMMwCtR8",
       "privacy": "public"
+    },
+    {
+      "date": "2026-09-26 09:56",
+      "kind": "walk",
+      "title": "Can You Walk from India to Portugal? 🌍🚶",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-09-26-walk-india-to-portugal.mp4",
+      "error": "upload: ResumableUploadError: <HttpError 400 when requesting None returned \"The request metadata specifies an invalid video description.\". Details: \"[{'message': 'The request metadata specif"
     }
   ],
-  "fails": {}
+  "fails": {
+    "walk:1": 1
+  }
 }
