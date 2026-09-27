@@ -39,8 +39,10 @@ STYLE = {
         "smooth, flowing delivery. Expressive but natural, never over-acted: curious "
         "and playful on the opening question, energetic while walking, a touch of awe "
         "at mountains and deserts, a hint of chill in the cold, a surprised pause when "
-        "the land runs out, gentle disappointment at the water, and warm and upbeat on "
-        "the last line. No whispering, no breathy or shaky voice, no exaggerated sighs"),
+        "the land runs out, building suspense at the coast, a clear, satisfying reveal "
+        "of the answer, and a light, knowing lift on the very short last line, as if it "
+        "leads straight back into the opening question. No whispering, no breathy or "
+        "shaky voice, no exaggerated sighs"),
     "question": (
         "a friendly, confident quiz host with clear, crisp articulation and a smooth, "
         "flowing delivery. Playful on the opening question, a small lift of surprise on "

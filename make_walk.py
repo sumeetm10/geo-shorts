@@ -369,9 +369,11 @@ def _in_boxes(lon, lat, boxes):
 def plan_legs(route):
     legs = []
     s1 = geo.unwrap(route["side1"])
-    # about 40 seconds: 2-4 legs before the water, 1-2 after it
-    k1 = min(4, max(2, round(route["km1"] / 3000))) if not route["walkable"] \
-        else min(5, max(3, round(route["km1"] / 2800)))
+    # about 25 seconds (retention test from 2026-09-28): 2-3 legs before the
+    # water and none after it. The 43 s walks held viewers ~54%; the imagined
+    # "even if you got across" legs came AFTER the answer, so people swiped.
+    k1 = (2 if route["km1"] < 6000 else 3) if not route["walkable"] \
+        else (3 if route["km1"] < 8000 else 4)
     for chunk in _split(s1, route["countries1"], k1):
         legs.append({"kind": "walk", "points": [c[:2] for c in chunk], "points_tagged": chunk,
                      "walked": list(dict.fromkeys(c[2] for c in chunk)),
@@ -381,13 +383,6 @@ def plan_legs(route):
         ab = geo.unwrap([s1[-1], a, b])
         legs.append({"kind": "gap", "points": [ab[1], ab[2]],
                      "walked": [route["gap"]["from"], route["gap"]["to"]], "regions": []})
-        s2 = geo.unwrap([ab[2]] + route["side2"][1:])
-        if len(s2) >= 2:
-            k2 = 1 if route["km2"] < 3500 else 2
-            for chunk in _split(s2, route["countries2"], k2):
-                legs.append({"kind": "after", "points": [c[:2] for c in chunk], "points_tagged": chunk,
-                             "walked": list(dict.fromkeys(c[2] for c in chunk)),
-                             "regions": _regions(chunk)})
 
     for i, leg in enumerate(legs):
         pts = leg["points"]
@@ -505,26 +500,19 @@ def _llm():
 def _beats(route, legs, built):
     """One beat per line: the facts that line has to carry, nothing else."""
     o, d = geo.short(route["origin"]), geo.short(route["dest"])
-    beats = [("hook", 0, f"HOOK: the viewer decides in one second whether to keep watching. "
-                         f"Name both {_the(route['origin'])} and {_the(route['dest'])}, at most "
-                         f"12 words, and make them NEED the answer - a dare, a surprise or a "
-                         f"bold question. Never give the answer away.")]
+    # The hook is a question the closing line leads back into ("So next time
+    # someone asks you... Can you walk from X to Y?"), so the Short loops.
+    beats = [("hook", 0, f"HOOK: START with exactly \"Can you walk from {_the(route['origin'])} to "
+                         f"{_the(route['dest'])}?\" or \"Could you really walk from "
+                         f"{_the(route['origin'])} to {_the(route['dest'])}?\", then at most 5 more "
+                         f"words that make them NEED the answer. Never give the answer away.")]
     seen = {route["origin"]}                  # you start there; you do not "enter" it
     for i, leg in enumerate(legs):
         if leg["kind"] == "gap":
             gap = route["gap"]
-            isles = [geo.short(c) for c in gap.get("islands", [])][:2]
-            water = gap["water"] or ("sea, with islands scattered across it" if isles else "open sea")
-            beats.append(("stop", i, f"The land ends at the coast of {geo.short(gap['from'])}. "
-                                    f"In front of you: the {water}."))
-            if isles:
-                detail = (f"{geo.short(gap['to'])} is about {gap['said']:,} km away across the "
-                          f"sea, past the islands of {' and '.join(isles)}. No road, no bridge.")
-            else:
-                detail = (f"{gap['said']:,} km of {gap['what']} to {geo.short(gap['to'])}. "
-                          f"No road, no bridge.")
-            note = NOTES.get(frozenset({gap["from"], gap["to"]}))
-            beats.append(("detail", i, detail + (f" {note}" if note else "")))
+            beats.append(("stop", i, f"SUSPENSE: you reach the coast of {geo.short(gap['from'])}, "
+                                    f"{geo.short(gap['to'])} is close now. Do NOT say yet that you are "
+                                    f"stuck and do NOT name the water - the answer comes next."))
             continue
         steps = _journey(leg["points_tagged"], seen, first=(i == 0))
         seen.update(leg["walked"])
@@ -543,12 +531,21 @@ def _beats(route, legs, built):
         beats.append((leg["mood"], i, ". ".join(facts) + "."))
     km = _floor_km(route["km1"])
     if route["walkable"]:
-        pay = f"Yes. At least {km:,} km on foot, through {len(route['countries1'])} countries."
-    elif route["gap"].get("islands"):
-        pay = f"No. At least {km:,} km of walking, and then the land runs out."
+        pay = f"THE ANSWER: Yes. At least {km:,} km on foot, through {len(route['countries1'])} countries."
     else:
-        pay = (f"No. At least {km:,} km of walking, stopped by "
-               f"{route['gap']['said']:,} km of water.")
+        # the water and the verdict share the LAST line: once "no" is said there
+        # is nothing left to wait for, so it comes as late as possible
+        gap = route["gap"]
+        isles = [geo.short(c) for c in gap.get("islands", [])][:2]
+        if isles:
+            water = (f"{geo.short(gap['to'])} is about {gap['said']:,} km across the sea, past "
+                     f"{' and '.join(isles)}. No road, no bridge.")
+        else:
+            water = (f"the {gap['water'] or 'open sea'}: {gap['said']:,} km of {gap['what']} "
+                     f"to {geo.short(gap['to'])}. No road, no bridge.")
+        note = NOTES.get(frozenset({gap["from"], gap["to"]}))
+        pay = (f"THE ANSWER, all in this one line: {water}{f' {note}' if note else ''} "
+               f"So: no. At least {km:,} km of walking, and you are stuck.")
     beats.append(("payoff", len(legs) - 1, pay))
     return beats
 
@@ -569,7 +566,7 @@ def _gate(lines, beats, route):
     allowed = _allowed_numbers(route)
     for i, line in enumerate(lines):
         words = line.split()
-        if not 3 <= len(words) <= 20:
+        if not 3 <= len(words) <= (26 if i == len(lines) - 1 else 20):   # the last carries the answer
             return f"line {i + 1} has {len(words)} words"
         for n in re.findall(r"\d[\d,]*", line):
             v = int(n.replace(",", ""))
@@ -589,9 +586,19 @@ def _gate(lines, beats, route):
     for line, (_, _, txt) in zip(lines, beats):
         if "HYPOTHETICAL" in txt and not re.search(r"\b(would|if|could|imagine)\b", line.lower()):
             return f"'{line}' is past the water but does not say it is imagined"
+    if not route["walkable"]:
+        stop = lines[[k for k, _, _ in beats].index("stop")].lower()
+        water = (route["gap"]["water"] or "").lower()
+        if (water and water in stop) or re.search(
+                r"\b(stuck|can't|cannot|no way|impossible|ends?|runs? out|water|sea|ocean|strait)\b", stop):
+            return f"'{stop}' gives the answer away before the last line"
+        if not re.search(r"\bno\b", lines[-1].lower()):
+            return "the last line must say no"
     if len(lines[0].split()) > 14:
         return "the hook is too long to land in the first seconds"
     hook = lines[0].lower()
+    if not hook.startswith(("can you", "could you")):
+        return "the hook must open with 'Can you' / 'Could you' - the closing line leads into it"
     for c in (route["origin"], route["dest"]):
         names = [geo.short(c).lower(), c.lower()] + ALIASES.get(c, [])
         if not any(n in hook for n in names):
@@ -609,7 +616,10 @@ Write EXACTLY {len(beats)} lines, one per beat, in order:
 {plan}
 
 RULES
-- Each line 6-15 words. Plain spoken English a 12-year-old would use.
+- Each line 6-14 words; only the LAST line may run to 24 words. Plain spoken
+  English a 12-year-old would use.
+- Keep the answer for the LAST line: no earlier line may hint whether the walk
+  works. The last line gives it straight: the fact, then yes or no.
 - Talk to the viewer as "you", present tense, as if walking it together.
 - Every line must sound different. Never start two lines the same way, never
   use the word "feeling", never copy the beat wording - turn the facts into
@@ -623,14 +633,14 @@ RULES
   the first line.
 
 HOOKS THAT WORK (line 1, for tone only - never copy them):
-"India to the USA, on foot. Sounds impossible, right?"
-"I bet you can't walk from Nigeria to the UK."
-"Could you really walk from Egypt to China? Let's find out."
+"Can you walk from India to the USA? Sounds impossible."
+"Could you really walk from Nigeria to the UK? Let's see."
+"Can you walk from Egypt to China? Watch closely."
 
 GOOD STYLE for the rest, for tone only:
 "You cross into China and climb the roof of the world."
 "Siberia. Nothing but frozen forest for weeks."
-"And then the land just ends."
+"The coast of France. The UK is almost in sight..."
 
 Return ONLY JSON: {{"lines": ["line 1", ...]}}"""
     cfg, llm = _llm()
@@ -672,12 +682,23 @@ def _template(kind, beat, route):
     """A plain, always-true line per beat for when the model cannot be trusted."""
     o, d = geo.short(route["origin"]), geo.short(route["dest"])
     if kind == "hook":
-        return f"Could you walk from {_the(route['origin'])} to {_the(route['dest'])}?"
+        return f"Can you really walk from {_the(route['origin'])} to {_the(route['dest'])}?"
     if kind == "payoff":
-        return beat.replace("The answer: ", "").strip()
+        km = _floor_km(route["km1"])
+        if route["walkable"]:
+            return f"Yes. At least {km:,} km on foot, through {len(route['countries1'])} countries."
+        gap = route["gap"]
+        to = _the(gap["to"])
+        if gap.get("islands"):
+            fact = f"{to[0].upper() + to[1:]} is {gap['said']:,} km across the sea."
+        elif gap["water"]:
+            fact = f"The {gap['water']}: {gap['said']:,} km of {gap['what']}."
+        else:
+            fact = f"{gap['said']:,} km of {gap['what']} to {to}."
+        return f"{fact} So no. At least {km:,} km of walking, and you're stuck."
     if kind == "stop":
         gap = route["gap"]
-        return f"You reach {_the(gap['from'])}, and the land runs out."
+        return f"You reach the coast of {_the(gap['from'])}, and {_the(gap['to'])} is almost in sight."
     if kind == "detail":
         gap = route["gap"]
         if gap.get("islands"):
@@ -745,10 +766,11 @@ def make(origin, dest, date=None):
     print(f"[legs  ] {len(built)}: " + ", ".join(b["mood"] for b in built))
 
     lines, beats = write_script(route, legs, built)
-    # the call to action is ours, not the model's: one fixed line per video
-    closing = seo.cta("walk_yes" if route["walkable"] else "walk_no", slug)
+    # the closing line is ours, not the model's. It leads back into the opening
+    # question so the Short replays; Subscribe is shown, not said.
+    closing = seo.cta("walk_loop", slug)
     lines = lines + [closing]
-    beats = beats + [("cta", len(legs) - 1, closing)]
+    beats = beats + [("loop", len(legs) - 1, closing)]
     for i, l in enumerate(lines, 1):
         print(f"      {i:2d}. {l}")
 
@@ -759,24 +781,24 @@ def make(origin, dest, date=None):
         first_line.setdefault(leg_i, li)
     for i, b in enumerate(built):
         b["from"] = 0 if i == 0 else first_line.get(i, 0)
-    secs = round(vo[-1]["end"] + 1.2, 2)
+    secs = round(vo[-1]["end"] + 0.45, 2)          # short tail: the replay starts at once
 
     card = None
     if not route["walkable"]:
-        gap_leg = next(i for i, l in enumerate(legs) if l["kind"] == "gap")
-        start = first_line[gap_leg]
         gp = route["gap"]
+        # the water's name appears with the answer (the last spoken line), not before
         card = {"title": (gp["water"] or "No land route").upper(),
                 "sub": f"{gp['said']:,} km of "
                        + ("sea and islands" if gp.get("islands") else gp["what"]),
-                "fromLine": start, "toLine": min(len(vo) - 1, start + 2)}
+                "fromLine": len(lines) - 2, "toLine": len(lines) - 1}
 
     props = {
         "legs": [{k: v for k, v in b.items() if k != "countries"} for b in built],
         "vo": vo,
         "hook": {"top": f"{geo.short(origin)} → {geo.short(dest)}", "bottom": "on foot?"},
         "card": card,
-        "cta": {"fromLine": len(lines) - 1, "text": "for more walks"},
+        "cta": {"fromLine": len(lines) - 2, "toLine": len(lines) - 1, "text": "", "compact": True},
+        "loop": {"fromLine": len(lines) - 1},
         "durationInSeconds": secs,
     }
     props_path = job / "props.json"
@@ -806,7 +828,7 @@ def make(origin, dest, date=None):
 
     found = seo.walk_meta(route, lines)
     meta = {
-        "kind": "walk", "file": str(final), "slug": slug, "date": date,
+        "kind": "walk", "format": "short-loop", "file": str(final), "slug": slug, "date": date,
         "title": found["title"], "description": found["description"], "tags": found["tags"],
         "facts": {"walkable": route["walkable"], "km1": round(route["km1"]),
                   "countries": route["countries1"] + route["countries2"],

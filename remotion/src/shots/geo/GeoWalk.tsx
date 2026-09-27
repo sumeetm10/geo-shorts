@@ -48,7 +48,10 @@ export type WalkProps = {
   vo: VoLine[];
   hook: { top: string; bottom: string };
   card?: { title: string; sub: string; fromLine: number; toLine: number };
-  cta?: { fromLine: number; text: string };
+  cta?: { fromLine: number; text: string; toLine?: number; compact?: boolean };
+  // the last line leads back into the question, and the picture returns to
+  // frame 0 under it, so the Short replays without a visible seam
+  loop?: { fromLine: number };
   durationInSeconds: number;
 };
 
@@ -285,7 +288,7 @@ const HookArrow: React.FC = () => (
 );
 
 const GeoWalk: React.FC<Partial<WalkProps>> = ({
-  legs = [], vo = [], hook = { top: '', bottom: '' }, card, cta, durationInSeconds = 40,
+  legs = [], vo = [], hook = { top: '', bottom: '' }, card, cta, loop, durationInSeconds = 40,
 }) => {
   const f = useCurrentFrame();
   const END = Math.round(durationInSeconds * FPS);
@@ -297,6 +300,12 @@ const GeoWalk: React.FC<Partial<WalkProps>> = ({
   const cardIn = card ? cue(card.fromLine) : END;
   const cardOut = card ? cue(card.toLine) : END;
   const cardT = card ? EASE_OUT(prog(f, cardIn, cardIn + 16)) * (1 - prog(f, cardOut - 10, cardOut)) : 0;
+
+  // back to the opening frame: leg 1 unwalked, at its frame-0 zoom, question on top
+  const loopIn = loop ? cue(loop.fromLine) : END;
+  const loopT = loop && legs.length ? EASE_INOUT(prog(f, loopIn, END - 4)) : 0;
+  const zoom0 = 1.04 + 0.1 * prog(0, starts[0] - 10, ends[0] ?? END);
+  const hookBack = loop ? prog(f, END - 22, END - 4) : 0;
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#05070b' }}>
@@ -314,12 +323,18 @@ const GeoWalk: React.FC<Partial<WalkProps>> = ({
         );
       })}
 
+      {loopT > 0.001 && (
+        <AbsoluteFill style={{ opacity: loopT }}>
+          <LegView leg={legs[0]} t={0} zoom={zoom0} />
+        </AbsoluteFill>
+      )}
+
       {/* the question sits over the opening frame — frame 0 is the thumbnail */}
       <div style={{
         position: 'absolute', top: 210, left: 60, right: 60, textAlign: 'center',
         fontFamily: 'Space Grotesk, sans-serif', fontWeight: 700, fontSize: 86, lineHeight: 1.05,
         color: '#fff', textShadow: '0 6px 30px rgba(0,0,0,0.85)',
-        opacity: 1 - prog(f, cue(1), cue(1) + 12),
+        opacity: Math.max(1 - prog(f, cue(1), cue(1) + 12), hookBack),
       }}>
         {hook.top.split('→').map((part, i, all) => (
           <React.Fragment key={i}>{part.trim()}{i < all.length - 1 && <HookArrow />}</React.Fragment>
@@ -345,7 +360,8 @@ const GeoWalk: React.FC<Partial<WalkProps>> = ({
         </div>
       )}
 
-      {cta && <EndCard from={cue(cta.fromLine)} text={cta.text} />}
+      {cta && <EndCard from={cue(cta.fromLine)} text={cta.text} compact={cta.compact}
+        to={cta.toLine !== undefined ? cue(cta.toLine) : undefined} />}
 
       <Captions lines={vo} y={1560} accent={ROUTE} maxWords={3} size={58} plate />
     </AbsoluteFill>

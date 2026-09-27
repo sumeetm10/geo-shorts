@@ -26,6 +26,10 @@ CTA = {
     "walk_yes": ["Subscribe if you'd take this walk.",
                  "Subscribe for more walks like this.",
                  "Would you do it? Subscribe for the next walk."],
+    # walks since 2026-09-28: the last line runs back into "Can you walk from...?"
+    "walk_loop": ["So next time someone asks you...",
+                  "So if anyone ever asks you...",
+                  "Now you know what to say when someone asks..."],
     "question": ["Subscribe for more map facts.",
                  "Tell me your country, and subscribe for more.",
                  "Subscribe for more strange borders."],

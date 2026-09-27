@@ -149,6 +149,8 @@ def run(kind, test=False, publish_at=None, day=None):
         return failed(f"build: {type(e).__name__}: {str(e)[:160]}")
 
     entry.update(title=meta["title"], file=meta["file"])
+    if meta.get("format"):
+        entry["format"] = meta["format"]          # which version, for the retention test
     problem = verify(meta["file"])
     if problem:
         return failed(f"check: {problem} - nothing posted")
