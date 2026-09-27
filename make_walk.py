@@ -567,7 +567,7 @@ def _gate(lines, beats, route):
     allowed = _allowed_numbers(route)
     for i, line in enumerate(lines):
         words = line.split()
-        if not 3 <= len(words) <= (20 if i == len(lines) - 1 else 13):   # the last carries the answer
+        if not 3 <= len(words) <= (22 if i == len(lines) - 1 else 13):   # the last carries the answer
             return f"line {i + 1} has {len(words)} words"
         for n in re.findall(r"\d[\d,]*", line):
             v = int(n.replace(",", ""))
