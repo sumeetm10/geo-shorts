@@ -36,7 +36,9 @@ STYLE = {
     # sighs read as over-acted ("make it a bit smooth and clear")
     "walk": (
         "a warm, confident travel storyteller with clear, crisp articulation and a "
-        "smooth, flowing delivery. Expressive but natural, never over-acted: curious "
+        "smooth, flowing delivery at a brisk, lively pace within each line (the "
+        "whole Short is about 25 seconds). Expressive but natural, never "
+        "over-acted: curious "
         "and playful on the opening question, energetic while walking, a touch of awe "
         "at mountains and deserts, a hint of chill in the cold, a surprised pause when "
         "the land runs out, building suspense at the coast, a clear, satisfying reveal "

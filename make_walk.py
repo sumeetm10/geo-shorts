@@ -539,12 +539,13 @@ def _beats(route, legs, built):
         isles = [geo.short(c) for c in gap.get("islands", [])][:2]
         if isles:
             water = (f"{geo.short(gap['to'])} is about {gap['said']:,} km across the sea, past "
-                     f"{' and '.join(isles)}. No road, no bridge.")
+                     f"{' and '.join(isles)}.")
         else:
             water = (f"the {gap['water'] or 'open sea'}: {gap['said']:,} km of {gap['what']} "
-                     f"to {geo.short(gap['to'])}. No road, no bridge.")
+                     f"to {geo.short(gap['to'])}.")
         note = NOTES.get(frozenset({gap["from"], gap["to"]}))
-        pay = (f"THE ANSWER, all in this one line: {water}{f' {note}' if note else ''} "
+        pay = (f"THE ANSWER, all in this one line of at most 18 words: {water}"
+               f"{f' (optional, in 6 words or fewer: {note})' if note else ''} "
                f"So: no. At least {km:,} km of walking, and you are stuck.")
     beats.append(("payoff", len(legs) - 1, pay))
     return beats
@@ -566,7 +567,7 @@ def _gate(lines, beats, route):
     allowed = _allowed_numbers(route)
     for i, line in enumerate(lines):
         words = line.split()
-        if not 3 <= len(words) <= (26 if i == len(lines) - 1 else 20):   # the last carries the answer
+        if not 3 <= len(words) <= (20 if i == len(lines) - 1 else 13):   # the last carries the answer
             return f"line {i + 1} has {len(words)} words"
         for n in re.findall(r"\d[\d,]*", line):
             v = int(n.replace(",", ""))
@@ -594,7 +595,7 @@ def _gate(lines, beats, route):
             return f"'{stop}' gives the answer away before the last line"
         if not re.search(r"\bno\b", lines[-1].lower()):
             return "the last line must say no"
-    if len(lines[0].split()) > 14:
+    if len(lines[0].split()) > 12:
         return "the hook is too long to land in the first seconds"
     hook = lines[0].lower()
     if not hook.startswith(("can you", "could you")):
@@ -616,8 +617,9 @@ Write EXACTLY {len(beats)} lines, one per beat, in order:
 {plan}
 
 RULES
-- Each line 6-14 words; only the LAST line may run to 24 words. Plain spoken
-  English a 12-year-old would use.
+- Each line 5-10 words; only the LAST line may run to 18 words. The whole
+  Short is about 25 seconds - short lines. Plain spoken English a 12-year-old
+  would use.
 - Keep the answer for the LAST line: no earlier line may hint whether the walk
   works. The last line gives it straight: the fact, then yes or no.
 - Talk to the viewer as "you", present tense, as if walking it together.
