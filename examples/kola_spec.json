@@ -1,0 +1,61 @@
+{
+ "hook": "Could you actually reach the deepest hole on Earth?",
+ "hook_top": "The deepest hole on Earth",
+ "hook_bottom": "could you get there?",
+ "title": "How Do You Get to the Deepest Hole on Earth?",
+ "column": {
+  "medium": "rock",
+  "vehicle": "drill",
+  "axis": "depth"
+ },
+ "beats": [
+  {
+   "line": "Fly to Murmansk, far in the Russian Arctic.",
+   "scene": "map",
+   "from": "Moscow",
+   "to": "Murmansk",
+   "mode": "plane",
+   "label": "MURMANSK"
+  },
+  {
+   "line": "Then drive to the Kola Peninsula, near Norway.",
+   "scene": "map",
+   "from": "Murmansk",
+   "to": "TARGET",
+   "mode": "car",
+   "label": "KOLA BOREHOLE"
+  },
+  {
+   "line": "At 11,882 metres, the drill hit 180 degrees.",
+   "scene": "column",
+   "value": 11882,
+   "marker": "180 °C · 11,882 m",
+   "quote": "stopped due to higher-than-expected temperatures of 180 °C (356 °F) in 1992 at 11,882 metres"
+  },
+  {
+   "line": "They reached 12,262 metres, the deepest hole on Earth.",
+   "scene": "column",
+   "value": 12262,
+   "marker": "THE BOTTOM · 12,262 m",
+   "quote": "which attained maximum true vertical depth of 12,262 metres (40,230 ft) in 1989"
+  },
+  {
+   "line": "Mount Everest would fit, with 3.4 km to spare.",
+   "scene": "compare",
+   "with": "everest"
+  },
+  {
+   "line": "Down there, the rock was 180 degrees.",
+   "scene": "stat",
+   "icon": "thermo",
+   "value": 180,
+   "unit": "°C",
+   "label": "AT THE BOTTOM",
+   "theme": "hot",
+   "quote": "stopped due to higher-than-expected temperatures of 180 °C (356 °F) in 1992"
+  }
+ ],
+ "facts": [
+  "The hole is 12,262 m deep."
+ ]
+}

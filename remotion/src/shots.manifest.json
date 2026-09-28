@@ -1,5 +1,21 @@
 [
  {
+  "id": "Explore",
+  "durationInSeconds": 35,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "GeoDive",
+  "durationInSeconds": 30,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
   "id": "GeoList",
   "durationInSeconds": 20,
   "fps": 30,

@@ -1,6 +1,7 @@
 name: post
 
-# Two Shorts a day, published at EXACTLY 11:00 and 19:00 Nepal time.
+# Two Shorts a day, published at EXACTLY 11:00 (explore, or a walk if none passes
+# the fact gate) and 19:00 (question) Nepal time.
 # GitHub's schedule is best-effort (one run never started; one day ran 4.5 h
 # late), so it does not decide the time: shortly after midnight Nepal time it
 # builds both of the day's videos and uploads them SCHEDULED - YouTube
@@ -17,7 +18,7 @@ on:
       kind:
         description: "Which video"
         type: choice
-        options: [nightly, walk, question]
+        options: [nightly, explore, walk, question, research, explore-example]
         default: walk
       mode:
         description: "test = build only and keep the video as a download; post = build and upload; check = only confirm the YouTube login"
@@ -35,7 +36,7 @@ concurrency:
 jobs:
   post:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 75      # an explore that fails still leaves time for the walk
     steps:
       - uses: actions/checkout@v4
 
@@ -94,6 +95,9 @@ jobs:
         run: |
           if [ "${{ steps.pick.outputs.mode }}" = "check" ]; then
             python upload_geo.py --whoami
+          elif [ "${{ steps.pick.outputs.kind }}" = "explore-example" ]; then
+            # render check with no Gemini calls: a saved script (still fact-gated), free voice
+            python make_explore.py "Kola Superdeep Borehole" depth --free --spec examples/kola_spec.json
           elif [ "${{ steps.pick.outputs.mode }}" = "test" ]; then
             python run.py "${{ steps.pick.outputs.kind }}" --test
           else

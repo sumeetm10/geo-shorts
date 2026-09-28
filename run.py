@@ -1,11 +1,18 @@
-"""Daily run: one walk video in the morning, one question in the evening.
+"""Daily run: an "explore" video in the morning, a question in the evening.
 
-    python run.py walk          build (and post, once the channel exists) the next route
-    python run.py question      same, for the next "your country" question
+    python run.py explore       build and post the next researched topic ("How do you
+                                get to <an extreme place>?", make_explore.py)
+    python run.py walk          the older morning format, now the fallback
+    python run.py question      the next "your country" question
+    python run.py research      look for viral topics and queue them (research.py)
     python run.py status        what has been made, what is next
     python run.py nightly       build BOTH of the coming Nepal day's videos and
                                 schedule them on YouTube for 11:00 and 19:00
-    python run.py walk --test   build the next one, post nothing, move nothing on
+    python run.py explore --test   build the next one, post nothing, move nothing on
+
+The morning slot tries an explore video first; if there is no topic, or the
+topic's script cannot pass the fact gate, it posts a walk instead, so the slot
+is never empty. Research runs by itself when the queue runs low.
 
 Exit codes are real, not decorative: a run that exits 0 but made nothing is how
 another channel lost four days unnoticed. 0 = made and posted, 2 = held
@@ -83,21 +90,49 @@ def cleanup(days=3):
 
 
 NEPAL = timedelta(hours=5, minutes=45)
-PUBLISH = {"walk": (11, 0), "question": (19, 0)}          # Nepal time, exact
+PUBLISH = {"morning": (11, 0), "evening": (19, 0)}        # Nepal time, exact
+SLOT = {"explore": "morning", "walk": "morning", "question": "evening"}
+NOTHING = 4                                                # exit code: no topic to make
+
+
+def explore_state(s):
+    return s.setdefault("explore", {"queue": [], "done": [], "failed": []})
+
+
+def build(kind, s):
+    """Build the next video of this kind; (meta, fail_key) or raise."""
+    if kind == "explore":
+        t = explore_state(s)["queue"][0]
+        import make_explore
+        return make_explore.make(t["wikipedia"], t["kind"], t.get("angle", "")), f"explore:{t['wikipedia']}"
+    pool = topics.WALKS if kind == "walk" else topics.QUESTIONS
+    i = s["walk_next" if kind == "walk" else "question_next"] % len(pool)
+    if kind == "walk":
+        import make_walk
+        return make_walk.make(*pool[i]), f"walk:{i}"
+    import make_question
+    return make_question.make(pool[i]["id"]), f"question:{i}"
+
+
+def advance(kind, s, gave_up=False):
+    """Move this kind's queue on: after a post, or after a topic failed twice."""
+    if kind == "explore":
+        ex = explore_state(s)
+        t = ex["queue"].pop(0)
+        (ex["failed"] if gave_up else ex["done"]).append(t["wikipedia"])
+    else:
+        key = "walk_next" if kind == "walk" else "question_next"
+        s[key] = s[key] + 1
 
 
 def run(kind, test=False, publish_at=None, day=None):
     import upload_geo
     if test:
         s = load_state()
-        pool = topics.WALKS if kind == "walk" else topics.QUESTIONS
-        i = s["walk_next" if kind == "walk" else "question_next"] % len(pool)
-        if kind == "walk":
-            import make_walk
-            meta = make_walk.make(*pool[i])
-        else:
-            import make_question
-            meta = make_question.make(pool[i]["id"])
+        if kind == "explore" and not explore_state(s)["queue"]:
+            print("[test  ] the explore queue is empty - run: python run.py research")
+            return NOTHING
+        meta, _ = build(kind, s)
         problem = verify(meta["file"])
         print(f"[test  ] {meta['title']} -> {meta['file']}: {problem or 'looks fine'}")
         return 3 if problem else 0
@@ -111,17 +146,22 @@ def run(kind, test=False, publish_at=None, day=None):
     # GitHub's timer is best-effort, so each slot has backup triggers; the first
     # one that runs posts, the rest find it done and stop here.
     today = datetime.now().strftime("%Y-%m-%d")
-    if any(h.get("kind") == kind and h.get("youtube_id") and
+    same_slot = [k for k, v in SLOT.items() if v == SLOT[kind]]
+    if any(h.get("kind") in same_slot and h.get("youtube_id") and
            (h.get("for_day") == day if day else h.get("date", "").startswith(today))
            for h in s["history"]):
-        print(f"[skip  ] {kind} for {day or today} is already up or scheduled")
+        print(f"[skip  ] the {SLOT[kind]} video for {day or today} is already up or scheduled")
         return 0
+    if kind == "explore" and not explore_state(s)["queue"]:
+        print("[none  ] no explore topic queued")
+        return NOTHING
     fails = s.setdefault("fails", {})
-    key_next = "walk_next" if kind == "walk" else "question_next"
-    pool = topics.WALKS if kind == "walk" else topics.QUESTIONS
-    i = s[key_next] % len(pool)
-    fkey = f"{kind}:{i}"
-    entry = {"date": datetime.now().strftime("%Y-%m-%d %H:%M"), "kind": kind, "title": str(pool[i])}
+    if kind == "explore":
+        fkey = f"explore:{explore_state(s)['queue'][0]['wikipedia']}"
+    else:
+        pool = topics.WALKS if kind == "walk" else topics.QUESTIONS
+        fkey = f"{kind}:{s['walk_next' if kind == 'walk' else 'question_next'] % len(pool)}"
+    entry = {"date": datetime.now().strftime("%Y-%m-%d %H:%M"), "kind": kind, "title": fkey}
     if day:
         entry["for_day"] = day
 
@@ -131,19 +171,14 @@ def run(kind, test=False, publish_at=None, day=None):
         entry["error"] = why
         s["history"].append(entry)
         if fails[fkey] >= 2:
-            s[key_next] = i + 1
-            print(f"[skip  ] {kind} topic {i} failed twice - moving on")
+            advance(kind, s, gave_up=True)
+            print(f"[skip  ] {fkey} failed twice - moving on")
         save_state(s)
         print(f"[FAIL  ] {why}")
         return 3
 
     try:
-        if kind == "walk":
-            import make_walk
-            meta = make_walk.make(*pool[i])
-        else:
-            import make_question
-            meta = make_question.make(pool[i]["id"])
+        meta, _ = build(kind, s)
     except (Exception, SystemExit) as e:
         traceback.print_exc()
         return failed(f"build: {type(e).__name__}: {str(e)[:160]}")
@@ -163,11 +198,26 @@ def run(kind, test=False, publish_at=None, day=None):
         return failed(f"upload: {type(e).__name__}: {str(e)[:160]}")
 
     fails.pop(fkey, None)
-    s[key_next] = i + 1
+    advance(kind, s)
     s["history"].append(entry)
     save_state(s)
     cleanup()
     return 0
+
+
+def maybe_research():
+    """Top the explore queue up when it runs low, or once a week."""
+    ex = explore_state(load_state())
+    last = ex.get("last_research", "2000-01-01")
+    stale = (datetime.now() - datetime.strptime(last, "%Y-%m-%d")).days >= 7
+    if len(ex["queue"]) >= 3 and not stale:
+        return
+    try:
+        import research
+        research.research()
+    except Exception as e:                        # research must never cost a post
+        traceback.print_exc()
+        print(f"[warn  ] research failed: {type(e).__name__}: {str(e)[:120]}")
 
 
 def nightly():
@@ -175,11 +225,18 @@ def nightly():
     now = datetime.now(timezone.utc)
     day = (now + NEPAL).date()
     worst = 0
-    for kind in ("walk", "question"):
-        h, m = PUBLISH[kind]
+    for slot, kinds in (("morning", ("explore", "walk")), ("evening", ("question",))):
+        h, m = PUBLISH[slot]
         at = datetime(day.year, day.month, day.day, h, m, tzinfo=timezone.utc) - NEPAL
-        print(f"=== {kind} for {day} at {h:02d}:{m:02d} Nepal")
-        worst = max(worst, run(kind, publish_at=at, day=day.isoformat()))
+        if slot == "morning":
+            maybe_research()
+        rc = 0
+        for kind in kinds:                        # the first that works fills the slot
+            print(f"=== {slot}: {kind} for {day} at {h:02d}:{m:02d} Nepal")
+            rc = run(kind, publish_at=at, day=day.isoformat())
+            if rc in (0, 2):
+                break
+        worst = max(worst, rc)
     return worst
 
 
@@ -189,6 +246,9 @@ def status():
     q = topics.QUESTIONS[s["question_next"] % len(topics.QUESTIONS)]
     print(f"next walk     : {w[0]} -> {w[1]}")
     print(f"next question : {q['title']}")
+    ex = explore_state(s)
+    print(f"explore queue : {', '.join(t['wikipedia'] for t in ex['queue']) or '(empty)'}")
+    print(f"explore done  : {', '.join(ex['done']) or '-'}")
     print(f"made so far   : {len(s['history'])}")
     for h in s["history"][-6:]:
         tag = h.get("youtube_id") or ("HELD" if h.get("uploaded") is False else h.get("error", "?"))
@@ -202,6 +262,10 @@ if __name__ == "__main__":
         sys.exit(0)
     if what == "nightly":
         sys.exit(nightly())
-    if what not in ("walk", "question"):
-        sys.exit("usage: python run.py walk|question|nightly|status [--test]")
+    if what == "research":
+        import research
+        research.research(dry="--dry" in sys.argv or "--test" in sys.argv)
+        sys.exit(0)
+    if what not in ("explore", "walk", "question"):
+        sys.exit("usage: python run.py explore|walk|question|research|nightly|status [--test]")
     sys.exit(run(what, test="--test" in sys.argv))

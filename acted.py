@@ -57,6 +57,12 @@ STYLE = {
         "sub sinks into the dark, an amazed reveal at the bottom and at Everest, "
         "serious on the pressure, and a warm, inviting lift on the last line. Natural, "
         "never over-acted, no whispering or breathy voice"),
+    "explore": (
+        "a gripping documentary explorer with clear, crisp articulation and a smooth, "
+        "flowing delivery at a brisk pace: intrigued on the opening question, "
+        "adventurous on the journey, rising tension and quiet awe at the extreme, an "
+        "amazed reveal on the most surprising fact, and a warm, inviting lift on the "
+        "last line. Natural, never over-acted, no whispering or breathy voice"),
     "question": (
         "a friendly, confident quiz host with clear, crisp articulation and a smooth, "
         "flowing delivery. Playful on the opening question, a small lift of surprise on "
