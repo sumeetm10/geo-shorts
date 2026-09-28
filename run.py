@@ -256,6 +256,8 @@ def status():
 
 
 if __name__ == "__main__":
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")   # titles carry emoji
     what = sys.argv[1] if len(sys.argv) > 1 else "status"
     if what == "status":
         status()
