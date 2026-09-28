@@ -30,6 +30,11 @@ TEMPO = 1.0                      # no time-stretch: it blurred the voice a littl
 # Line-break finder weights (see _cuts). Tuned offline on a real take plus
 # synthetic worst cases: pause length leads, the rest breaks ties.
 POS_W, GAP_W, FIT_W = 1.0, 2.5, 0.15
+# A line's own pace must be believable: on 2026-09-28 the breaks sat at real
+# pauses, yet one line came out 11.6 syllables a second (the performer paused as
+# long inside lines as between them) and the captions ran ahead of the voice.
+# Such a take falls back to edge-tts rather than going out out of sync.
+RATE_OK = (1.3, 9.0)             # syllables per second a real line can have
 
 STYLE = {
     # expressive but smooth and clear: the first version's shivers and heavy
@@ -45,6 +50,13 @@ STYLE = {
         "of the answer, and a light, knowing lift on the very short last line, as if it "
         "leads straight back into the opening question. No whispering, no breathy or "
         "shaky voice, no exaggerated sighs"),
+    "dive": (
+        "a gripping documentary explorer with clear, crisp articulation and a smooth, "
+        "flowing delivery at a brisk pace: intrigued on the opening question, "
+        "adventurous on the flight and the sail, quiet awe and rising tension as the "
+        "sub sinks into the dark, an amazed reveal at the bottom and at Everest, "
+        "serious on the pressure, and a warm, inviting lift on the last line. Natural, "
+        "never over-acted, no whispering or breathy voice"),
     "question": (
         "a friendly, confident quiz host with clear, crisp articulation and a smooth, "
         "flowing delivery. Playful on the opening question, a small lift of surprise on "
@@ -247,6 +259,11 @@ def perform(lines, style, out_dir):
         raise VoiceUnavailable(f"take does not match the script ({score:.2f})")
 
     bounds = _cuts(timing.speech_islands(raw), lines)
+    for i, ((a, b), text) in enumerate(zip(bounds, lines), 1):
+        rate = _syllables(text) / max(0.05, b - a)
+        if not RATE_OK[0] <= rate <= RATE_OK[1]:
+            raise VoiceUnavailable(f"line {i} would be {rate:.1f} syllables a second - "
+                                   f"the cut is in the wrong place")
     wavs, vo, t = [], [], 0.0
     for i, ((a, b), text) in enumerate(zip(bounds, lines), 1):
         wav = takes / f"{i:02d}.wav"

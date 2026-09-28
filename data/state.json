@@ -99,10 +99,12 @@
     {
       "date": "2026-09-28 22:32",
       "kind": "walk",
-      "title": "How Do You Get to the Deepest Point on Earth? (dive, uploaded from the PC)",
+      "title": "How Do You Get to the Deepest Point on Earth? 🌊",
       "for_day": "2026-09-29",
-      "youtube_id": "PENDING",
-      "format": "dive"
+      "youtube_id": "gWITirnDRk8",
+      "format": "dive",
+      "publish_at": "2026-09-29 05:15 UTC",
+      "privacy": "public"
     }
   ],
   "fails": {}
