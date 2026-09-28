@@ -107,5 +107,13 @@
       "privacy": "public"
     }
   ],
-  "fails": {}
+  "fails": {},
+  "explore": {
+    "queue": [],
+    "done": [
+      "Challenger Deep",
+      "Mariana Trench"
+    ],
+    "failed": []
+  }
 }
