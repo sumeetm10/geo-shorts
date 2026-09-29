@@ -1,6 +1,6 @@
 {
   "walk_next": 4,
-  "question_next": 5,
+  "question_next": 6,
   "history": [
     {
       "date": "2026-09-25 07:27",
@@ -115,18 +115,32 @@
       "youtube_id": "gEbw_LoK45s",
       "privacy": "public",
       "publish_at": "2026-09-29 13:15 UTC"
+    },
+    {
+      "date": "2026-09-29 22:22",
+      "kind": "explore",
+      "title": "How Do You Get to the Deepest Hole Ever Dug? 🌍",
+      "for_day": "2026-09-30",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-09-29-explore-kola-superdeep-borehole.mp4",
+      "format": "explore",
+      "youtube_id": "t3h9TPHkEtM",
+      "privacy": "public",
+      "publish_at": "2026-09-30 05:15 UTC"
+    },
+    {
+      "date": "2026-09-29 22:28",
+      "kind": "question",
+      "title": "City Countries: Nations That Are Just ONE City 🌍",
+      "for_day": "2026-09-30",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-09-29-question-city-countries.mp4",
+      "youtube_id": "8t-YqJo-ciQ",
+      "privacy": "public",
+      "publish_at": "2026-09-30 13:15 UTC"
     }
   ],
   "fails": {},
   "explore": {
     "queue": [
-      {
-        "wikipedia": "Kola Superdeep Borehole",
-        "kind": "depth",
-        "angle": "How do you get to the deepest hole ever dug on Earth?",
-        "evidence": "The Deepest Hole on Earth — And Why the Soviets Sealed It Shut #history",
-        "added": "2026-09-28"
-      },
       {
         "wikipedia": "Pole of inaccessibility",
         "kind": "remote",
@@ -165,7 +179,8 @@
     ],
     "done": [
       "Challenger Deep",
-      "Mariana Trench"
+      "Mariana Trench",
+      "Kola Superdeep Borehole"
     ],
     "failed": [],
     "seed_at": 6,
