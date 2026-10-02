@@ -4,7 +4,8 @@ import Shot0, { compositionConfig as cfg0 } from './shots/geo/Explore';
 import Shot1, { compositionConfig as cfg1 } from './shots/geo/GeoDive';
 import Shot2, { compositionConfig as cfg2 } from './shots/geo/GeoList';
 import Shot3, { compositionConfig as cfg3 } from './shots/geo/GeoWalk';
-import Shot4, { compositionConfig as cfg4 } from './shots/short-walk/ShortWalkIndiaUsa';
+import Shot4, { compositionConfig as cfg4 } from './shots/geo/Globe';
+import Shot5, { compositionConfig as cfg5 } from './shots/short-walk/ShortWalkIndiaUsa';
 
 export const shots: { Comp: React.FC; config: any }[] = [
   { Comp: Shot0 as React.FC, config: cfg0 },
@@ -12,4 +13,5 @@ export const shots: { Comp: React.FC; config: any }[] = [
   { Comp: Shot2 as React.FC, config: cfg2 },
   { Comp: Shot3 as React.FC, config: cfg3 },
   { Comp: Shot4 as React.FC, config: cfg4 },
+  { Comp: Shot5 as React.FC, config: cfg5 },
 ];

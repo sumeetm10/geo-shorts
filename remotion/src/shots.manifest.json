@@ -32,6 +32,14 @@
   "transparent": false
  },
  {
+  "id": "Globe",
+  "durationInSeconds": 10,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
   "id": "ShortWalkIndiaUsa",
   "durationInSeconds": 43,
   "fps": 30,
