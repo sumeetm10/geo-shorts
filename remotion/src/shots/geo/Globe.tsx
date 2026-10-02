@@ -63,7 +63,20 @@ const L = (() => { const v = [-0.55, 0.45, 0.7]; const n = Math.hypot(...v); ret
 const Hv = (() => { const v = [L[0], L[1], L[2] + 1]; const n = Math.hypot(...v); return v.map((x) => x / n); })();
 const RAD = Math.PI / 180;
 
-function drawGlobe(ctx: CanvasRenderingContext2D, tex: Tex, cx: number, cy: number, R: number, lon0: number, lat0: number) {
+// Optional overlays for the "Earth split in 4" video: the Equator and the
+// Greenwich meridian as glowing lines, each quarter tinted, one picked out.
+export type GlobeOverlay = { lines?: number; tint?: number; focus?: 'NE' | 'NW' | 'SE' | 'SW' | null; focusAmt?: number };
+const ZONE_RGB: Record<string, [number, number, number]> = {
+  NE: [255, 196, 60], NW: [255, 92, 92], SE: [60, 220, 190], SW: [176, 124, 255],
+};
+
+function drawGlobe(ctx: CanvasRenderingContext2D, tex: Tex, cx: number, cy: number, R: number, lon0: number, lat0: number,
+  ov: GlobeOverlay = {}) {
+  const lines = ov.lines ?? 0;
+  const tint = ov.tint ?? 0;
+  const focus = ov.focus ?? null;
+  const focusAmt = ov.focusAmt ?? 0;
+  const lineW = 2.6 / R;                         // ~5 px wide on screen, in radians
   const x0 = Math.max(0, Math.floor(cx - R));
   const x1 = Math.min(W, Math.ceil(cx + R));
   const y0 = Math.max(0, Math.floor(cy - R));
@@ -104,6 +117,30 @@ function drawGlobe(ctx: CanvasRenderingContext2D, tex: Tex, cx: number, cy: numb
         r += spec * 0.9; g += spec * 0.95; b += spec;
       }
       // blue haze towards the edge (thicker air at the limb)
+      if (tint > 0 || lines > 0) {
+        let ln = lon % (2 * Math.PI);
+        if (ln > Math.PI) ln -= 2 * Math.PI;
+        if (ln < -Math.PI) ln += 2 * Math.PI;
+        const zone = (lat >= 0 ? 'N' : 'S') + (ln >= 0 ? 'E' : 'W');
+        if (tint > 0) {
+          const [zr, zg, zb] = ZONE_RGB[zone];
+          const a = 0.42 * tint;
+          r = r * (1 - a) + zr * a * shade; g = g * (1 - a) + zg * a * shade; b = b * (1 - a) + zb * a * shade;
+          if (focus && zone !== focus) {
+            const d = 1 - 0.62 * focusAmt;
+            r *= d; g *= d; b *= d;
+          }
+        }
+        if (lines > 0) {
+          // distance to the Equator, and to Greenwich, measured along the surface
+          const dEq = Math.abs(lat);
+          const dGr = Math.abs(Math.sin(ln)) * Math.cos(lat) < Math.sin(lineW) && Math.abs(ln) < Math.PI / 2 ? 0 : 1;
+          if (dEq < lineW || dGr === 0) {
+            const a = lines;
+            r = r * (1 - a) + 255 * a; g = g * (1 - a) + 225 * a; b = b * (1 - a) + 77 * a;
+          }
+        }
+      }
       const limb = Math.pow(1 - z, 2.2) * (0.35 + 0.65 * day);
       r = r * (1 - limb) + 110 * limb;
       g = g * (1 - limb) + 170 * limb;
@@ -133,8 +170,8 @@ export const SpaceBg: React.FC<{ starsO?: number }> = ({ starsO = 1 }) => {
 
 // the lit globe and its atmosphere, centred at (cx, cy) with radius R
 export const GlobeView: React.FC<{
-  texture?: string; cx: number; cy: number; R: number; lon0: number; lat0: number; id?: string;
-}> = ({ texture = 'globe/earth4k.jpg', cx, cy, R, lon0, lat0, id = 'g' }) => {
+  texture?: string; cx: number; cy: number; R: number; lon0: number; lat0: number; id?: string; overlay?: GlobeOverlay;
+}> = ({ texture = 'globe/earth4k.jpg', cx, cy, R, lon0, lat0, id = 'g', overlay }) => {
   const tex = useTexture(texture);
   const ref = useRef<HTMLCanvasElement>(null);
   useLayoutEffect(() => {
@@ -142,8 +179,8 @@ export const GlobeView: React.FC<{
     if (!c || !tex) return;
     const ctx = c.getContext('2d')!;
     ctx.clearRect(0, 0, W, H);
-    drawGlobe(ctx, tex, cx, cy, R, lon0, lat0);
-  }, [tex, cx, cy, R, lon0, lat0]);
+    drawGlobe(ctx, tex, cx, cy, R, lon0, lat0, overlay);
+  }, [tex, cx, cy, R, lon0, lat0, overlay?.lines, overlay?.tint, overlay?.focus, overlay?.focusAmt]);
   const glow = R * 1.12;
   return (
     <AbsoluteFill>
