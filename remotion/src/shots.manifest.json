@@ -1,5 +1,13 @@
 [
  {
+  "id": "BlackHole",
+  "durationInSeconds": 34,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
   "id": "Explore",
   "durationInSeconds": 35,
   "fps": 30,
@@ -26,6 +34,14 @@
  {
   "id": "GeoWalk",
   "durationInSeconds": 40,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "Globe",
+  "durationInSeconds": 10,
   "fps": 30,
   "width": 1080,
   "height": 1920,

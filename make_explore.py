@@ -320,6 +320,7 @@ def build_props(spec, page, target, vo, slug):
     wide = geo.Window(lon - dlat * geo.ASPECT / 2, lon + dlat * geo.ASPECT / 2, clat - dlat / 2, clat + dlat / 2)
     props = {"vo": vo, "hook": {"top": spec["hook_top"], "bottom": spec["hook_bottom"]},
              "wide": {"image": _crop(wide, f"{rel}/wide.jpg"), "target": _pt(wide, lon, lat)},
+             "globe": {"lon": lon, "lat": lat, "texture": "globe/earth4k.jpg"},     # 3D intro
              "scenes": [], "durationInSeconds": round(vo[-1]["end"] + 0.45, 2)}
     beats = spec["beats"]
     col = spec.get("column") or {}

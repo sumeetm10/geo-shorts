@@ -8,6 +8,7 @@ import {
   ShipTop, Sub, Tower, W, Wreck, fmt, lerp, ridge, rng,
 } from './parts';
 import type { Pt } from './parts';
+import { GlobeView, SpaceBg, introCamera } from './Globe';
 
 // =============================================================================
 // "Explore" Shorts: "How do you get to <an extreme place>?" built automatically.
@@ -51,6 +52,9 @@ export type ExploreProps = {
   vo: VoLine[];
   hook: { top: string; bottom: string };
   wide: { image: string; target: Pt };
+  // when given, the hook is a spinning 3D Earth diving to the place (and the
+  // last line returns to it); the flat wide map is the fallback
+  globe?: { lon: number; lat: number; texture?: string };
   scenes: Scene[];
   durationInSeconds: number;
 };
@@ -383,7 +387,7 @@ const CardView: React.FC<{ s: CardScene; c: Clock }> = ({ s, c }) => {
 
 // ----------------------------------------------------------------- the shot
 const Explore: React.FC<Partial<ExploreProps>> = ({
-  vo = [], hook = { top: '', bottom: '' }, wide, scenes = [], durationInSeconds = 35,
+  vo = [], hook = { top: '', bottom: '' }, wide, globe, scenes = [], durationInSeconds = 35,
 }) => {
   const f = useCurrentFrame();
   if (!wide) return <AbsoluteFill style={{ background: '#05070b' }} />;
@@ -397,6 +401,16 @@ const Explore: React.FC<Partial<ExploreProps>> = ({
   const loopT = EASE_INOUT(prog(f, cue(last), END - 4));
   const hookO = Math.max(1 - prog(f, cue(1) - 8, cue(1) + 4), prog(f, END - 22, END - 4));
 
+  const globeView = (t: number, id: string) => {
+    const cam = introCamera(t, globe!.lon, globe!.lat);
+    return (
+      <AbsoluteFill>
+        <SpaceBg starsO={1 - EASE_OUT(cam.dive)} />
+        <GlobeView texture={globe!.texture} id={id} cx={cam.cx} cy={cam.cy} R={cam.R} lon0={cam.lon0} lat0={cam.lat0} />
+      </AbsoluteFill>
+    );
+  };
+
   const wideView = (z: number) => (
     <AbsoluteFill style={{ transform: `scale(${z})`, transformOrigin: `${wide.target.x}px ${wide.target.y}px` }}>
       <Img src={staticFile(wide.image)} style={{ width: W, height: H, objectFit: 'cover' }} />
@@ -406,7 +420,12 @@ const Explore: React.FC<Partial<ExploreProps>> = ({
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#05070b', overflow: 'hidden' }}>
-      {wideO > 0.001 && <AbsoluteFill style={{ opacity: wideO }}>{wideView(1.04 + 0.05 * prog(f, 0, firstStart))}</AbsoluteFill>}
+      {wideO > 0.001 && (
+        <AbsoluteFill style={{ opacity: wideO }}>
+          {globe ? globeView(Math.min(1, f / Math.max(1, firstStart - 4)), 'intro')
+            : wideView(1.04 + 0.05 * prog(f, 0, firstStart))}
+        </AbsoluteFill>
+      )}
 
       {scenes.map((s, i) => {
         const start = cue(s.from);
@@ -424,7 +443,9 @@ const Explore: React.FC<Partial<ExploreProps>> = ({
         );
       })}
 
-      {loopT > 0.001 && <AbsoluteFill style={{ opacity: loopT }}>{wideView(1.04)}</AbsoluteFill>}
+      {loopT > 0.001 && (
+        <AbsoluteFill style={{ opacity: loopT }}>{globe ? globeView(0, 'loop') : wideView(1.04)}</AbsoluteFill>
+      )}
 
       <AbsoluteFill style={{ background: 'radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 58%, rgba(0,0,0,0.42) 100%)' }} />
 
