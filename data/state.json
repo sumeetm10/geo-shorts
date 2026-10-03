@@ -1,6 +1,6 @@
 {
-  "walk_next": 7,
-  "question_next": 9,
+  "walk_next": 8,
+  "question_next": 10,
   "history": [
     {
       "date": "2026-09-25 07:27",
@@ -220,21 +220,42 @@
       "youtube_id": "H5ot9VORpaA",
       "privacy": "public",
       "publish_at": "2026-10-03 13:15 UTC"
+    },
+    {
+      "date": "2026-10-03 21:25",
+      "kind": "explore",
+      "title": "explore:Oymyakon",
+      "for_day": "2026-10-04",
+      "error": "build: RuntimeError: no script passed the fact gate (not supported: 'July 2022 recorded a record high temperature of 34.6 °C.' (The line states the record high was in July 2022, whe"
+    },
+    {
+      "date": "2026-10-03 21:31",
+      "kind": "walk",
+      "title": "Can You Walk from India to Sri Lanka? 🌍🚶",
+      "for_day": "2026-10-04",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-03-walk-india-to-sri-lanka.mp4",
+      "format": "short-loop",
+      "youtube_id": "aJY2CxNiHZE",
+      "privacy": "public",
+      "publish_at": "2026-10-04 05:15 UTC"
+    },
+    {
+      "date": "2026-10-03 21:35",
+      "kind": "question",
+      "title": "Which Country Has the MOST Neighbours? 🌍",
+      "for_day": "2026-10-04",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-03-question-most-neighbours.mp4",
+      "youtube_id": "zU_a8bIXtCE",
+      "privacy": "public",
+      "publish_at": "2026-10-04 13:15 UTC"
     }
   ],
   "fails": {
     "explore:Pole of inaccessibility": 2,
-    "explore:Oymyakon": 1
+    "explore:Oymyakon": 2
   },
   "explore": {
     "queue": [
-      {
-        "wikipedia": "Oymyakon",
-        "kind": "cold",
-        "angle": "How do you get to the coldest permanently inhabited place on Earth?",
-        "evidence": "The Coldest City on Earth #didyouknow #foryou #crazy #youtube #amazing",
-        "added": "2026-09-28"
-      },
       {
         "wikipedia": "Lut Desert",
         "kind": "hot",
@@ -263,7 +284,8 @@
       "Kola Superdeep Borehole"
     ],
     "failed": [
-      "Pole of inaccessibility"
+      "Pole of inaccessibility",
+      "Oymyakon"
     ],
     "seed_at": 6,
     "last_research": "2026-09-28"
