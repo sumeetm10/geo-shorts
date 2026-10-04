@@ -183,11 +183,31 @@ export const SpaceBg: React.FC<{ starsO?: number }> = ({ starsO = 1 }) => {
   );
 };
 
+// city lights: the 3,000 biggest places in Natural Earth (media/globe/cities.json,
+// [lon, lat, weight]) - drawn on the night side when the Sun goes out
+type City = [number, number, number];
+const cityCache: { pts?: City[] } = {};
+const useCities = (want: boolean) => {
+  const [pts, setPts] = useState<City[] | null>(cityCache.pts ?? null);
+  const [handle] = useState(() => (want && !cityCache.pts ? delayRender('cities') : null));
+  useEffect(() => {
+    if (!want || cityCache.pts) return;
+    fetch(staticFile('globe/cities.json')).then((r) => r.json()).then((d: City[]) => {
+      cityCache.pts = d;
+      setPts(d);
+      if (handle !== null) continueRender(handle);
+    });
+  }, [want, handle]);
+  return pts;
+};
+
 // the lit globe and its atmosphere, centred at (cx, cy) with radius R
 export const GlobeView: React.FC<{
   texture?: string; cx: number; cy: number; R: number; lon0: number; lat0: number; id?: string; overlay?: GlobeOverlay;
-}> = ({ texture = 'globe/earth4k.jpg', cx, cy, R, lon0, lat0, id = 'g', overlay }) => {
+  lights?: number;                                  // 0..1 city lights
+}> = ({ texture = 'globe/earth4k.jpg', cx, cy, R, lon0, lat0, id = 'g', overlay, lights = 0 }) => {
   const tex = useTexture(texture);
+  const cities = useCities(lights > 0);
   const ref = useRef<HTMLCanvasElement>(null);
   useLayoutEffect(() => {
     const c = ref.current;
@@ -210,6 +230,28 @@ export const GlobeView: React.FC<{
         <circle cx={cx} cy={cy} r={glow} fill={`url(#atmo-${id})`} opacity={1 - 0.85 * (overlay?.night ?? 0)} />
       </svg>
       <canvas ref={ref} width={W} height={H} style={{ position: 'absolute', inset: 0 }} />
+      {lights > 0.01 && cities && (
+        <svg width={W} height={H} style={{ position: 'absolute', inset: 0 }}>
+          {(() => {
+            const s0 = Math.sin(lat0 * RAD); const c0 = Math.cos(lat0 * RAD);
+            const k = Math.max(0.5, R / 420);
+            return cities.map(([lo, la, w], i) => {
+              const p = la * RAD; const dl = (lo - lon0) * RAD;
+              const cosc = s0 * Math.sin(p) + c0 * Math.cos(p) * Math.cos(dl);
+              if (cosc <= 0.05) return null;
+              const x = cx + R * Math.cos(p) * Math.sin(dl);
+              const y = cy - R * (c0 * Math.sin(p) - s0 * Math.cos(p) * Math.cos(dl));
+              const o = lights * Math.min(1, cosc * 3) * (0.35 + 0.65 * w);
+              return (
+                <g key={i}>
+                  <circle cx={x} cy={y} r={(2 + 7 * w) * k} fill="#ffb347" opacity={o * 0.18} />
+                  <circle cx={x} cy={y} r={(0.6 + 1.8 * w) * k} fill="#fff1c2" opacity={o} />
+                </g>
+              );
+            });
+          })()}
+        </svg>
+      )}
     </AbsoluteFill>
   );
 };

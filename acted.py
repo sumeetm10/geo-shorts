@@ -35,6 +35,11 @@ POS_W, GAP_W, FIT_W = 1.0, 2.5, 0.15
 # long inside lines as between them) and the captions ran ahead of the voice.
 # Such a take falls back to edge-tts rather than going out out of sync.
 RATE_OK = (1.3, 9.0)             # syllables per second a real line can have
+# The performer also pauses for a second or more INSIDE lines, at every full stop
+# ("one by one. [pause] Jupiter...") - the user heard them as unwanted gaps
+# (2026-10-04). Any silence inside a line longer than 0.32 s is cut down to 0.2 s.
+SQUEEZE = ("silenceremove=start_periods=0:stop_periods=-1:stop_duration=0.32:"
+           "stop_threshold=-40dB:stop_silence=0.2,")
 
 STYLE = {
     # expressive but smooth and clear: the first version's shivers and heavy
@@ -121,7 +126,8 @@ def _client():
 def _take(client, lines, style, dest):
     from google.genai import types
     prompt = (f"Voice {STYLE[style]}. Keep a brisk pace for a YouTube Short, and leave a "
-              f"clear pause of about two seconds between lines. Speak only the script below, word "
+              f"clear pause of about two seconds between lines, but no long pauses inside a line. "
+              f"Speak only the script below, word "
               f"for word exactly as written (it is captioned on screen), and never read "
               f"these directions aloud.\n\nScript:\n\n" + "\n\n".join(lines))
     last = None
@@ -244,6 +250,58 @@ def _cuts(islands, lines):
     return bounds
 
 
+def _bad_cut(bounds, lines):
+    """Why these line bounds cannot be right, or None."""
+    for i, ((a, b), text) in enumerate(zip(bounds, lines), 1):
+        d = b - a
+        rate = _syllables(text) / max(0.05, d)
+        per_word = d / max(1, len(text.split()))
+        if not RATE_OK[0] <= rate <= RATE_OK[1] or not 0.12 <= per_word <= 1.2:
+            return f"line {i} would be {d:.1f}s ({rate:.1f} syllables a second)"
+    return None
+
+
+def _cuts_by_listening(client, raw, lines, islands):
+    """Second way to place the line breaks, for takes whose pauses mislead _cuts
+    (2026-10-04: a script of short sentences paused as long inside lines as between
+    them, twice). Gemini listens once and says roughly when each line starts; each
+    start is then snapped to the nearest real pause, so cuts still land in silence."""
+    from google.genai import types
+    gaps = [(islands[k][1], islands[k + 1][0]) for k in range(len(islands) - 1)
+            if islands[k + 1][0] - islands[k][1] >= 0.12]
+    numbered = "\n".join(f"{i + 1}. {l}" for i, l in enumerate(lines))
+    prompt = ("This audio is a narrator reading these numbered lines in order:\n" + numbered +
+              "\n\nFor each line give the time in seconds (from the start of the audio, two decimals) "
+              "when its FIRST word begins. Return ONLY JSON: {\"starts\": [seconds, ...]} with exactly "
+              f"{len(lines)} numbers.")
+    starts = None
+    for model in CHECK_MODELS:
+        try:
+            r = client.models.generate_content(
+                model=model, contents=[types.Part.from_bytes(data=Path(raw).read_bytes(), mime_type="audio/wav"), prompt],
+                config=types.GenerateContentConfig(response_mime_type="application/json", temperature=0.0))
+            import json as _json
+            got = _json.loads(r.text or "{}").get("starts") or []
+            if len(got) == len(lines):
+                starts = [float(x) for x in got]
+                break
+        except Exception:
+            continue
+    if not starts:
+        raise VoiceUnavailable("could not place the line breaks by listening")
+    chosen, used = [], set()
+    for j in range(1, len(lines)):
+        best = min((g for g in range(len(gaps)) if g not in used and (not chosen or g > chosen[-1])),
+                   key=lambda g: abs(gaps[g][1] - starts[j]), default=None)
+        if best is None or abs(gaps[best][1] - starts[j]) > 1.5:
+            raise VoiceUnavailable(f"no pause near line {j + 1}'s start ({starts[j]:.2f}s)")
+        chosen.append(best)
+        used.add(best)
+    edges = [islands[0][0]] + [gaps[g][1] for g in chosen]
+    ends = [gaps[g][0] for g in chosen] + [islands[-1][1]]
+    return list(zip(edges, ends))
+
+
 def _duration(path):
     r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
                         "-of", "csv=p=0", str(path)], capture_output=True, text=True, check=True)
@@ -257,19 +315,29 @@ def perform(lines, style, out_dir):
     takes = out_dir / "acted"
     takes.mkdir(parents=True, exist_ok=True)
     client = _client()
-    raw = _take(client, lines, style, takes / "raw.wav")
+    # the same script again (a re-render) reuses its take: TTS takes are scarce
+    script = takes / "script.txt"
+    raw = takes / "raw.wav"
+    if not (raw.exists() and script.exists() and script.read_text(encoding="utf-8") == "\n".join(lines)):
+        raw = _take(client, lines, style, takes / "raw.wav")
+        script.write_text("\n".join(lines), encoding="utf-8")
+    else:
+        print("      [voice] reusing the take for this exact script")
 
     heard = _heard(client, raw)
     score = similarity(" ".join(lines), heard)
     if score < MATCH:
         raise VoiceUnavailable(f"take does not match the script ({score:.2f})")
 
-    bounds = _cuts(timing.speech_islands(raw), lines)
-    for i, ((a, b), text) in enumerate(zip(bounds, lines), 1):
-        rate = _syllables(text) / max(0.05, b - a)
-        if not RATE_OK[0] <= rate <= RATE_OK[1]:
-            raise VoiceUnavailable(f"line {i} would be {rate:.1f} syllables a second - "
-                                   f"the cut is in the wrong place")
+    islands = timing.speech_islands(raw)
+    bounds = _cuts(islands, lines)
+    problem = _bad_cut(bounds, lines)
+    if problem:
+        print(f"      [voice] pauses misled the cutter ({problem}) - placing breaks by listening")
+        bounds = _cuts_by_listening(client, raw, lines, islands)
+        problem = _bad_cut(bounds, lines)
+        if problem:
+            raise VoiceUnavailable(f"{problem} - the cut is in the wrong place")
     wavs, vo, t = [], [], 0.0
     for i, ((a, b), text) in enumerate(zip(bounds, lines), 1):
         wav = takes / f"{i:02d}.wav"
@@ -278,12 +346,13 @@ def perform(lines, style, out_dir):
         tempo = f"atempo={TEMPO}," if TEMPO != 1.0 else ""
         subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(raw), "-af",
                         f"atrim={max(0.0, a - 0.06):.3f}:{b + 0.12:.3f},asetpts=PTS-STARTPTS,"
+                        f"{SQUEEZE}"
                         f"afade=t=in:d=0.015,areverse,afade=t=in:d=0.06,areverse,"
                         f"{tempo}apad=pad_dur={GAP}", "-ar", "24000", "-ac", "1",
                         str(wav)], check=True)
         d = _duration(wav)
         per_word = (d - GAP) / max(1, len(text.split()))
-        if not 0.14 <= per_word <= 0.75:
+        if not 0.14 <= per_word <= 1.2:
             raise VoiceUnavailable(f"line {i} is {d:.1f}s for {len(text.split())} words - "
                                    f"the cut is in the wrong place")
         words = timing.time_words(text, wav, offset=t, line=i - 1)

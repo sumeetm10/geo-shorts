@@ -31,23 +31,27 @@ import wiki  # noqa: E402
 from make_walk import render  # noqa: E402
 
 LINES = [
-    ("What if the Sun disappeared right now?", "hook"),
-    ("For 8 minutes and 20 seconds, nothing would change.", "stop"),
-    ("That's how long sunlight takes to reach us. Even gravity waits.", "reveal"),
-    ("Then the sky goes black. The Moon goes dark too.", "cold"),
-    ("Earth flies off in a straight line, at about 30 km a second.", "walk"),
-    ("Plants stop making food the moment the light is gone.", "reveal"),
-    ("Day after day, the whole planet gets colder.", "cold"),
-    ("Earth becomes a rogue planet, drifting alone through the dark.", "payoff"),
-    ("Luckily, the Sun will keep shining for billions of years.", "cheer"),
-    ("Subscribe, so next time someone asks you...", "cta"),
+    ("You wouldn't even notice if the Sun vanished. Not for 8 minutes.", "hook"),
+    ("Its last light is still on the way. So is its gravity.", "stop"),
+    ("Then, 8 minutes and 20 seconds later: darkness.", "cold"),
+    ("Earth shoots off in a straight line at nearly 30 km a second.", "walk"),
+    ("Fast enough to cross the whole planet in 7 minutes.", "reveal"),
+    ("But look up. The stars are still shining.", "cheer"),
+    ("The planets go dark one by one. Jupiter after an hour, Saturn after two.", "reveal"),
+    ("Deep-sea vent life carries on. It never needed sunlight.", "walk"),
+    ("Earth becomes a rogue planet. Our galaxy may already have billions.", "payoff"),
+    ("Subscribe. Because remember...", "cta"),
 ]
-AT = dict(delay=1, why=2, dark=3, fly=4, plants=5, cold=6, rogue=7, safe=8)
+AT = dict(light=1, dark=2, fly=3, cross=4, stars=5, planets=6, vents=7, rogue=8)
+# Light-time floor for a planet to go dark after the Sun does, as seen from Earth:
+# (Sun->planet + planet->Earth) / c >= (a + a - 1 AU) / c, 1 AU of light = 8.317 min.
+# Jupiter 5.20 AU (perihelion 4.95): >= 74 min; Saturn 9.59 AU (perihelion 9.0): >= 141 min.
 
 
 def check_facts():
-    need = {"Sun": "8 minutes and 20 seconds", "Earth's orbit": "29.78 km/s", "Speed of gravity": "speed of light",
-            "Rogue planet": "rogue planet"}
+    need = {"Sun": "8 minutes and 20 seconds", "Earth's orbit": "diameter in 7 minutes",
+            "Speed of gravity": "speed of light", "Rogue planet": "billions to trillions of rogue planets",
+            "Hydrothermal vent": "instead of light", "Jupiter": "5.20 AU", "Saturn": "9.59 AU"}
     for title, text in need.items():
         if text.lower() not in wiki.page(title)["text"].lower():
             raise SystemExit(f"Wikipedia '{title}' no longer says '{text}' - check the script")
@@ -61,7 +65,8 @@ def main():
     vo, voice = narrate.narrate([l for l, _ in LINES], [k for _, k in LINES], job,
                                 style=None if free else "explore")
     secs = round(vo[-1]["end"] + 0.45, 2)
-    props = {"vo": vo, "hook": {"top": "THE SUN", "bottom": "DISAPPEARS?"}, "at": AT, "durationInSeconds": secs}
+    props = {"vo": vo, "hook": {"top": "THE SUN VANISHED", "bottom": "WOULD YOU NOTICE?", "badge": "NOT FOR 8 MINUTES"},
+             "at": AT, "durationInSeconds": secs}
     (job / "props.json").write_text(json.dumps(props), encoding="utf-8")
     if "--props" in sys.argv:
         print([round(v["start"], 1) for v in vo], secs)
@@ -77,14 +82,16 @@ def main():
     mix.mix(silent, voice, bed, out, bed_db=-9)
     found = [q for q in seo.suggestions("what if the sun disappeared") if len(q) < 60][:6]
     meta = {"kind": "whatif", "file": str(out),
-            "title": "What If the Sun Disappeared Right Now? ☀️",
-            "description": ("What would happen if the Sun vanished?\n\n"
+            "title": "If the Sun Vanished, You Wouldn't Notice for 8 Minutes ☀️",
+            "description": ("What would really happen if the Sun vanished?\n\n"
                             "- Sunlight takes about 8 minutes and 20 seconds to reach Earth - and changes in "
                             "gravity travel at the same speed, so for 8 min 20 s nothing would change\n"
-                            "- Then Earth would fly off in a straight line at about 30 km a second "
-                            "(its orbital speed averages 29.78 km/s)\n"
-                            "- The Moon would go dark: it only reflects sunlight\n"
-                            "- Earth would become a rogue planet\n\n"
+                            "- Then Earth would fly off in a straight line at 29.78 km/s - fast enough to cross "
+                            "its own diameter in 7 minutes\n"
+                            "- The stars would keep shining; the planets, which only reflect sunlight, would go "
+                            "dark one by one (Jupiter after over an hour, Saturn after over two)\n"
+                            "- Life around deep-sea vents runs on chemicals, not light\n"
+                            "- The Milky Way may have billions to trillions of rogue planets\n\n"
                             "Which what-if should I do next? Tell me in the comments \U0001F447\n\n"
                             "#space #sun #earth #shorts"),
             "tags": list(dict.fromkeys(["what if the sun disappeared", "sun disappeared", "what if the sun vanished",
