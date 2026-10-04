@@ -248,18 +248,22 @@
       "youtube_id": "zU_a8bIXtCE",
       "privacy": "public",
       "publish_at": "2026-10-04 13:15 UTC"
+    },
+    {
+      "date": "2026-10-04 21:36",
+      "kind": "explore",
+      "title": "How Do You Get to the Hottest Land Surface on Earth? 🌍",
+      "for_day": "2026-10-05",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-04-explore-lut-desert.mp4",
+      "format": "explore",
+      "youtube_id": "_7BWv9PBOdk",
+      "privacy": "public",
+      "publish_at": "2026-10-05 05:15 UTC"
     }
   ],
   "fails": {},
   "explore": {
     "queue": [
-      {
-        "wikipedia": "Lut Desert",
-        "kind": "hot",
-        "angle": "How do you get to the hottest land surface on Earth?",
-        "evidence": "Tempat Terpanas di Bumi Bisa Mencapai 80°C 🥵🔥",
-        "added": "2026-09-28"
-      },
       {
         "wikipedia": "Yakutsk",
         "kind": "cold",
@@ -292,7 +296,8 @@
     "done": [
       "Challenger Deep",
       "Mariana Trench",
-      "Kola Superdeep Borehole"
+      "Kola Superdeep Borehole",
+      "Lut Desert"
     ],
     "failed": [],
     "seed_at": 6,
