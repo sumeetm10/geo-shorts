@@ -6,8 +6,9 @@ import Shot2, { compositionConfig as cfg2 } from './shots/geo/GeoDive';
 import Shot3, { compositionConfig as cfg3 } from './shots/geo/GeoList';
 import Shot4, { compositionConfig as cfg4 } from './shots/geo/GeoWalk';
 import Shot5, { compositionConfig as cfg5 } from './shots/geo/Globe';
-import Shot6, { compositionConfig as cfg6 } from './shots/geo/Zones';
-import Shot7, { compositionConfig as cfg7 } from './shots/short-walk/ShortWalkIndiaUsa';
+import Shot6, { compositionConfig as cfg6 } from './shots/geo/SunGone';
+import Shot7, { compositionConfig as cfg7 } from './shots/geo/Zones';
+import Shot8, { compositionConfig as cfg8 } from './shots/short-walk/ShortWalkIndiaUsa';
 
 export const shots: { Comp: React.FC; config: any }[] = [
   { Comp: Shot0 as React.FC, config: cfg0 },
@@ -18,4 +19,5 @@ export const shots: { Comp: React.FC; config: any }[] = [
   { Comp: Shot5 as React.FC, config: cfg5 },
   { Comp: Shot6 as React.FC, config: cfg6 },
   { Comp: Shot7 as React.FC, config: cfg7 },
+  { Comp: Shot8 as React.FC, config: cfg8 },
 ];

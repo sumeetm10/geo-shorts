@@ -65,7 +65,11 @@ const RAD = Math.PI / 180;
 
 // Optional overlays for the "Earth split in 4" video: the Equator and the
 // Greenwich meridian as glowing lines, each quarter tinted, one picked out.
-export type GlobeOverlay = { lines?: number; tint?: number; focus?: 'NE' | 'NW' | 'SE' | 'SW' | null; focusAmt?: number };
+export type GlobeOverlay = {
+  lines?: number; tint?: number; focus?: 'NE' | 'NW' | 'SE' | 'SW' | null; focusAmt?: number;
+  night?: number;                  // 0..1: the Sun's light gone
+  frost?: number;                  // 0..1: ice spreading over everything
+};
 const ZONE_RGB: Record<string, [number, number, number]> = {
   NE: [255, 196, 60], NW: [255, 92, 92], SE: [60, 220, 190], SW: [176, 124, 255],
 };
@@ -76,6 +80,8 @@ function drawGlobe(ctx: CanvasRenderingContext2D, tex: Tex, cx: number, cy: numb
   const tint = ov.tint ?? 0;
   const focus = ov.focus ?? null;
   const focusAmt = ov.focusAmt ?? 0;
+  const night = ov.night ?? 0;
+  const frost = ov.frost ?? 0;
   const lineW = 2.6 / R;                         // ~5 px wide on screen, in radians
   const x0 = Math.max(0, Math.floor(cx - R));
   const x1 = Math.min(W, Math.ceil(cx + R));
@@ -141,7 +147,16 @@ function drawGlobe(ctx: CanvasRenderingContext2D, tex: Tex, cx: number, cy: numb
           }
         }
       }
-      const limb = Math.pow(1 - z, 2.2) * (0.35 + 0.65 * day);
+      if (frost > 0) {
+        const a = frost * (0.55 + 0.35 * day);
+        const lum = (r + g + b) / 3;
+        r = r * (1 - a) + (lum * 0.8 + 70) * a; g = g * (1 - a) + (lum * 0.85 + 90) * a; b = b * (1 - a) + (lum * 0.9 + 120) * a;
+      }
+      if (night > 0) {
+        const k = 1 - 0.9 * night;
+        r = r * k + 4 * night; g = g * k + 7 * night; b = b * k + 16 * night;
+      }
+      const limb = Math.pow(1 - z, 2.2) * (0.35 + 0.65 * day) * (1 - 0.85 * night);
       r = r * (1 - limb) + 110 * limb;
       g = g * (1 - limb) + 170 * limb;
       b = b * (1 - limb) + 255 * limb;
@@ -180,19 +195,19 @@ export const GlobeView: React.FC<{
     const ctx = c.getContext('2d')!;
     ctx.clearRect(0, 0, W, H);
     drawGlobe(ctx, tex, cx, cy, R, lon0, lat0, overlay);
-  }, [tex, cx, cy, R, lon0, lat0, overlay?.lines, overlay?.tint, overlay?.focus, overlay?.focusAmt]);
+  }, [tex, cx, cy, R, lon0, lat0, overlay?.lines, overlay?.tint, overlay?.focus, overlay?.focusAmt, overlay?.night, overlay?.frost]);
   const glow = R * 1.12;
   return (
     <AbsoluteFill>
       <svg width={W} height={H} style={{ position: 'absolute', inset: 0 }}>
         <defs>
-          <radialGradient id={`atmo-${id}`} cx="0.5" cy="0.5" r="0.5">
+          <radialGradient id={`atmo-${id}`} cx="0.5" cy="0.5" r="0.5" gradientTransform="" >
             <stop offset={R / glow - 0.01} stopColor="#6fb7ff" stopOpacity={0.9} />
             <stop offset={(R / glow + 1) / 2} stopColor="#3d7fe0" stopOpacity={0.35} />
             <stop offset="1" stopColor="#1d3f8a" stopOpacity={0} />
           </radialGradient>
         </defs>
-        <circle cx={cx} cy={cy} r={glow} fill={`url(#atmo-${id})`} />
+        <circle cx={cx} cy={cy} r={glow} fill={`url(#atmo-${id})`} opacity={1 - 0.85 * (overlay?.night ?? 0)} />
       </svg>
       <canvas ref={ref} width={W} height={H} style={{ position: 'absolute', inset: 0 }} />
     </AbsoluteFill>

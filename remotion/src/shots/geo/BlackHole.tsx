@@ -82,7 +82,7 @@ const Shadow: React.FC<{ x: number; y: number; r: number; o: number }> = ({ x, y
   );
 };
 
-const Sun: React.FC<{ x: number; y: number; r: number }> = ({ x, y, r }) => (
+export const Sun: React.FC<{ x: number; y: number; r: number }> = ({ x, y, r }) => (
   <g>
     <defs>
       <radialGradient id="sunGlow" cx="0.5" cy="0.5" r="0.5">
@@ -105,7 +105,7 @@ const Arrow: React.FC<{ x1: number; y: number; len: number; dir: 1 | -1; color: 
   );
 };
 
-const Card: React.FC<{ top: string; sub?: string; o: number; color?: string; y?: number }> = ({ top, sub, o, color = ROUTE, y = 300 }) => (
+export const Card: React.FC<{ top: string; sub?: string; o: number; color?: string; y?: number }> = ({ top, sub, o, color = ROUTE, y = 300 }) => (
   <div style={{ position: 'absolute', top: y, left: 60, right: 60, textAlign: 'center', opacity: o,
     transform: `scale(${0.92 + 0.08 * o})` }}>
     <div style={{ display: 'inline-block', background: 'rgba(8,10,14,0.78)', border: `3px solid ${color}`, borderRadius: 18,

@@ -48,6 +48,14 @@
   "transparent": false
  },
  {
+  "id": "SunGone",
+  "durationInSeconds": 36,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
   "id": "Zones",
   "durationInSeconds": 32,
   "fps": 30,
