@@ -168,12 +168,38 @@ Also give:
 - "facts": 3-4 short facts for the description, each with its number, all from the text.
 The last beat is the most surprising fact. Do not write "subscribe" (it is added).
 Write numbers as digits, exactly as the text has them (rounding like "nearly 11 km" is fine).
+For an approximate number say "about" - never "over", "under", "more than" or "at least"
+unless the quote itself says so. Keep each fact's date, place and subject exactly as the
+quote gives them (if the quote says a record was set in July, do not move it to another month).
+Use "column" beats ONLY for a depth or height topic; for cold, hot and remote topics use
+"map", "stat" and "card" beats.
 
 Return ONLY JSON: {{"hook": "", "hook_top": "", "hook_bottom": "", "title": "",
 "target_quote": "", "column": {{}}, "beats": [{{"line": "", "scene": "", ...}}], "facts": []}}"""
 
 
-def gate(spec, page):
+def gate(spec, page, kind=None):
+    """Like _gate, but a malformed script (wrong types from the model) is a rejection
+    with a reason the next attempt can fix - on 2026-10-01 it crashed the build."""
+    try:
+        return _gate(spec, page, kind)
+    except (TypeError, ValueError, KeyError, AttributeError) as e:
+        return f"malformed script ({type(e).__name__}: {str(e)[:80]}) - follow the JSON shape exactly"
+
+
+def _default_column(spec, page, kind):
+    """Column settings the model forgot (2026-10-03: 'bad column settings {}')."""
+    col = spec.get("column") if isinstance(spec.get("column"), dict) else {}
+    if col.get("medium") in MEDIA_KINDS and col.get("vehicle") in VEHICLES and col.get("axis") in ("depth", "height"):
+        return col
+    if kind == "height":
+        return {"medium": "air", "vehicle": "climber", "axis": "height"}
+    wet = re.search(r"\b(ocean|sea|lake|trench|underwater|seabed)\b", page["text"][:3000], re.IGNORECASE)
+    return {"medium": "ocean", "vehicle": "sub", "axis": "depth"} if wet else \
+        {"medium": "rock", "vehicle": "drill", "axis": "depth"}
+
+
+def _gate(spec, page, kind=None):
     """None if the script may be used, else the reason it may not.
 
     A number must be in the SENTENCE quoted for its own beat (8% for rounding,
@@ -189,8 +215,12 @@ def gate(spec, page):
     hook = str(spec.get("hook", ""))
     if not hook.endswith("?") or not 4 <= len(hook.split()) <= 12:
         return "the hook must be a question of 4-12 words"
-    col = spec.get("column") or {}
     kinds = [b.get("scene") for b in beats]
+    if kind in ("cold", "hot", "remote") and any(k in ("column", "compare") for k in kinds):
+        return "a cold/hot/remote topic uses map, stat and card beats - no column or compare"
+    if any(k in ("column", "compare") for k in kinds):
+        spec["column"] = _default_column(spec, page, kind)
+    col = spec.get("column") or {}
     if any(k not in SCENES for k in kinds):
         return f"unknown scene in {kinds}"
     if kinds[0] != "map":
@@ -275,13 +305,16 @@ def write_spec(topic, page):
     import llm
     cfg = llm.config()
     feedback = None
-    for attempt in range(3):
+    for attempt in range(4):
         try:
             spec = llm.run_json(cfg, _prompt(topic, page, feedback), temperature=0.6)
         except Exception as e:
             feedback = f"{type(e).__name__}: {str(e)[:80]}"
             continue
-        problem = gate(spec, page)
+        if not isinstance(spec, dict):
+            feedback = "return one JSON object"
+            continue
+        problem = gate(spec, page, topic.get("kind"))
         if not problem:
             problem = _checked_by_model(spec, llm, cfg)
         if not problem:
@@ -421,7 +454,7 @@ def make(wiki_title, kind="depth", angle="", date=None, free=False, spec_file=No
 
     if spec_file:                                # a saved script: still gated, never trusted
         spec = json.loads(Path(spec_file).read_text(encoding="utf-8"))
-        problem = gate(spec, page)
+        problem = gate(spec, page, kind)
         if problem:
             raise RuntimeError(f"{spec_file} fails the fact gate: {problem}")
     else:

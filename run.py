@@ -106,12 +106,22 @@ def build(kind, s):
         import make_explore
         return make_explore.make(t["wikipedia"], t["kind"], t.get("angle", "")), f"explore:{t['wikipedia']}"
     pool = topics.WALKS if kind == "walk" else topics.QUESTIONS
-    i = s["walk_next" if kind == "walk" else "question_next"] % len(pool)
+    i = s["walk_next" if kind == "walk" else "question_next"]      # never wraps: see used_up()
     if kind == "walk":
         import make_walk
         return make_walk.make(*pool[i]), f"walk:{i}"
     import make_question
     return make_question.make(pool[i]["id"]), f"question:{i}"
+
+
+def used_up(kind, s):
+    """Every walk / question has been posted once. Repeats are not an option:
+    the first repeat on 2026-10-03 got 11 views where the original had 1,500 -
+    YouTube buries reused uploads. New topics go in topics.py."""
+    if kind not in ("walk", "question"):
+        return False
+    pool = topics.WALKS if kind == "walk" else topics.QUESTIONS
+    return s.get("walk_next" if kind == "walk" else "question_next", 0) >= len(pool)
 
 
 def advance(kind, s, gave_up=False):
@@ -131,6 +141,9 @@ def run(kind, test=False, publish_at=None, day=None):
         s = load_state()
         if kind == "explore" and not explore_state(s)["queue"]:
             print("[test  ] the explore queue is empty - run: python run.py research")
+            return NOTHING
+        if used_up(kind, s):
+            print(f"[test  ] every {kind} topic has been used - add new ones to topics.py")
             return NOTHING
         meta, _ = build(kind, s)
         problem = verify(meta["file"])
@@ -155,12 +168,16 @@ def run(kind, test=False, publish_at=None, day=None):
     if kind == "explore" and not explore_state(s)["queue"]:
         print("[none  ] no explore topic queued")
         return NOTHING
+    if used_up(kind, s):
+        print(f"::warning::every {kind} topic has been posted once - nothing posted rather than a repeat; "
+              f"add new ones to topics.py")
+        return NOTHING
     fails = s.setdefault("fails", {})
     if kind == "explore":
         fkey = f"explore:{explore_state(s)['queue'][0]['wikipedia']}"
     else:
         pool = topics.WALKS if kind == "walk" else topics.QUESTIONS
-        fkey = f"{kind}:{s['walk_next' if kind == 'walk' else 'question_next'] % len(pool)}"
+        fkey = f"{kind}:{s['walk_next' if kind == 'walk' else 'question_next']}"
     entry = {"date": datetime.now().strftime("%Y-%m-%d %H:%M"), "kind": kind, "title": fkey}
     if day:
         entry["for_day"] = day
@@ -236,16 +253,16 @@ def nightly():
             rc = run(kind, publish_at=at, day=day.isoformat())
             if rc in (0, 2):
                 break
-        worst = max(worst, rc)
+        worst = max(worst, 0 if rc == NOTHING else rc)      # an empty slot is not a crash
     return worst
 
 
 def status():
     s = load_state()
-    w = topics.WALKS[s["walk_next"] % len(topics.WALKS)]
-    q = topics.QUESTIONS[s["question_next"] % len(topics.QUESTIONS)]
-    print(f"next walk     : {w[0]} -> {w[1]}")
-    print(f"next question : {q['title']}")
+    w = topics.WALKS[s["walk_next"]] if s["walk_next"] < len(topics.WALKS) else None
+    q = topics.QUESTIONS[s["question_next"]] if s["question_next"] < len(topics.QUESTIONS) else None
+    print(f"next walk     : {f'{w[0]} -> {w[1]}' if w else 'ALL USED - add walks to topics.py'}")
+    print(f"next question : {q['title'] if q else 'ALL USED - add questions to topics.py'}")
     ex = explore_state(s)
     print(f"explore queue : {', '.join(t['wikipedia'] for t in ex['queue']) or '(empty)'}")
     print(f"explore done  : {', '.join(ex['done']) or '-'}")
