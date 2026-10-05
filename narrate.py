@@ -70,7 +70,9 @@ async def _speak(text, kind, mp3):
     rate, pitch = DELIVERY.get(kind, DELIVERY["walk"])
     for attempt in range(3):
         try:
-            await edge_tts.Communicate(text, VOICE, rate=rate, pitch=pitch).save(str(mp3))
+            # a stalled connection once hung a build for 10+ minutes (2026-10-04);
+            # one line takes a few seconds, so give up after 45 and retry
+            await asyncio.wait_for(edge_tts.Communicate(text, VOICE, rate=rate, pitch=pitch).save(str(mp3)), 45)
             return
         except Exception:
             if attempt == 2:

@@ -242,7 +242,11 @@ def nightly():
     now = datetime.now(timezone.utc)
     day = (now + NEPAL).date()
     worst = 0
-    for slot, kinds in (("morning", ("explore", "walk")), ("evening", ("question",))):
+    # 11:00 alternates walk and explore (2026-10-05); each falls back to the other
+    last = next((h["kind"] for h in reversed(load_state()["history"])
+                 if h.get("kind") in ("explore", "walk") and h.get("youtube_id")), "walk")
+    morning = ("explore", "walk") if last == "walk" else ("walk", "explore")
+    for slot, kinds in (("morning", morning), ("evening", ("question",))):
         h, m = PUBLISH[slot]
         at = datetime(day.year, day.month, day.day, h, m, tzinfo=timezone.utc) - NEPAL
         if slot == "morning":

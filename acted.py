@@ -256,7 +256,10 @@ def _bad_cut(bounds, lines):
         d = b - a
         rate = _syllables(text) / max(0.05, d)
         per_word = d / max(1, len(text.split()))
-        if not RATE_OK[0] <= rate <= RATE_OK[1] or not 0.12 <= per_word <= 1.2:
+        # short punchy lines ("Subscribe for more black holes.") are spoken fast and the
+        # syllable count runs high on them; the mis-cut that RATE_OK exists for was 11.6
+        top = RATE_OK[1] + (1.5 if len(text.split()) <= 6 else 0)
+        if not RATE_OK[0] <= rate <= top or not 0.12 <= per_word <= 1.2:
             return f"line {i} would be {d:.1f}s ({rate:.1f} syllables a second)"
     return None
 

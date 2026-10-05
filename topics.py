@@ -24,16 +24,25 @@ WALKS = [
     ("India", "Japan"),                         # NO  Korea Strait
     ("South Africa", "Russia"),                 # YES
     ("India", "Sri Lanka"),                     # NO  Palk Strait
+    # 2026-10-05: India/Asia routes first - the best walks so far all start in India
+    # (Sri Lanka 6.7k, Australia 3k, Japan 2.4k views). Checked with plan_route().
+    ("India", "Singapore"),                     # YES  Myanmar, Thailand, Malaysia
+    ("Nepal", "United Kingdom"),                # NO   English Channel
+    ("India", "Germany"),                       # YES
+    ("Bangladesh", "Japan"),                    # NO   Korea Strait
+    ("India", "Russia"),                        # YES  through China
+    ("India", "Brazil"),                        # NO  Bering (3rd suggestion)
+    ("Nepal", "Thailand"),                      # YES  China, Laos
+    ("Morocco", "India"),                       # YES
+    ("India", "Saudi Arabia"),                  # YES  Pakistan, Iran, Iraq
+    ("Egypt", "China"),                         # YES
+    ("France", "Vietnam"),                      # YES
+    ("Pakistan", "China"),                      # YES
     ("Argentina", "Canada"),                    # YES
     ("Portugal", "Argentina"),                  # NO  Bering, the long way round
-    ("India", "Germany"),                       # YES
     ("Nigeria", "United Kingdom"),              # NO  English Channel
-    ("Morocco", "India"),                       # YES
     ("United States of America", "South Africa"),  # NO  Bering, reversed
-    ("Egypt", "China"),                         # YES
     ("Mozambique", "Madagascar"),               # NO  Mozambique Channel
-    ("France", "Vietnam"),                      # YES
-    ("India", "Brazil"),                        # NO  Bering (3rd suggestion)
     ("Mexico", "Argentina"),                    # YES
     ("Norway", "South Africa"),                 # YES
 ]
