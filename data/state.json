@@ -291,6 +291,48 @@
         "angle": "How do you get to the loneliest place on Earth?",
         "evidence": "requeued after the 2026-10-04 fixes",
         "added": "2026-10-04"
+      },
+      {
+        "wikipedia": "Krubera Cave",
+        "kind": "depth",
+        "angle": "How do you get to the bottom of Krubera Cave, one of the deepest places on Earth?",
+        "evidence": "The Deepest Cave on Earth 😱 | Krubera Cave",
+        "added": "2026-10-05"
+      },
+      {
+        "wikipedia": "Tristan da Cunha",
+        "kind": "remote",
+        "angle": "How do you get to Tristan da Cunha, the most isolated inhabited island on Earth?",
+        "evidence": "¿Cómo viven las personas más aisladas del planeta? #tristandacunha",
+        "added": "2026-10-05"
+      },
+      {
+        "wikipedia": "Ilha da Queimada Grande",
+        "kind": "remote",
+        "angle": "How do you get to Snake Island, the world's most dangerous forbidden island?",
+        "evidence": "What Happens If You Land on Brazil’s Snake Island?",
+        "added": "2026-10-05"
+      },
+      {
+        "wikipedia": "Mponeng Gold Mine",
+        "kind": "depth",
+        "angle": "How do you get to the bottom of Mponeng Mine, the deepest underground mine on Earth?",
+        "evidence": "Why is the world's deepest gold mine in South Africa? 😱⛏️",
+        "added": "2026-10-05"
+      },
+      {
+        "wikipedia": "North Sentinel Island",
+        "kind": "remote",
+        "angle": "How close can you get to North Sentinel Island, the world's most isolated island?",
+        "evidence": "North Sentinel Island – உலகத்திலிருந்து மறைந்த தீவு! 🏝️",
+        "added": "2026-10-05"
+      },
+      {
+        "wikipedia": "Lake Baikal",
+        "kind": "depth",
+        "angle": "How do you get to the bottom of Lake Baikal, the deepest lake on Earth?",
+        "evidence": "What’s the deepest lake in the United States?",
+        "added": "2026-10-05"
       }
     ],
     "done": [
@@ -300,7 +342,7 @@
       "Lut Desert"
     ],
     "failed": [],
-    "seed_at": 6,
-    "last_research": "2026-09-28"
+    "seed_at": 12,
+    "last_research": "2026-10-05"
   }
 }
