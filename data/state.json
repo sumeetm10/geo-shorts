@@ -270,18 +270,22 @@
       "youtube_id": "K8tkaJ9_404",
       "privacy": "public",
       "publish_at": "2026-10-06 05:15 UTC"
+    },
+    {
+      "date": "2026-10-06 22:42",
+      "kind": "explore",
+      "title": "How Do You Get to the Coldest Major City on Earth? 🌍",
+      "for_day": "2026-10-07",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-06-explore-yakutsk.mp4",
+      "format": "explore",
+      "youtube_id": "81Qo9csvL1A",
+      "privacy": "public",
+      "publish_at": "2026-10-07 05:15 UTC"
     }
   ],
   "fails": {},
   "explore": {
     "queue": [
-      {
-        "wikipedia": "Yakutsk",
-        "kind": "cold",
-        "angle": "How do you get to the coldest major city on Earth?",
-        "evidence": "أبرد مدينة في العالم: ياكوتسك روسيا",
-        "added": "2026-09-28"
-      },
       {
         "wikipedia": "Veryovkina Cave",
         "kind": "depth",
@@ -350,7 +354,8 @@
       "Challenger Deep",
       "Mariana Trench",
       "Kola Superdeep Borehole",
-      "Lut Desert"
+      "Lut Desert",
+      "Yakutsk"
     ],
     "failed": [],
     "seed_at": 12,
