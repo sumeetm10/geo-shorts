@@ -1,5 +1,5 @@
 {
-  "walk_next": 8,
+  "walk_next": 9,
   "question_next": 10,
   "history": [
     {
@@ -259,6 +259,17 @@
       "youtube_id": "_7BWv9PBOdk",
       "privacy": "public",
       "publish_at": "2026-10-05 05:15 UTC"
+    },
+    {
+      "date": "2026-10-06 00:08",
+      "kind": "walk",
+      "title": "Can You Walk from India to Singapore? 🌍🚶",
+      "for_day": "2026-10-06",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-06-walk-india-to-singapore.mp4",
+      "format": "short-loop",
+      "youtube_id": "K8tkaJ9_404",
+      "privacy": "public",
+      "publish_at": "2026-10-06 05:15 UTC"
     }
   ],
   "fails": {},
