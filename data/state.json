@@ -1,5 +1,5 @@
 {
-  "walk_next": 9,
+  "walk_next": 10,
   "question_next": 10,
   "history": [
     {
@@ -281,6 +281,17 @@
       "youtube_id": "81Qo9csvL1A",
       "privacy": "public",
       "publish_at": "2026-10-07 05:15 UTC"
+    },
+    {
+      "date": "2026-10-07 23:11",
+      "kind": "walk",
+      "title": "Can You Walk from Nepal to the UK? 🌍🚶",
+      "for_day": "2026-10-08",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-07-walk-nepal-to-uk.mp4",
+      "format": "short-loop",
+      "youtube_id": "zTq5Bg0Z-ys",
+      "privacy": "public",
+      "publish_at": "2026-10-08 05:15 UTC"
     }
   ],
   "fails": {},
