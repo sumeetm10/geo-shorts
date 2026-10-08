@@ -1,5 +1,5 @@
 {
-  "walk_next": 10,
+  "walk_next": 11,
   "question_next": 10,
   "history": [
     {
@@ -292,9 +292,29 @@
       "youtube_id": "zTq5Bg0Z-ys",
       "privacy": "public",
       "publish_at": "2026-10-08 05:15 UTC"
+    },
+    {
+      "date": "2026-10-08 23:26",
+      "kind": "explore",
+      "title": "explore:Veryovkina Cave",
+      "for_day": "2026-10-09",
+      "error": "build: RuntimeError: no script passed the fact gate (not supported: 'In August 2024, high precision gear measured this depth.' (The quote mentions an expedition in August 2024 and t"
+    },
+    {
+      "date": "2026-10-08 23:31",
+      "kind": "walk",
+      "title": "Can You Walk from India to Germany? 🌍🚶",
+      "for_day": "2026-10-09",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-08-walk-india-to-germany.mp4",
+      "format": "short-loop",
+      "youtube_id": "nzV9jslniIc",
+      "privacy": "public",
+      "publish_at": "2026-10-09 05:15 UTC"
     }
   ],
-  "fails": {},
+  "fails": {
+    "explore:Veryovkina Cave": 1
+  },
   "explore": {
     "queue": [
       {
