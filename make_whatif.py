@@ -440,6 +440,102 @@ SPECS = {
         tags=["andromeda galaxy", "andromeda collision", "milky way andromeda", "andromeda milky way collision",
               "galaxy collision", "space", "astronomy", "science", "shorts"],
     ),
+    # ------------------------------------------------------------------ batch 2026-10-09 (quality rules)
+    "voyager": dict(
+        comp="VoyagerDay", tone="curious", seed=162,
+        lines=[
+            ("Next month, a spacecraft from 1977 will be one full light-day from Earth.", "hook"),
+            ("Voyager 1. Launched in 1977, and still sending messages home.", "reveal"),
+            ("Right now it's 25.6 billion km away.", "walk"),
+            ("So far that its signals take over 23 hours to reach us.", "stop"),
+            ("On November 18th, that becomes a full 24 hours.", "reveal"),
+            ("No human-made object has ever been this far.", "cold"),
+            ("And it's still flying at 17 km every second.", "payoff"),
+            ("Subscribe for more space.", "cta"),
+        ],
+        at=dict(name=1, far=2, signal=3, day=4, record=5, speed=6),
+        hook={"top": "1 LIGHT-DAY", "bottom": "FROM EARTH", "badge": "NOV 18, 2026"},
+        facts={"Voyager 1": ["September 5, 1977", "25.6 billion km", "took more than 23 hours to reach Earth",
+                             "one light day from Earth in November 2026", "most distant human-made object",
+                             "17 km/s"]},
+        derived="Nov 18 2026 is NASA's official date (EarthSky, IFLScience; checked by hand).",
+        query="voyager 1",
+        title="Voyager 1 Is About to Be One Light-Day From Earth \U0001F6F0️",
+        description=("A spacecraft from 1977 is about to pass a milestone no human-made object ever has.\n\n"
+                     "- Voyager 1 launched on September 5, 1977, and still talks to Earth\n"
+                     "- It is about 25.6 billion km away (August 2026)\n"
+                     "- Its signals already take more than 23 hours to reach us\n"
+                     "- On November 18, 2026 (NASA's date) it reaches one light-day: 24 hours\n"
+                     "- It is the most distant human-made object, flying at about 17 km/s"),
+        tags=["voyager 1", "voyager 1 light day", "voyager 1 2026", "most distant spacecraft", "nasa voyager",
+              "space", "astronomy", "science", "shorts"],
+    ),
+    "amazon": dict(
+        comp="RiverStory", tone="curious", seed=173,
+        lines=[
+            ("Could you swim the Amazon, all the way to the sea?", "hook"),
+            ("It carries more water than any other river on Earth.", "reveal"),
+            ("And there isn't a single bridge across it.", "stop"),
+            ("In 2007, one man swam it anyway. 5,268 km.", "reveal"),
+            ("His team carried blood, to distract the piranhas.", "cold"),
+            ("He swam for over two months, from Peru to Brazil.", "walk"),
+            ("That's almost 80 km, every single day.", "payoff"),
+            ("Subscribe for more journeys like this.", "cta"),
+        ],
+        at=dict(water=1, bridge=2, swim=3, piranha=4, months=5, perday=6),
+        hook={"top": "SWIM THE AMAZON?", "bottom": "ALL THE WAY TO THE SEA", "badge": "ONE MAN DID"},
+        facts={"Amazon River": ["the largest river in the world by discharge volume of water",
+                                "There are no bridges across the entire width of the river"],
+               "Martin Strel": ["5,268 km", "pour blood into the river to distract"]},
+        derived="Guinness: 5,268 km, Atalaya (Peru) to Belem (Brazil), 1 Feb - 8 Apr 2007 (67 days; press says 66) -> 'over two months'; 5,268/67 = 79 km a day.",
+        extra=lambda: {"river": {
+            "name": "AMAZON", "line": __import__("rivers").river(["Ucayali", "Amazonas"], (-50.0, -0.2)),
+            "start": {"name": "ATALAYA, PERU", "lon": -73.77, "lat": -10.73},
+            "finish": {"name": "BELÉM, BRAZIL", "lon": -48.5, "lat": -1.45},
+            "swimmer": "MARTIN STREL", "year": 2007, "km": 5268, "days": 67,
+            "view": {"lon": -62.0, "lat": -6.5}}},
+        query="swimming the amazon river",
+        title="One Man Swam the Entire Amazon River \U0001F30A",
+        description=("Could you swim the Amazon all the way to the sea? One man did.\n\n"
+                     "- The Amazon carries more water than any other river on Earth\n"
+                     "- There are no bridges across its entire width\n"
+                     "- In 2007 Martin Strel swam 5,268 km of it, from Atalaya, Peru to Belem, Brazil "
+                     "(Guinness World Records)\n"
+                     "- His team carried blood to distract piranhas\n"
+                     "- Over two months in the water - almost 80 km a day"),
+        tags=["amazon river", "swimming the amazon", "martin strel", "amazon river facts", "piranhas",
+              "longest swim", "geography", "rivers", "shorts"],
+    ),
+    "nepal": dict(
+        comp="NepalFacts", tone="curious", seed=184,
+        lines=[
+            ("Nepal's flag breaks a rule every other country follows.", "hook"),
+            ("It's the only national flag in the world that isn't a rectangle.", "reveal"),
+            ("And the only one that's taller than it is wide.", "walk"),
+            ("But that's not the strangest thing about Nepal.", "stop"),
+            ("Eight of the world's ten highest mountains are here.", "reveal"),
+            ("It was never colonised.", "walk"),
+            ("And its clock is set 5 hours 45 minutes ahead. Only three time zones do that.", "payoff"),
+            ("Subscribe for more facts that sound fake.", "cta"),
+        ],
+        at=dict(rect=1, tall=2, strange=3, peaks=4, never=5, clock=6),
+        hook={"top": "NEPAL'S FLAG", "bottom": "BREAKS THE RULE", "badge": "THE ONLY ONE"},
+        facts={"Flag of Nepal": ["only non-rectangular/square national flag in the world",
+                                 "the only one that is taller than it is wide", "double-pennon"],
+               "Nepal": ["eight of the world's ten highest mountains", "never colonised"],
+               "Nepal Standard Time": ["UTC+05:45", "one of only three time zones with a 45-minute offset"]},
+        derived="",
+        query="nepal flag",
+        title="The Only Country Whose Flag Isn't a Rectangle \U0001F1F3\U0001F1F5",
+        description=("Nepal facts that sound fake - but are true:\n\n"
+                     "- Nepal's is the only national flag that isn't a rectangle or square\n"
+                     "- It's the only one taller than it is wide (a double pennon)\n"
+                     "- Eight of the world's ten highest mountains are in Nepal\n"
+                     "- Nepal was never colonised\n"
+                     "- Nepal Standard Time is UTC+05:45 - one of only three time zones with a 45-minute offset"),
+        tags=["nepal flag", "nepal facts", "only non rectangular flag", "nepal", "flags",
+              "facts that sound fake", "geography", "shorts"],
+    ),
 }
 
 

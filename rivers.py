@@ -29,7 +29,8 @@ def _pieces(name):
     d = json.loads(SRC.read_text(encoding="utf-8"))
     out = []
     for f in d["features"]:
-        if (f["properties"].get("name_en") or f["properties"].get("name")) != name:
+        names = name if isinstance(name, (list, tuple)) else [name]     # e.g. Amazon = Ucayali + Amazonas
+        if (f["properties"].get("name_en") or f["properties"].get("name")) not in names:
             continue
         g = f["geometry"]
         out += g["coordinates"] if g["type"] == "MultiLineString" else [g["coordinates"]]

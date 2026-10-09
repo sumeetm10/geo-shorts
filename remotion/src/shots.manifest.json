@@ -112,8 +112,24 @@
   "transparent": false
  },
  {
+  "id": "NepalFacts",
+  "durationInSeconds": 26,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
   "id": "NoSpin",
   "durationInSeconds": 42,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "RiverStory",
+  "durationInSeconds": 30,
   "fps": 30,
   "width": 1080,
   "height": 1920,
@@ -161,6 +177,14 @@
  },
  {
   "id": "TrueSize",
+  "durationInSeconds": 30,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "VoyagerDay",
   "durationInSeconds": 30,
   "fps": 30,
   "width": 1080,
