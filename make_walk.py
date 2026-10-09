@@ -504,13 +504,15 @@ def _beats(route, legs, built):
     # someone asks you... Can you walk from X to Y?"), so the Short loops.
     beats = [("hook", 0, f"HOOK: START with exactly \"Can you walk from {_the(route['origin'])} to "
                          f"{_the(route['dest'])}?\" or \"Could you really walk from "
-                         f"{_the(route['origin'])} to {_the(route['dest'])}?\", then at most 5 more "
-                         f"words that make them NEED the answer. Never give the answer away.")]
+                         f"{_the(route['origin'])} to {_the(route['dest'])}?\", then at most 6 more "
+                         f"words of STAKES that make them NEED the answer (a challenge or a warning, "
+                         f"e.g. 'Sounds easy. It isn't.'). Never give the answer away.")]
     seen = {route["origin"]}                  # you start there; you do not "enter" it
     for i, leg in enumerate(legs):
         if leg["kind"] == "gap":
             gap = route["gap"]
-            beats.append(("stop", i, f"SUSPENSE: you reach the coast of {geo.short(gap['from'])}, "
+            beats.append(("stop", i, f"SUSPENSE: after about {_days(route):,} days of walking (say this number), "
+                                    f"you reach the coast of {geo.short(gap['from'])}, "
                                     f"{geo.short(gap['to'])} is close now. Do NOT say yet that you are "
                                     f"stuck and do NOT name the water - the answer comes next."))
             continue
@@ -528,10 +530,14 @@ def _beats(route, legs, built):
                       "cheer": "You finally make it"}[leg["mood"]])
         if any(p["kind"] == "mountain" for p in built[i]["props"]):
             facts.append("Mountains")
+        if i == 0:
+            facts.append("OPEN A LOOP: end with a hint that something goes wrong later "
+                         "(e.g. 'Easy so far.' or 'But the hard part is coming.') - never say what")
         beats.append((leg["mood"], i, ". ".join(facts) + "."))
     km = _floor_km(route["km1"])
     if route["walkable"]:
-        pay = f"THE ANSWER: Yes. At least {km:,} km on foot, through {len(route['countries1'])} countries."
+        pay = (f"THE ANSWER: Yes. At least {km:,} km on foot, through {len(route['countries1'])} countries - "
+               f"about {_days(route):,} days of walking.")
     else:
         # the water and the verdict share the LAST line: once "no" is said there
         # is nothing left to wait for, so it comes as late as possible
@@ -551,8 +557,13 @@ def _beats(route, legs, built):
     return beats
 
 
+def _days(route):
+    """Days on foot at Wikipedia's average walking speed (5.0 km/h), 8 hours a day."""
+    return round(route["km1"] / 5.0 / 8)
+
+
 def _allowed_numbers(route):
-    nums = {len(route["countries1"]), len(route["countries1"]) + len(route["countries2"])}
+    nums = {len(route["countries1"]), len(route["countries1"]) + len(route["countries2"]), _days(route)}
     for km in (route["km1"], route["km1"] + route["km2"]):
         # floors only: a walking distance is a minimum, said as "at least"
         nums |= {n for n in (_floor_km(km), int(km // 1000) * 1000) if n > 0}
@@ -615,6 +626,14 @@ def write_script(route, legs, built):
 
 Write EXACTLY {len(beats)} lines, one per beat, in order:
 {plan}
+
+STORY - this is what keeps people watching:
+- Every line must make the viewer want the next one: tension, a turn, a "but".
+  Never a flat list like "Next you walk into X. Then you walk into Y."
+- Line 2 opens a loop (something goes wrong later); keep it open until the end.
+- Paint vivid, true pictures of the places (mountains, deserts, frozen forest,
+  borders) - using only the places and numbers given.
+- The line before the answer is pure suspense; the answer lands last, hard.
 
 RULES
 - Each line 5-10 words; only the LAST line may run to 18 words. The whole
@@ -684,7 +703,7 @@ def _template(kind, beat, route):
     """A plain, always-true line per beat for when the model cannot be trusted."""
     o, d = geo.short(route["origin"]), geo.short(route["dest"])
     if kind == "hook":
-        return f"Can you really walk from {_the(route['origin'])} to {_the(route['dest'])}?"
+        return f"Can you really walk from {_the(route['origin'])} to {_the(route['dest'])}? Sounds easy."
     if kind == "payoff":
         km = _floor_km(route["km1"])
         if route["walkable"]:
@@ -700,7 +719,7 @@ def _template(kind, beat, route):
         return f"{fact} So no. At least {km:,} km of walking, and you're stuck."
     if kind == "stop":
         gap = route["gap"]
-        return f"You reach the coast of {_the(gap['from'])}, and {_the(gap['to'])} is almost in sight."
+        return f"{_days(route):,} days of walking. The coast of {_the(gap['from'])}. {_the(gap['to'])[0].upper() + _the(gap['to'])[1:]} is right there..."
     if kind == "detail":
         gap = route["gap"]
         if gap.get("islands"):
@@ -727,7 +746,7 @@ def _template(kind, beat, route):
     if countries:
         if len(countries) >= 3:
             return f"{', '.join(countries)}. The borders fly by."
-        return [f"First stop: {into}.", f"Then straight on, {where}.", f"Keep going, {where}.",
+        return [f"First, {into}. Easy so far.", f"Then straight on, {where}.", f"Keep going, {where}.",
                 f"Borders keep coming: {into}."][n % 4]
     return [f"Then {where}, for days.", f"Mile after mile, {where}.", f"You keep walking {where}."][n % 3]
 
