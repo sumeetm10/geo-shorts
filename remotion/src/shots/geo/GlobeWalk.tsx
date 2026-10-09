@@ -193,7 +193,8 @@ const GlobeWalk: React.FC<Partial<Props>> = (props) => {
 
       {/* hook */}
       <div style={{ position: 'absolute', top: 170, left: 30, right: 30, textAlign: 'center', fontFamily: SANS, fontWeight: 800,
-        fontSize: 104, lineHeight: 1.0, color: '#fff', textShadow: '0 10px 40px rgba(0,0,0,0.95)', opacity: hookO }}>
+        fontSize: hook.top.length > 13 ? Math.max(60, Math.floor(1400 / hook.top.length)) : 104, lineHeight: 1.0, color: '#fff',
+        textShadow: '0 10px 40px rgba(0,0,0,0.95)', opacity: hookO }}>
         {hook.top}<br /><span style={{ color: ROUTE }}>{hook.bottom}</span>
       </div>
       <div style={{ position: 'absolute', top: 1400, left: 0, right: 0, textAlign: 'center', opacity: hookO,
