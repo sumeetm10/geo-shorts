@@ -1,5 +1,5 @@
 {
-  "walk_next": 11,
+  "walk_next": 12,
   "question_next": 10,
   "history": [
     {
@@ -310,20 +310,31 @@
       "youtube_id": "nzV9jslniIc",
       "privacy": "public",
       "publish_at": "2026-10-09 05:15 UTC"
+    },
+    {
+      "date": "2026-10-09 22:44",
+      "kind": "explore",
+      "title": "explore:Veryovkina Cave",
+      "for_day": "2026-10-10",
+      "error": "build: RuntimeError: no script passed the fact gate (column values must go up: [2285.0, 32.0, 2209.0])"
+    },
+    {
+      "date": "2026-10-09 22:48",
+      "kind": "walk",
+      "title": "Can You Walk from Bangladesh to Japan? 🌍🚶",
+      "for_day": "2026-10-10",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-09-walk-bangladesh-to-japan.mp4",
+      "format": "globe-walk",
+      "youtube_id": "0F3NShfqQtI",
+      "privacy": "public",
+      "publish_at": "2026-10-10 05:15 UTC"
     }
   ],
   "fails": {
-    "explore:Veryovkina Cave": 1
+    "explore:Veryovkina Cave": 2
   },
   "explore": {
     "queue": [
-      {
-        "wikipedia": "Veryovkina Cave",
-        "kind": "depth",
-        "angle": "How do you get to the deepest known cave on Earth?",
-        "evidence": "The Deepest Place On Earth",
-        "added": "2026-09-28"
-      },
       {
         "wikipedia": "Oymyakon",
         "kind": "cold",
@@ -388,7 +399,9 @@
       "Lut Desert",
       "Yakutsk"
     ],
-    "failed": [],
+    "failed": [
+      "Veryovkina Cave"
+    ],
     "seed_at": 12,
     "last_research": "2026-10-05"
   }
