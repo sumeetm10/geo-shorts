@@ -403,6 +403,43 @@ SPECS = {
         tags=["antarctica facts", "antarctica", "facts that sound fake", "geography facts", "south pole",
               "continents", "geography", "shorts"],
     ),
+    # ------------------------------------------------------------------ quality-first space (2026-10-09)
+    # Rules: <=30 s, motion + question in the first second, TWO sources per fact.
+    # vidIQ: "Flying to Andromeda's Black Hole" 652k. Second source for the twist: the 2025
+    # Sawala et al. study (Univ. Helsinki; Hubble + Gaia; 100,000 simulations) as reported by
+    # UWA, Live Science and EarthSky - ~50% chance of no merger in 10 bn years.
+    "andromeda": dict(
+        comp="AndroCollide", tone="surprising", seed=151,
+        lines=[
+            ("A whole galaxy is coming straight for us. You can see it tonight.", "hook"),
+            ("Andromeda. 2.5 million light-years away, closing in at 300 km a second.", "reveal"),
+            ("For years, we thought it would hit us in about 4.5 billion years.", "walk"),
+            ("Then 100,000 computer simulations said: maybe not.", "stop"),
+            ("Now it's roughly a coin flip.", "reveal"),
+            ("And even if they crash, the stars almost never hit each other.", "walk"),
+            ("They're as far apart as ping-pong balls, kilometres from each other.", "payoff"),
+            ("Subscribe for more space.", "cta"),
+        ],
+        at=dict(name=1, then=2, sims=3, coin=4, stars=5, pong=6),
+        hook={"top": "A GALAXY IS COMING", "bottom": "FOR US", "badge": "SEE IT TONIGHT"},
+        facts={"Andromeda Galaxy": ["2.5 million light-years", "visible to the naked eye", "300 km/s",
+                                    "50% chance of colliding with each other in the next 10 billion years"],
+               "Andromeda–Milky Way collision": ["may occur in about 4.5 billion years",
+                                                  "one ping-pong ball every 3.2 km",
+                                                  "extremely unlikely that any two stars from the merging galaxies would collide"]},
+        derived="100,000 simulations: Sawala et al. 2025 (UWA / Live Science / EarthSky), checked by hand.",
+        query="andromeda galaxy collision",
+        title="A Galaxy Is Coming for Us - But It Might Miss \U0001F30C",
+        description=("Is Andromeda really going to crash into the Milky Way?\n\n"
+                     "- Andromeda is 2.5 million light-years away and visible to the naked eye on dark nights\n"
+                     "- It is approaching at about 300 km/s\n"
+                     "- The old forecast: a collision in about 4.5 billion years\n"
+                     "- A 2025 study ran 100,000 simulations with Hubble and Gaia data: about a 50% chance there is "
+                     "NO merger in the next 10 billion years\n"
+                     "- Even if they merge, stars almost never collide - like one ping-pong ball every 3.2 km"),
+        tags=["andromeda galaxy", "andromeda collision", "milky way andromeda", "andromeda milky way collision",
+              "galaxy collision", "space", "astronomy", "science", "shorts"],
+    ),
 }
 
 

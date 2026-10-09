@@ -1,7 +1,55 @@
 [
  {
+  "id": "AndroCollide",
+  "durationInSeconds": 30,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "Antarctica",
+  "durationInSeconds": 40,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "BHFall",
+  "durationInSeconds": 33,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "BHSqueeze",
+  "durationInSeconds": 34,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
   "id": "BlackHole",
   "durationInSeconds": 34,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "DinoRock",
+  "durationInSeconds": 40,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "EarthHole",
+  "durationInSeconds": 40,
   "fps": 30,
   "width": 1080,
   "height": 1920,
@@ -48,8 +96,64 @@
   "transparent": false
  },
  {
+  "id": "GlobeWalk",
+  "durationInSeconds": 26,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "MoonGone",
+  "durationInSeconds": 42,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "NoSpin",
+  "durationInSeconds": 42,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "RiverSwim",
+  "durationInSeconds": 40,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
   "id": "SunGone",
   "durationInSeconds": 40,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "SunHole",
+  "durationInSeconds": 40,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "SunSize",
+  "durationInSeconds": 42,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "TonBH",
+  "durationInSeconds": 39,
   "fps": 30,
   "width": 1080,
   "height": 1920,

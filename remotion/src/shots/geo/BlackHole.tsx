@@ -38,7 +38,7 @@ const STARS = (() => {
 })();
 
 // stars as seen around a lens at (lx, ly) with Einstein radius tE (px)
-const LensedStars: React.FC<{ lx: number; ly: number; tE: number; o: number }> = ({ lx, ly, tE, o }) => {
+export const LensedStars: React.FC<{ lx: number; ly: number; tE: number; o: number }> = ({ lx, ly, tE, o }) => {
   const f = useCurrentFrame();
   const dots: React.ReactElement[] = [];
   STARS.forEach((s, i) => {
@@ -64,7 +64,7 @@ const LensedStars: React.FC<{ lx: number; ly: number; tE: number; o: number }> =
   return <g>{dots}</g>;
 };
 
-const Shadow: React.FC<{ x: number; y: number; r: number; o: number }> = ({ x, y, r, o }) => {
+export const Shadow: React.FC<{ x: number; y: number; r: number; o: number }> = ({ x, y, r, o }) => {
   const f = useCurrentFrame();
   return (
     <g opacity={o}>

@@ -722,7 +722,14 @@ def _template(kind, beat, route):
         where = "on and on"
     if "HYPOTHETICAL" in beat:                # after the water: it never happens
         return f"Even if you got across, you would walk {where}."
-    return f"Next you walk {where}." if countries else f"You keep walking {where}."
+    # vary the openings (2026-10-09: a run of "Next you walk into..." read as dull)
+    n = route["_tpl"] = route.get("_tpl", -1) + 1
+    if countries:
+        if len(countries) >= 3:
+            return f"{', '.join(countries)}. The borders fly by."
+        return [f"First stop: {into}.", f"Then straight on, {where}.", f"Keep going, {where}.",
+                f"Borders keep coming: {into}."][n % 4]
+    return [f"Then {where}, for days.", f"Mile after mile, {where}.", f"You keep walking {where}."][n % 3]
 
 
 # ------------------------------------------------------------------ build

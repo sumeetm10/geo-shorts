@@ -108,8 +108,8 @@ def build(kind, s):
     pool = topics.WALKS if kind == "walk" else topics.QUESTIONS
     i = s["walk_next" if kind == "walk" else "question_next"]      # never wraps: see used_up()
     if kind == "walk":
-        import make_walk
-        return make_walk.make(*pool[i]), f"walk:{i}"
+        import make_walk2                          # 3D globe + Atlas, from 2026-10-09
+        return make_walk2.make(*pool[i]), f"walk:{i}"
     import make_question
     return make_question.make(pool[i]["id"]), f"question:{i}"
 
