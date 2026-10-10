@@ -536,6 +536,95 @@ SPECS = {
         tags=["nepal flag", "nepal facts", "only non rectangular flag", "nepal", "flags",
               "facts that sound fake", "geography", "shorts"],
     ),
+    # ------------------------------------------------------------------ "like Voyager" (2026-10-10)
+    "apophis": dict(
+        comp="ApophisPass", tone="surprising", seed=195,
+        lines=[
+            ("On Friday the 13th, 2029, an asteroid flies closer than our satellites.", "hook"),
+            ("It's called Apophis, after a serpent of darkness.", "reveal"),
+            ("When it was found, it had a 2.7% chance of hitting us.", "stop"),
+            ("Then that was ruled out.", "walk"),
+            ("But it will still pass just 31,600 km up.", "reveal"),
+            ("Closer than the satellites at 35,786 km.", "walk"),
+            ("And you'll see it with your naked eye.", "payoff"),
+            ("Subscribe, and mark your calendar.", "cta"),
+        ],
+        at=dict(name=1, odds=2, ruled=3, close=4, sats=5, eyes=6),
+        hook={"top": "FRIDAY THE 13TH", "bottom": "APRIL 2029", "badge": "CLOSER THAN SATELLITES"},
+        facts={"99942 Apophis": ["Friday, April 13, 2029", "probability of 2.7%", "eliminated that possibility",
+                                 "31,600 km", "visible to the naked eye", "Apep", "serpent"],
+               "Geostationary orbit": ["35,786 km"]},
+        derived="",
+        query="apophis asteroid 2029",
+        title="An Asteroid Will Fly Closer Than Our Satellites in 2029 ☄️",
+        description=("Apophis will pass Earth on Friday, April 13, 2029.\n\n"
+                     "- Named after Apep, the Egyptian serpent of darkness\n"
+                     "- In 2004 it briefly had a 2.7% chance of hitting Earth in 2029 - later ruled out\n"
+                     "- It will pass about 31,600 km above the surface - closer than satellites in geostationary "
+                     "orbit (35,786 km)\n"
+                     "- It should be visible to the naked eye from dark places"),
+        tags=["apophis", "apophis 2029", "asteroid 2029", "apophis asteroid", "asteroid close approach",
+              "space", "astronomy", "science", "shorts"],
+    ),
+    "parker": dict(
+        comp="ParkerSun", tone="surprising", seed=206,
+        lines=[
+            ("The fastest thing humans ever built is flying into the Sun.", "hook"),
+            ("Parker Solar Probe. 690,000 km an hour.", "reveal"),
+            ("Fast enough to cross Earth in about a minute.", "walk"),
+            ("On Christmas Eve 2024, it passed just 6.16 million km from the Sun.", "stop"),
+            ("Nothing we've made has ever been closer.", "reveal"),
+            ("Outside, its heat shield faces 1,370 degrees.", "hot"),
+            ("Behind it, the instruments sit at just 29.", "payoff"),
+            ("Subscribe for more space.", "cta"),
+        ],
+        at=dict(name=1, cross=2, xmas=3, record=4, heat=5, cool=6),
+        hook={"top": "FLYING INTO", "bottom": "THE SUN", "badge": "690,000 KM/H"},
+        facts={"Parker Solar Probe": ["690,000 km/h", "fastest object ever built", "December 24, 2024",
+                                      "6.16 million km", "closest ever artificial object to the Sun", "1,370 °C", "29 °C"],
+               "Earth": ["about 12,742 km"]},
+        derived="12,742 km / 690,000 km/h = 66 s, 'about a minute'.",
+        query="parker solar probe",
+        title="The Fastest Thing Ever Built Is Flying Into the Sun ☀️",
+        description=("Parker Solar Probe - the fastest object humans have ever built.\n\n"
+                     "- 690,000 km/h at its closest approach - fast enough to cross Earth in about a minute\n"
+                     "- On December 24, 2024 it passed 6.16 million km from the Sun\n"
+                     "- It has been the closest human-made object to the Sun since 2018\n"
+                     "- Its heat shield faces about 1,370 °C; behind it the instruments stay at about 29 °C"),
+        tags=["parker solar probe", "fastest object ever built", "touching the sun", "nasa sun mission", "sun",
+              "space", "astronomy", "science", "shorts"],
+    ),
+    "issdeorbit": dict(
+        comp="IssCrash", tone="urgent", seed=217,
+        lines=[
+            ("NASA is going to crash the space station into the ocean. On purpose.", "hook"),
+            ("It's the largest spacecraft ever built.", "reveal"),
+            ("Racing around Earth at 28,000 km an hour. 16 sunrises a day.", "walk"),
+            ("After 2030, a special vehicle will push it down.", "stop"),
+            ("Point Nemo. The place farthest from any land.", "reveal"),
+            ("A spacecraft cemetery, where hundreds of old satellites lie.", "cold"),
+            ("And the closest humans? Often astronauts on the ISS.", "payoff"),
+            ("Subscribe for more space.", "cta"),
+        ],
+        at=dict(big=1, fast=2, down=3, push=3, nemo=4, grave=5, twist=6),
+        hook={"top": "NASA WILL CRASH", "bottom": "THE SPACE STATION", "badge": "ON PURPOSE"},
+        facts={"International Space Station": ["largest human spacecraft ever constructed", "28,000 kilometres per hour",
+                                               "16 sunrises and sunsets daily"],
+               "Deorbit of the International Space Station": ["operational until the end of 2030", "U.S. Deorbit Vehicle",
+                                                              "spacecraft cemetery"],
+               "Point Nemo": ["oceanic pole of inaccessibility", "hundreds of decommissioned satellites",
+                              "the closest human beings are astronauts aboard the International Space Station"]},
+        derived="",
+        query="iss deorbit",
+        title="NASA Will Crash the Space Station Into the Ocean - On Purpose \U0001F6F0️",
+        description=("What happens to the International Space Station at the end?\n\n"
+                     "- It's the largest human spacecraft ever built, circling at 28,000 km/h (16 sunrises a day)\n"
+                     "- It's expected to operate until the end of 2030; then the U.S. Deorbit Vehicle will steer it down\n"
+                     "- Remnants are aimed at the 'spacecraft cemetery' near Point Nemo, the place farthest from land\n"
+                     "- Near Point Nemo, the closest humans are sometimes the astronauts on the ISS overhead"),
+        tags=["iss deorbit", "international space station", "point nemo", "spacecraft cemetery", "nasa iss",
+              "space", "astronomy", "science", "shorts"],
+    ),
 }
 
 

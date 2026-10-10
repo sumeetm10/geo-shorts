@@ -2,30 +2,33 @@
 import type React from 'react';
 import Shot0, { compositionConfig as cfg0 } from './shots/geo/AndroCollide';
 import Shot1, { compositionConfig as cfg1 } from './shots/geo/Antarctica';
-import Shot2, { compositionConfig as cfg2 } from './shots/geo/BHFall';
-import Shot3, { compositionConfig as cfg3 } from './shots/geo/BHSqueeze';
-import Shot4, { compositionConfig as cfg4 } from './shots/geo/BlackHole';
-import Shot5, { compositionConfig as cfg5 } from './shots/geo/DinoRock';
-import Shot6, { compositionConfig as cfg6 } from './shots/geo/EarthHole';
-import Shot7, { compositionConfig as cfg7 } from './shots/geo/Explore';
-import Shot8, { compositionConfig as cfg8 } from './shots/geo/GeoDive';
-import Shot9, { compositionConfig as cfg9 } from './shots/geo/GeoList';
-import Shot10, { compositionConfig as cfg10 } from './shots/geo/GeoWalk';
-import Shot11, { compositionConfig as cfg11 } from './shots/geo/Globe';
-import Shot12, { compositionConfig as cfg12 } from './shots/geo/GlobeWalk';
-import Shot13, { compositionConfig as cfg13 } from './shots/geo/MoonGone';
-import Shot14, { compositionConfig as cfg14 } from './shots/geo/NepalFacts';
-import Shot15, { compositionConfig as cfg15 } from './shots/geo/NoSpin';
-import Shot16, { compositionConfig as cfg16 } from './shots/geo/RiverStory';
-import Shot17, { compositionConfig as cfg17 } from './shots/geo/RiverSwim';
-import Shot18, { compositionConfig as cfg18 } from './shots/geo/SunGone';
-import Shot19, { compositionConfig as cfg19 } from './shots/geo/SunHole';
-import Shot20, { compositionConfig as cfg20 } from './shots/geo/SunSize';
-import Shot21, { compositionConfig as cfg21 } from './shots/geo/TonBH';
-import Shot22, { compositionConfig as cfg22 } from './shots/geo/TrueSize';
-import Shot23, { compositionConfig as cfg23 } from './shots/geo/VoyagerDay';
-import Shot24, { compositionConfig as cfg24 } from './shots/geo/Zones';
-import Shot25, { compositionConfig as cfg25 } from './shots/short-walk/ShortWalkIndiaUsa';
+import Shot2, { compositionConfig as cfg2 } from './shots/geo/ApophisPass';
+import Shot3, { compositionConfig as cfg3 } from './shots/geo/BHFall';
+import Shot4, { compositionConfig as cfg4 } from './shots/geo/BHSqueeze';
+import Shot5, { compositionConfig as cfg5 } from './shots/geo/BlackHole';
+import Shot6, { compositionConfig as cfg6 } from './shots/geo/DinoRock';
+import Shot7, { compositionConfig as cfg7 } from './shots/geo/EarthHole';
+import Shot8, { compositionConfig as cfg8 } from './shots/geo/Explore';
+import Shot9, { compositionConfig as cfg9 } from './shots/geo/GeoDive';
+import Shot10, { compositionConfig as cfg10 } from './shots/geo/GeoList';
+import Shot11, { compositionConfig as cfg11 } from './shots/geo/GeoWalk';
+import Shot12, { compositionConfig as cfg12 } from './shots/geo/Globe';
+import Shot13, { compositionConfig as cfg13 } from './shots/geo/GlobeWalk';
+import Shot14, { compositionConfig as cfg14 } from './shots/geo/IssCrash';
+import Shot15, { compositionConfig as cfg15 } from './shots/geo/MoonGone';
+import Shot16, { compositionConfig as cfg16 } from './shots/geo/NepalFacts';
+import Shot17, { compositionConfig as cfg17 } from './shots/geo/NoSpin';
+import Shot18, { compositionConfig as cfg18 } from './shots/geo/ParkerSun';
+import Shot19, { compositionConfig as cfg19 } from './shots/geo/RiverStory';
+import Shot20, { compositionConfig as cfg20 } from './shots/geo/RiverSwim';
+import Shot21, { compositionConfig as cfg21 } from './shots/geo/SunGone';
+import Shot22, { compositionConfig as cfg22 } from './shots/geo/SunHole';
+import Shot23, { compositionConfig as cfg23 } from './shots/geo/SunSize';
+import Shot24, { compositionConfig as cfg24 } from './shots/geo/TonBH';
+import Shot25, { compositionConfig as cfg25 } from './shots/geo/TrueSize';
+import Shot26, { compositionConfig as cfg26 } from './shots/geo/VoyagerDay';
+import Shot27, { compositionConfig as cfg27 } from './shots/geo/Zones';
+import Shot28, { compositionConfig as cfg28 } from './shots/short-walk/ShortWalkIndiaUsa';
 
 export const shots: { Comp: React.FC; config: any }[] = [
   { Comp: Shot0 as React.FC, config: cfg0 },
@@ -54,4 +57,7 @@ export const shots: { Comp: React.FC; config: any }[] = [
   { Comp: Shot23 as React.FC, config: cfg23 },
   { Comp: Shot24 as React.FC, config: cfg24 },
   { Comp: Shot25 as React.FC, config: cfg25 },
+  { Comp: Shot26 as React.FC, config: cfg26 },
+  { Comp: Shot27 as React.FC, config: cfg27 },
+  { Comp: Shot28 as React.FC, config: cfg28 },
 ];

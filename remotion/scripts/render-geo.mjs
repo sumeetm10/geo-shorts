@@ -32,8 +32,13 @@ const composition = {
   durationInFrames: Math.max(1, Math.round((inputProps.durationInSeconds ?? base.durationInFrames / fps) * fps)),
 };
 
+// compositions with a WebGL shader (ShaderSun) need Chrome's software GL;
+// the default headless mode has no WebGL at all
+const WEBGL = new Set(['ParkerSun']);
+
 let last = -1;
 await renderMedia({
+  ...(WEBGL.has(id) ? { chromiumOptions: { gl: 'angle' } } : {}),
   serveUrl,
   composition,
   codec: 'h264',
