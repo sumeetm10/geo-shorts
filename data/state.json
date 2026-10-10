@@ -1,5 +1,5 @@
 {
-  "walk_next": 12,
+  "walk_next": 13,
   "question_next": 10,
   "history": [
     {
@@ -328,10 +328,29 @@
       "youtube_id": "0F3NShfqQtI",
       "privacy": "public",
       "publish_at": "2026-10-10 05:15 UTC"
+    },
+    {
+      "date": "2026-10-10 21:51",
+      "kind": "explore",
+      "title": "explore:Oymyakon",
+      "for_day": "2026-10-11",
+      "error": "build: RuntimeError: no coordinates for 'Tomtor'"
+    },
+    {
+      "date": "2026-10-10 21:54",
+      "kind": "walk",
+      "title": "Can You Walk from India to Russia? 🌍🚶",
+      "for_day": "2026-10-11",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-10-walk-india-to-russia.mp4",
+      "format": "globe-walk",
+      "youtube_id": "cA-CdvwvZvQ",
+      "privacy": "public",
+      "publish_at": "2026-10-11 05:15 UTC"
     }
   ],
   "fails": {
-    "explore:Veryovkina Cave": 2
+    "explore:Veryovkina Cave": 2,
+    "explore:Oymyakon": 1
   },
   "explore": {
     "queue": [
