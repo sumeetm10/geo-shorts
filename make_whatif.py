@@ -675,7 +675,7 @@ SPECS = {
         derived="",
         query="wormhole time machine",
         title="How a Wormhole Could Become a Time Machine ⏳ (Part 2)",
-        description=("Part 1: could you travel through a wormhole? PART1LINK\n\n"
+        description=("Part 1: could you travel through a wormhole? https://youtu.be/EDrzVQhAYc4\n\n"
                      "- A proposed time machine: accelerate one end of a traversable wormhole to a large fraction of light speed and bring it back\n"
                      "- Time dilation means the moved end ages less - it comes back younger\n"
                      "- Enter the younger end and you exit the older one: back in time, as seen from outside\n"
