@@ -66,8 +66,12 @@ const BHLBig: React.FC<Partial<LongProps>> = ({ vo = [], at, durationInSeconds =
         <Stars drift={f * 0.3} />
         <svg width={LW} height={LH} style={{ position: 'absolute', inset: 0 }}>
           <defs><radialGradient id="dying"><stop offset="0" stopColor="#fff" /><stop offset="0.3" stopColor="#ffb46b" /><stop offset="1" stopColor="#ff5a14" stopOpacity={0} /></radialGradient></defs>
-          {(() => { const p = 1 + 0.18 * Math.sin(f / 2.2) * EASE_OUT(within(at.almost, 0.2, 1)); const r = lerp(300, 160, EASE_INOUT(within(at.almost, 0.2, 1)));
-            return <circle cx={C.x} cy={C.y} r={r * p} fill="url(#dying)" />; })()}
+          {(() => { const k = within(at.almost, 0, 1); const p = 1 + (0.08 + 0.25 * k) * Math.sin(f / (2.6 - 1.4 * k)); const r = lerp(320, 120, EASE_INOUT(k));
+            return <g>
+              {Array.from({ length: 30 }, (_, i) => { const a = i * 2.4; const t = ((f / 45 + i / 30) % 1);
+                return <circle key={i} cx={C.x + Math.cos(a) * lerp(r, r + 420, t)} cy={C.y + Math.sin(a) * lerp(r, r + 420, t)} r={5 * (1 - t)} fill="#ffb46b" opacity={(1 - t) * k} />; })}
+              <circle cx={C.x} cy={C.y} r={r * p} fill="url(#dying)" />
+            </g>; })()}
         </svg>
         <Headline text="ALMOST A BLACK HOLE" sub="BUT NOT QUITE?" top={70} size={76} />
       </Scene>

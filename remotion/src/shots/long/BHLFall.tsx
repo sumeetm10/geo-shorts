@@ -131,14 +131,29 @@ const BHLFall: React.FC<Partial<LongProps>> = ({ vo = [], at, durationInSeconds 
       {/* no way out; the singularity */}
       <Scene f={f} a={cue(at.inside)} b={END + 30} kind="zoom">
         <AbsoluteFill style={{ background: '#000' }} />
+        <AbsoluteFill style={{ background: 'radial-gradient(circle at 50% 48%, #1a0a02 0%, #000 55%)' }} />
         <svg width={LW} height={LH} style={{ position: 'absolute', inset: 0 }}>
+          {/* space itself flowing inward: rings shrinking toward the centre */}
+          {Array.from({ length: 9 }, (_, k) => { const t = ((f / 70 + k / 9) % 1); const r = lerp(900, 10, t);
+            return <ellipse key={k} cx={LW / 2} cy={520} rx={r} ry={r * 0.55} fill="none" stroke="#ff9a3c" strokeWidth={3} opacity={0.15 + 0.5 * t} />; })}
           {Array.from({ length: 24 }, (_, i) => { const a = (i / 24) * Math.PI * 2; const t = ((f / 40 + i * 0.13) % 1);
-            const r0 = lerp(560, 30, t); const r1 = r0 - 60;
-            return <line key={i} x1={LW / 2 + Math.cos(a) * r0} y1={520 + Math.sin(a) * r0} x2={LW / 2 + Math.cos(a) * Math.max(0, r1)} y2={520 + Math.sin(a) * Math.max(0, r1)}
-              stroke={ROUTE} strokeWidth={4} opacity={0.3 + 0.7 * (1 - t)} />; })}
+            const r0 = lerp(700, 30, t); const r1 = r0 - 90;
+            return <line key={i} x1={LW / 2 + Math.cos(a) * r0} y1={520 + Math.sin(a) * r0 * 0.55} x2={LW / 2 + Math.cos(a) * Math.max(0, r1)} y2={520 + Math.sin(a) * Math.max(0, r1) * 0.55}
+              stroke={ROUTE} strokeWidth={5} opacity={0.3 + 0.7 * (1 - t)} />; })}
+          {/* arrows that try to get out, and bend back in */}
+          {f < cue(at.centre) && [0.6, 2.2, 3.9, 5.3].map((a, i) => { const t = ((f / 50 + i * 0.25) % 1); const out = Math.sin(t * Math.PI);
+            const r = 120 + 260 * out; const x = LW / 2 + Math.cos(a) * r; const y = 520 + Math.sin(a) * r * 0.55;
+            return <g key={i} transform={`translate(${x} ${y}) rotate(${(a * 180) / Math.PI + (t < 0.5 ? 0 : 180)})`} opacity={0.85}>
+              <line x1={-40} y1={0} x2={20} y2={0} stroke={ALERT} strokeWidth={8} strokeLinecap="round" />
+              <path d="M 20 -16 L 46 0 L 20 16 Z" fill={ALERT} />
+            </g>; })}
+          {/* Atlas spiralling in */}
+          {(() => { const t = within(at.inside, 0, 1) * 0.6 + (f >= cue(at.centre) ? 0.4 * within(at.centre, 0, 0.55) : 0); const a = t * 9; const r = lerp(620, 0, Math.min(1, t));
+            return t < 0.98 ? <g transform={`translate(${LW / 2 + Math.cos(a) * r} ${520 + Math.sin(a) * r * 0.55}) rotate(${f * 4}) scale(${lerp(1.3, 0.1, Math.min(1, t))})`}>
+              <Atlas x={0} y={60} s={1.2} t={f * 0.3} walking={0.3} mood="shocked" /></g> : null; })()}
           {f >= cue(at.centre) && <g opacity={EASE_OUT(within(at.centre, 0.5, 0.75))}>
-            <circle cx={LW / 2} cy={520} r={6 + 3 * Math.sin(f / 2)} fill="#fff" />
-            <circle cx={LW / 2} cy={520} r={40} fill="#fff" opacity={0.12} />
+            <circle cx={LW / 2} cy={520} r={8 + 3 * Math.sin(f / 2)} fill="#fff" />
+            <circle cx={LW / 2} cy={520} r={50} fill="#fff" opacity={0.12} />
           </g>}
         </svg>
         {f < cue(at.centre) ? <Headline text="NO WAY BACK OUT" top={70} size={86} color={ALERT} /> :

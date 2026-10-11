@@ -18,7 +18,7 @@ export const compositionConfig = {
   height: 1080,
 };
 
-const DOTS = (() => { const r = rng(1974); return Array.from({ length: 14 }, () => [200 + r() * 1520, 240 + r() * 560, r()]); })();
+const DOTS = (() => { const r = rng(1974); return Array.from({ length: 14 }, () => [140 + r() * 1000, 240 + r() * 520, r()]); })();
 
 const BHLEnd: React.FC<Partial<LongProps>> = ({ vo = [], at, durationInSeconds = 40, chapter = 7, chapterName = '' }) => {
   const f = useCurrentFrame();
@@ -31,7 +31,7 @@ const BHLEnd: React.FC<Partial<LongProps>> = ({ vo = [], at, durationInSeconds =
       <Scene f={f} a={0} b={cue(at.hawking)} kind="zoom">
         <AbsoluteFill style={{ background: '#000' }} />
         <BHShader x={0} y={0} w={LW} h={LH} res={340} tilt={0.14} dist={20} />
-        <Headline text="THE FINAL TWIST" sub="BLACK HOLES DON'T LAST FOREVER" top={70} size={84} subColor={ALERT} o={EASE_OUT(prog(f, 4, 18))} />
+        <Headline text="THE FINAL TWIST" sub="BLACK HOLES DON'T LAST FOREVER" top={150} size={84} subColor={ALERT} o={EASE_OUT(prog(f, 4, 18))} />
       </Scene>
 
       {/* Hawking radiation: leaking, shrinking */}
@@ -50,13 +50,17 @@ const BHLEnd: React.FC<Partial<LongProps>> = ({ vo = [], at, durationInSeconds =
       <Scene f={f} a={cue(at.small)} b={cue(at.time)} kind="zoom">
         <Stars drift={f * 0.2} />
         <svg width={LW} height={LH} style={{ position: 'absolute', inset: 0 }}>
-          {DOTS.map(([x, y, k], i) => { const pop = within(at.small, 0.2 + k * 0.6, 0.25 + k * 0.6);
+          {DOTS.map(([x, y, k], i) => { const pop = within(at.small, 0.08 + (i / DOTS.length) * 0.82, 0.13 + (i / DOTS.length) * 0.82);
             const r = 12 + k * 30;
             return pop >= 1 ? null : <g key={i}>
               <circle cx={x} cy={y} r={r * (1 + 2 * pop)} fill="none" stroke="#cfe6ff" strokeWidth={4} opacity={pop} />
               <circle cx={x} cy={y} r={r * (1 - pop)} fill="#000" stroke="#ffb46b" strokeWidth={3} />
             </g>; })}
         </svg>
+        <BHShader x={1440 - 210} y={560 - 210} w={420} h={420} res={200} tilt={0.3} dist={18} round />
+        <div style={{ position: 'absolute', left: 1440 - 200, width: 400, top: 790, textAlign: 'center', fontFamily: SANS, fontWeight: 800, fontSize: 32, color: '#cfd6e3' }}>BIG ONES: STILL HERE</div>
+        <div style={{ position: 'absolute', left: 220, top: 790, fontFamily: MONO, fontWeight: 700, fontSize: 40, color: ROUTE }}>
+          TINY ONES GONE: {DOTS.filter((_, i) => within(at.small, 0.13 + (i / DOTS.length) * 0.82, 1) > 0).length}</div>
         <Headline text="THE SMALLER," sub="THE FASTER THEY GO" top={70} size={84} />
       </Scene>
 

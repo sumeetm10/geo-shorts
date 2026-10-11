@@ -4,6 +4,7 @@
     python make_long.py blackhole --free           full render with the free voice (preview)
     python make_long.py blackhole                  acted voice per chapter + render
     python make_long.py blackhole --reuse          re-render, keeping each chapter's voice
+    python make_long.py blackhole --only 2,5 --strict-voice   re-voice + re-render chapters 2 and 5 (main TTS model only)
 
 Each chapter is its own 1920x1080 composition (remotion/src/shots/long/BHL*.tsx)
 with its own narration, so a chapter can be fixed and re-rendered alone
@@ -181,7 +182,11 @@ def main():
     name = sys.argv[1]
     spec = LONGS[name]
     free, reuse, props_only = "--free" in sys.argv, "--reuse" in sys.argv, "--props" in sys.argv
-    only = int(sys.argv[sys.argv.index("--only") + 1]) if "--only" in sys.argv else None
+    # --only 2,5,6  re-make just these chapters (the rest keep their voice and video)
+    only = {int(x) for x in sys.argv[sys.argv.index("--only") + 1].split(",")} if "--only" in sys.argv else None
+    # --strict-voice  every chapter must come from the first (main) TTS model; no quiet fallback
+    # to the second model or edge-tts - the second model reads the same voice ~4 semitones lower
+    strict = "--strict-voice" in sys.argv
     base = ROOT / "data" / "jobs" / f"long-{name}"
     base.mkdir(parents=True, exist_ok=True)
     chapter_secs = []
@@ -190,7 +195,7 @@ def main():
         job.mkdir(exist_ok=True)
         lines = [l for l, _ in ch["lines"]]
         old = job / "props.json"
-        if only is not None and i != only and old.exists():
+        if only is not None and i not in only and old.exists():
             chapter_secs.append(json.loads(old.read_text(encoding="utf-8"))["durationInSeconds"])
             continue
         check_facts(ch)
@@ -198,6 +203,10 @@ def main():
             vo, voice = json.loads(old.read_text(encoding="utf-8"))["vo"], job / "voice.mp3"
             if [v.get("text") for v in vo] != lines:
                 raise SystemExit(f"chapter {i}: script changed since its voice was made - build without --reuse")
+        elif strict and not free:
+            import acted
+            acted.TTS_MODELS = acted.TTS_MODELS[:1]
+            vo, voice = acted.perform(lines, "explore", job)          # raises rather than falling back
         else:
             vo, voice = narrate.narrate(lines, [k for _, k in ch["lines"]], job, style=None if free else "explore")
         secs = round(vo[-1]["end"] + PAD, 2)

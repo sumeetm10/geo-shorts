@@ -42,18 +42,29 @@ const BHLFind: React.FC<Partial<LongProps>> = ({ vo = [], at, durationInSeconds 
         <AbsoluteFill style={{ background: `linear-gradient(#02030a 0%, #0b1736 ${lerp(70, 40, within(0, 0, 1))}%, #1a2b52 100%)` }} />
         <Stars drift={f * 0.2} o={0.8} tint="#02030a" />
         <svg width={LW} height={LH} style={{ position: 'absolute', inset: 0 }}>
-          {(() => { const t = EASE_INOUT(within(0, 0, 0.7)); const y = lerp(980, 260, t);
-            return <g transform={`translate(${lerp(520, 640, t)} ${y}) rotate(12)`}>
-              <path d={`M -14 70 L 0 ${70 + 120 + 30 * Math.sin(f)} L 14 70 Z`} fill="#ffb347" />
-              <rect x={-18} y={-60} width={36} height={130} rx={8} fill="#e9edf2" stroke="#000" strokeWidth={3} />
-              <path d="M -18 -60 L 0 -110 L 18 -60 Z" fill="#c94a3a" stroke="#000" strokeWidth={3} />
+          <defs>
+            <radialGradient id="limb" cx="0.5" cy="0.5" r="0.5"><stop offset="0.93" stopColor="#1d4f8f" /><stop offset="0.985" stopColor="#6fb7ff" /><stop offset="1" stopColor="#6fb7ff" stopOpacity={0} /></radialGradient>
+            <linearGradient id="land" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#24527a" /><stop offset="0.45" stopColor="#3c6b3a" /><stop offset="0.7" stopColor="#7a6b48" /><stop offset="1" stopColor="#24527a" /></linearGradient>
+          </defs>
+          <circle cx={LW / 2} cy={2500} r={1640} fill="url(#limb)" />
+          <circle cx={LW / 2} cy={2500} r={1600} fill="url(#land)" opacity={0.9} />
+          {(() => { const t = EASE_INOUT(within(0, 0, 0.75)); const x = lerp(900, 1180, t); const y = lerp(820, 300, t);
+            return <g>
+              {Array.from({ length: 14 }, (_, k) => <circle key={k} cx={lerp(900, x, k / 14)} cy={lerp(900, y + 90, k / 14)} r={10 + k * 1.5} fill="#e9edf2" opacity={0.08 + 0.02 * k} />)}
+              <g transform={`translate(${x} ${y}) rotate(${lerp(0, 22, t)}) scale(2.2)`}>
+                <path d={`M -14 70 L 0 ${70 + 90 + 25 * Math.sin(f)} L 14 70 Z`} fill="#ffb347" />
+                <rect x={-18} y={-60} width={36} height={130} rx={8} fill="#e9edf2" stroke="#000" strokeWidth={3} />
+                <path d="M -18 -60 L 0 -110 L 18 -60 Z" fill="#c94a3a" stroke="#000" strokeWidth={3} />
+              </g>
             </g>; })()}
-          {within(0, 0.55, 0.7) > 0 && <g opacity={EASE_OUT(within(0, 0.55, 0.7))}>
-            {[0, 1, 2].map((k) => <circle key={k} cx={1400} cy={300} r={40 + k * 40 + 8 * Math.sin(f / 3)} fill="none" stroke="#c7a6ff" strokeWidth={4} opacity={0.6 - k * 0.15} />)}
-            <circle cx={1400} cy={300} r={14} fill="#e7dcff" />
-          </g>}
+          {/* the X-ray source in Cygnus, pulsing from the start */}
+          {[0, 1, 2, 3].map((k) => { const r = ((f * 1.6 + k * 40) % 160);
+            return <circle key={k} cx={1500} cy={260} r={20 + r} fill="none" stroke="#c7a6ff" strokeWidth={4} opacity={0.7 * (1 - r / 160)} />; })}
+          <circle cx={1500} cy={260} r={16} fill="#e7dcff" />
+          <text x={1500} y={150} textAnchor="middle" fontFamily={SANS} fontWeight={800} fontSize={30} fill="#c7a6ff">X-RAYS</text>
         </svg>
-        <Headline text="CYGNUS X-1" sub="FOUND IN 1964, ON A ROCKET FLIGHT" top={640} size={92} o={EASE_OUT(within(0, 0.55, 0.75))} />
+        {within(0, 0.4, 0.5) <= 0 ? <Headline text="THE FIRST ONE WE FOUND" top={160} size={72} align="left" left={120} /> :
+          <Headline text="CYGNUS X-1" sub="FOUND IN 1964, ON A ROCKET FLIGHT" top={160} size={92} align="left" left={120} o={EASE_OUT(within(0, 0.4, 0.55))} />}
       </Scene>
 
       {/* 21 Suns, orbiting a blue supergiant */}

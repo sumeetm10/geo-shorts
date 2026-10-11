@@ -44,7 +44,7 @@ const BHLNeutron: React.FC<Partial<LongProps>> = ({ vo = [], at, durationInSecon
         <div style={{ position: 'absolute', inset: 0, opacity: EASE_OUT(prog(f, 30, 60)) }}>
           <NeutronShader x={C.x} y={C.y} size={900} res={340} radius={0.4} spin={0.3} />
         </div>
-        <Headline text="NEUTRON STAR" top={70} size={96} o={EASE_OUT(prog(f, 40, 60))} />
+        <Headline text="NEUTRON STAR" top={150} size={96} o={EASE_OUT(prog(f, 40, 60))} />
       </Scene>
       <Flash f={f} at={6} len={8} />
 
