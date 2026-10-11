@@ -625,6 +625,66 @@ SPECS = {
         tags=["iss deorbit", "international space station", "point nemo", "spacecraft cemetery", "nasa iss",
               "space", "astronomy", "science", "shorts"],
     ),
+    "wormtravel": dict(
+        comp="WormholeTravel", tone="surprising", seed=263,
+        lines=[
+            ("Einstein's own equations allow a tunnel through space. Could you fly through it?", "hook"),
+            ("It's called a wormhole. First found in the maths in 1916, then by Einstein and Rosen in 1935.", "reveal"),
+            ("But step inside, and it pinches shut too fast for even light to cross.", "stop"),
+            ("To hold it open, you'd need something with negative energy.", "walk"),
+            ("Sounds impossible. But the Casimir effect shows negative energy can be real.", "reveal"),
+            ("And some physicists think the amount needed could be made tiny.", "payoff"),
+            ("Would you step in? Part 2: the wormhole time machine.", "cta"),
+        ],
+        at=dict(name=1, pinch=2, neg=3, casimir=4, tiny=5),
+        hook={"top": "A TUNNEL", "bottom": "THROUGH SPACE?", "badge": "EINSTEIN'S MATHS"},
+        facts={"Wormhole": ["hypothetical structure", "Ludwig Flamm in 1916", "1935",
+                            "pinch off too quickly for light", "negative energy", "Casimir effect",
+                            "arbitrarily small"],
+               "Casimir effect": ["energy density in very small regions of space to be negative", "stabilize a traversable wormhole"]},
+        derived="",
+        query="wormhole",
+        title="Could You Actually Travel Through a Wormhole? 🌀",
+        description=("A wormhole is a hypothetical tunnel through spacetime that's allowed by Einstein's equations.\n\n"
+                     "- First found in the maths by Ludwig Flamm in 1916, then by Einstein and Rosen in 1935\n"
+                     "- That kind of wormhole pinches off too quickly for even light to get through\n"
+                     "- Holding one open would need exotic matter with negative energy\n"
+                     "- The Casimir effect shows quantum physics does allow negative energy in small regions\n"
+                     "- Later calculations suggested the amount needed could be made arbitrarily small\n"
+                     "- No wormhole has ever been observed\n\n"
+                     "The wormhole in this video is a shader drawn in code."),
+        tags=["wormhole", "einstein rosen bridge", "can you travel through a wormhole", "negative energy",
+              "casimir effect", "space", "physics", "science", "shorts"],
+    ),
+    "wormtime": dict(
+        comp="WormholeTime", tone="surprising", seed=271,
+        lines=[
+            ("Physicists worked out how a wormhole could become a time machine.", "hook"),
+            ("Take one end, and fly it at nearly the speed of light. Then bring it back.", "walk"),
+            ("Time runs slower for that end. So it comes back younger.", "reveal"),
+            ("Step into the young end, and you come out of the old one. In the past.", "stop"),
+            ("But there's a catch. You can't go back further than the day the machine was built.", "cold"),
+            ("So no visiting the dinosaurs. And nobody has ever found a wormhole.", "payoff"),
+            ("Where would you go? Subscribe for more space.", "cta"),
+        ],
+        at=dict(fly=1, young=2, past=3, catch=4, dino=5),
+        hook={"top": "A WORMHOLE", "bottom": "TIME MACHINE", "badge": "PART 2"},
+        facts={"Wormhole": ["time-travel machine", "significant fraction of the speed of light",
+                            "aged less", "initial creation of the machine", "hypothetical structure"],
+               "Time dilation": ["moving clock"]},
+        derived="",
+        query="wormhole time machine",
+        title="How a Wormhole Could Become a Time Machine ⏳ (Part 2)",
+        description=("Part 1: could you travel through a wormhole? PART1LINK\n\n"
+                     "- A proposed time machine: accelerate one end of a traversable wormhole to a large fraction of light speed and bring it back\n"
+                     "- Time dilation means the moved end ages less - it comes back younger\n"
+                     "- Enter the younger end and you exit the older one: back in time, as seen from outside\n"
+                     "- The catch: you can only go back as far as when the machine was made\n"
+                     "- Wormholes are hypothetical - none has ever been observed\n\n"
+                     "The wormhole in this video is a shader drawn in code."),
+        tags=["wormhole time machine", "wormhole", "time travel", "time dilation", "einstein",
+              "space", "physics", "science", "shorts"],
+    ),
     "neutron": dict(
         comp="NeutronStar", tone="surprising", seed=258,
         lines=[

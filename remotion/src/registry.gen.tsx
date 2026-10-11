@@ -30,8 +30,10 @@ import Shot26, { compositionConfig as cfg26 } from './shots/geo/SunSize';
 import Shot27, { compositionConfig as cfg27 } from './shots/geo/TonBH';
 import Shot28, { compositionConfig as cfg28 } from './shots/geo/TrueSize';
 import Shot29, { compositionConfig as cfg29 } from './shots/geo/VoyagerDay';
-import Shot30, { compositionConfig as cfg30 } from './shots/geo/Zones';
-import Shot31, { compositionConfig as cfg31 } from './shots/short-walk/ShortWalkIndiaUsa';
+import Shot30, { compositionConfig as cfg30 } from './shots/geo/WormholeTime';
+import Shot31, { compositionConfig as cfg31 } from './shots/geo/WormholeTravel';
+import Shot32, { compositionConfig as cfg32 } from './shots/geo/Zones';
+import Shot33, { compositionConfig as cfg33 } from './shots/short-walk/ShortWalkIndiaUsa';
 
 export const shots: { Comp: React.FC; config: any }[] = [
   { Comp: Shot0 as React.FC, config: cfg0 },
@@ -66,4 +68,6 @@ export const shots: { Comp: React.FC; config: any }[] = [
   { Comp: Shot29 as React.FC, config: cfg29 },
   { Comp: Shot30 as React.FC, config: cfg30 },
   { Comp: Shot31 as React.FC, config: cfg31 },
+  { Comp: Shot32 as React.FC, config: cfg32 },
+  { Comp: Shot33 as React.FC, config: cfg33 },
 ];

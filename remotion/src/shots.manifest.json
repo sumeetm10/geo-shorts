@@ -240,6 +240,22 @@
   "transparent": false
  },
  {
+  "id": "WormholeTime",
+  "durationInSeconds": 28,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "WormholeTravel",
+  "durationInSeconds": 34,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
   "id": "Zones",
   "durationInSeconds": 32,
   "fps": 30,
