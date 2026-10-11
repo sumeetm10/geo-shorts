@@ -48,6 +48,14 @@
   "transparent": false
  },
  {
+  "id": "BornPlanets",
+  "durationInSeconds": 45,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
   "id": "DinoRock",
   "durationInSeconds": 40,
   "fps": 30,
@@ -133,6 +141,14 @@
   "fps": 30,
   "width": 1080,
   "height": 1920,
+  "transparent": false
+ },
+ {
+  "id": "LongBorn",
+  "durationInSeconds": 400,
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
   "transparent": false
  },
  {
@@ -264,6 +280,78 @@
   "transparent": false
  },
  {
+  "id": "BHLBig",
+  "durationInSeconds": 24,
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "transparent": false
+ },
+ {
+  "id": "BHLEnd",
+  "durationInSeconds": 40,
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "transparent": false
+ },
+ {
+  "id": "BHLFall",
+  "durationInSeconds": 51,
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "transparent": false
+ },
+ {
+  "id": "BHLFind",
+  "durationInSeconds": 50,
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "transparent": false
+ },
+ {
+  "id": "BHLMake",
+  "durationInSeconds": 52,
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "transparent": false
+ },
+ {
+  "id": "BHLNeutron",
+  "durationInSeconds": 20,
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "transparent": false
+ },
+ {
+  "id": "BHLOpen",
+  "durationInSeconds": 20,
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "transparent": false
+ },
+ {
+  "id": "BHLPhoto",
+  "durationInSeconds": 59,
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "transparent": false
+ },
+ {
+  "id": "BHLThumb",
+  "durationInSeconds": 1,
+  "fps": 30,
+  "width": 1280,
+  "height": 720,
+  "transparent": false
+ },
+ {
   "id": "ShortWalkIndiaUsa",
   "durationInSeconds": 43,
   "fps": 30,
@@ -273,7 +361,7 @@
  },
  {
   "id": "Thumb",
-  "durationInSeconds": 1,
+  "durationInSeconds": 60,
   "fps": 30,
   "width": 1080,
   "height": 1920,
