@@ -625,6 +625,37 @@ SPECS = {
         tags=["iss deorbit", "international space station", "point nemo", "spacecraft cemetery", "nasa iss",
               "space", "astronomy", "science", "shorts"],
     ),
+    "sgra": dict(
+        comp="GalaxyHeart", tone="surprising", seed=244,
+        lines=[
+            ("At the centre of our galaxy hides a black hole 4 million times heavier than the Sun.", "hook"),
+            ("Sagittarius A star. 26,000 light-years away.", "reveal"),
+            ("Nobody can see it. So how do we know it's there?", "stop"),
+            ("Stars. One, called S2, whips around it every 16 years.", "walk"),
+            ("At its closest, it hit 7,650 km a second. Almost 3% of the speed of light.", "reveal"),
+            ("That discovery won the 2020 Nobel Prize.", "walk"),
+            ("And in 2022, we finally took its picture.", "payoff"),
+            ("Subscribe for more black holes.", "cta"),
+        ],
+        at=dict(name=1, see=2, s2=3, speed=4, nobel=5, photo=6),
+        hook={"top": "THE MONSTER AT", "bottom": "OUR GALAXY'S HEART", "badge": "4 MILLION SUNS"},
+        facts={"Sagittarius A*": ["million solar masses", "26,000 light-years", "2020 Nobel Prize in Physics",
+                                  "May 12, 2022", "first image of Sagittarius A*", "7,650 km/s", "the star S2"],
+               "S2 (star)": ["period of 16.0518 years", "7,650 km/s", "almost 3% of the speed of light"]},
+        derived="4.297 million solar masses, said as 4 million; 16.05 years said as 16.",
+        query="sagittarius a*",
+        title="The Black Hole at the Centre of Our Galaxy 🕳️",
+        description=("Sagittarius A* - the supermassive black hole at the heart of the Milky Way.\n\n"
+                     "- About 4.3 million times the mass of the Sun, roughly 26,000 light-years away\n"
+                     "- We can't see it directly - we know it's there from the stars orbiting it\n"
+                     "- The star S2 circles it every 16 years and reached 7,650 km/s (almost 3% of light speed) in 2018\n"
+                     "- The discovery earned Reinhard Genzel and Andrea Ghez the 2020 Nobel Prize in Physics\n"
+                     "- On May 12, 2022, the Event Horizon Telescope released the first image of it\n\n"
+                     "The black hole in this video is ray-traced in code: light is bent by gravity, so you see the far "
+                     "side of the disk over the top. The 'photo' is our recreation, not the real image."),
+        tags=["sagittarius a*", "black hole", "milky way black hole", "supermassive black hole", "s2 star",
+              "event horizon telescope", "space", "astronomy", "shorts"],
+    ),
     "isspart2": dict(
         comp="IssWhy", tone="urgent", seed=231,
         lines=[
