@@ -13,6 +13,7 @@ contents of token_geo.json after --login. It never goes in the repository.
 """
 import argparse
 import json
+import re
 import os
 import pickle
 import sys
@@ -126,14 +127,43 @@ def _clean(text):
     return str(text).replace("<", "").replace(">", "→")
 
 
-def upload(path, meta, privacy="public", publish_at=None):
+def _norm_title(t):
+    return re.sub(r"[^a-z0-9 ]+", "", t.lower()).split()
+
+
+def existing_title(yt, title):
+    """The channel's upload with the same title (ignoring case, emoji and
+    punctuation), or None. YouTube buries re-uploads: "3 Countries Completely
+    Inside Another Country" got 1,591 views, its re-upload on 2026-10-03 got 34."""
+    want = _norm_title(title)
+    ch = yt.channels().list(part="contentDetails", mine=True).execute()["items"][0]
+    pl = ch["contentDetails"]["relatedPlaylists"]["uploads"]
+    token = None
+    while True:
+        r = yt.playlistItems().list(part="snippet", playlistId=pl, maxResults=50, pageToken=token).execute()
+        for it in r["items"]:
+            if _norm_title(it["snippet"]["title"]) == want:
+                return it["snippet"]["resourceId"]["videoId"]
+        token = r.get("nextPageToken")
+        if not token:
+            return None
+
+
+def upload(path, meta, privacy="public", publish_at=None, replacing=None):
     """publish_at (aware UTC datetime): upload now as private and let YouTube
     make it public at exactly that minute. GitHub's timer ran 4.5 hours late
-    on 2026-09-26; YouTube's does not."""
+    on 2026-09-26; YouTube's does not.
+    Refuses a title the channel already has, unless `replacing` names that
+    video's id (a fixed re-upload whose old copy the owner will delete)."""
     meta = dict(meta, title=_clean(meta["title"]), description=_clean(meta["description"]))
     who = assert_correct_channel()
     print(f"[upload] target channel: {who['title']} ({who['handle']})")
     yt = build("youtube", "v3", credentials=_credentials())
+    dup = existing_title(yt, meta["title"])
+    if dup and dup != replacing:
+        raise SystemExit(f"[upload] refused: the channel already has '{meta['title']}' "
+                         f"(https://youtu.be/{dup}). Re-uploads get buried - use a new angle or title, "
+                         f"or pass replacing='{dup}' if the old one is being deleted.")
     body = {
         "snippet": {
             "title": meta["title"][:100],

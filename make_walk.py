@@ -502,11 +502,7 @@ def _beats(route, legs, built):
     o, d = geo.short(route["origin"]), geo.short(route["dest"])
     # The hook is a question the closing line leads back into ("So next time
     # someone asks you... Can you walk from X to Y?"), so the Short loops.
-    beats = [("hook", 0, f"HOOK: START with exactly \"Can you walk from {_the(route['origin'])} to "
-                         f"{_the(route['dest'])}?\" or \"Could you really walk from "
-                         f"{_the(route['origin'])} to {_the(route['dest'])}?\", then at most 6 more "
-                         f"words of STAKES that make them NEED the answer (a challenge or a warning, "
-                         f"e.g. 'Sounds easy. It isn't.'). Never give the answer away.")]
+    beats = [("hook", 0, f"HOOK: say exactly \"{_hook_line(route)}\" - nothing else.")]
     seen = {route["origin"]}                  # you start there; you do not "enter" it
     for i, leg in enumerate(legs):
         if leg["kind"] == "gap":
@@ -670,6 +666,11 @@ Return ONLY JSON: {{"lines": ["line 1", ...]}}"""
         try:
             out = llm.run_json(cfg, prompt, temperature=0.8)
             lines = [str(x).strip() for x in out.get("lines", []) if str(x).strip()]
+            if lines:
+                # the opening is fixed (2026-10-11): the question plus a dare to guess.
+                # Walks kept only ~50% of viewers past the first seconds when the
+                # model added filler like "Let's find out".
+                lines[0] = _hook_line(route)
             problem = _gate(lines, beats, route)
             if not problem:
                 return lines, beats
@@ -699,11 +700,16 @@ def _the(country):
     return _article(geo.short(country))
 
 
+def _hook_line(route):
+    """The spoken opening: the question, then a dare that gives a reason to stay to the end."""
+    return f"Can you walk from {_the(route['origin'])} to {_the(route['dest'])}? Guess before the end."
+
+
 def _template(kind, beat, route):
     """A plain, always-true line per beat for when the model cannot be trusted."""
     o, d = geo.short(route["origin"]), geo.short(route["dest"])
     if kind == "hook":
-        return f"Can you really walk from {_the(route['origin'])} to {_the(route['dest'])}? Sounds easy."
+        return _hook_line(route)
     if kind == "payoff":
         km = _floor_km(route["km1"])
         if route["walkable"]:

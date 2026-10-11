@@ -78,11 +78,21 @@ const GlobeWalk: React.FC<Partial<Props>> = (props) => {
 
   // ---- camera
   const o = path[0];
-  const hookT = EASE_INOUT(prog(f, 0, Math.max(20, cue(1) - 4)));
+  // Opening (2026-10-11): frame 0 already shows the whole challenge - the route
+  // drawing itself from start to finish and a red "?" where it might go wrong -
+  // then the camera dives onto Atlas. (The old opening, a generic spinning globe,
+  // kept only ~50% of viewers past the first seconds.)
+  const hookT = EASE_INOUT(prog(f, Math.max(10, cue(1) * 0.45), Math.max(20, cue(1) - 4)));
   const R0 = 430; const RW = 1500;
+  const mid = at01(0.5);
+  const span = Math.max(...path.map(([lo, la]) => {
+    const dl = Math.abs(((lo - mid[0] + 540) % 360) - 180) * Math.cos(((la + mid[1]) / 2) * RAD);
+    return Math.hypot(dl, la - mid[1]);
+  }));
+  const RF = Math.min(RW, Math.max(R0, 380 / Math.sin(Math.min(80, Math.max(8, span)) * RAD)));
   let lon0: number; let lat0: number; let R: number;
   if (f < walkStart) {
-    lon0 = lonLerp(o[0] - 90, o[0], hookT); lat0 = lerp(10, o[1] - 6, hookT); R = logLerp(R0, RW, hookT);
+    lon0 = lonLerp(mid[0], o[0], hookT); lat0 = lerp(mid[1] - 4, o[1] - 6, hookT); R = logLerp(RF, RW, hookT);
   } else {
     // follow the walker, looking a little ahead
     const [ll, la] = at01(Math.min(1, p + 0.05));
@@ -121,7 +131,28 @@ const GlobeWalk: React.FC<Partial<Props>> = (props) => {
           <filter id="routeGlow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7" /></filter>
         </defs>
         {/* the route ahead, faint; the route walked, glowing */}
-        <polyline points={ahead.join(' ')} fill="none" stroke="#ffffff" strokeWidth={4} strokeDasharray="10 12" opacity={0.45} />
+        {f < walkStart ? (() => {
+          const k = EASE_OUT(prog(f, 0, 22));
+          const vis = pts.filter((q, i) => q.vis && cum[i] <= k).map((q) => `${q.x},${q.y}`);
+          const tip = P(...at01(k));
+          return <g>
+            <polyline points={vis.join(' ')} fill="none" stroke="#000" strokeWidth={13} opacity={0.6} strokeLinecap="round" strokeLinejoin="round" />
+            <polyline points={vis.join(' ')} fill="none" stroke={ROUTE} strokeWidth={7} strokeDasharray="16 10" strokeLinecap="round" strokeLinejoin="round" />
+            {k < 1 && tip.vis && <circle cx={tip.x} cy={tip.y} r={12} fill={ROUTE} />}
+          </g>;
+        })() : (
+          <polyline points={ahead.join(' ')} fill="none" stroke="#ffffff" strokeWidth={4} strokeDasharray="10 12" opacity={0.45} />
+        )}
+        {/* the danger spot: a pulsing "?" (at the sea if there is one, else part-way along) */}
+        {f < walkStart && (() => {
+          const at = gap ? [(gap.a[0] + gap.b[0]) / 2, (gap.a[1] + gap.b[1]) / 2] as [number, number] : at01(0.62);
+          const q = P(at[0], at[1]); if (!q.vis) return null;
+          const o2 = prog(f, 16, 24); const pulse = 1 + 0.15 * Math.sin(f / 3);
+          return <g opacity={o2} transform={`translate(${q.x} ${q.y}) scale(${pulse})`}>
+            <circle r={46} fill={ALERT} stroke="#fff" strokeWidth={5} />
+            <text y={20} textAnchor="middle" fontFamily={SANS} fontWeight={800} fontSize={60} fill="#fff">?</text>
+          </g>;
+        })()}
         <polyline points={done.join(' ')} fill="none" stroke={ROUTE} strokeWidth={22} opacity={0.55} filter="url(#routeGlow)" strokeLinejoin="round" strokeLinecap="round" />
         <polyline points={done.join(' ')} fill="none" stroke={ROUTE} strokeWidth={8} strokeLinejoin="round" strokeLinecap="round" />
         {/* the sea in the way */}
@@ -146,8 +177,8 @@ const GlobeWalk: React.FC<Partial<Props>> = (props) => {
         {me.vis && (() => {
           // face the way he is heading on screen
           const [nl, na] = at01(Math.min(1, p + 0.01)); const nx = P(nl, na).x;
-          const mood = f < walkStart ? 'wave' : atSea ? 'shocked' : f >= walkEnd ? 'cheer' : 'walk';
-          return <Atlas x={me.x} y={me.y} s={1.7} t={f} walking={f >= walkStart && f < walkEnd ? 1 : 0} mood={mood}
+          const mood = atSea ? 'shocked' : f >= walkEnd ? 'cheer' : 'walk';
+          return <Atlas x={me.x} y={me.y} s={1.7} t={f} walking={f < walkEnd ? 1 : 0} mood={mood}
             left={f >= walkStart && nx < me.x - 0.5} />;
         })()}
       </svg>
@@ -200,7 +231,8 @@ const GlobeWalk: React.FC<Partial<Props>> = (props) => {
       <div style={{ position: 'absolute', top: 1400, left: 0, right: 0, textAlign: 'center', opacity: hookO,
         transform: `rotate(-3deg) scale(${1 + 0.05 * Math.sin(f / 4)})` }}>
         <span style={{ display: 'inline-block', background: '#ff2d2d', color: '#fff', fontFamily: SANS, fontWeight: 800,
-          fontSize: 64, padding: '10px 30px', borderRadius: 18, border: '5px solid #fff' }}>YES OR NO?</span>
+          fontSize: 60, padding: '10px 30px', borderRadius: 18, border: '5px solid #fff' }}>
+            {(props.km ?? 0).toLocaleString('en-US')} KM · {props.days ?? 0} DAYS</span>
       </div>
 
       <EndCard from={cue(last)} to={END - 10} text="" compact />
