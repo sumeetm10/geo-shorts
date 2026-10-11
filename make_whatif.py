@@ -625,6 +625,40 @@ SPECS = {
         tags=["iss deorbit", "international space station", "point nemo", "spacecraft cemetery", "nasa iss",
               "space", "astronomy", "science", "shorts"],
     ),
+    "neutron": dict(
+        comp="NeutronStar", tone="surprising", seed=258,
+        lines=[
+            ("One teaspoon of this star weighs more than 900 Great Pyramids.", "hook"),
+            ("It's a neutron star. The crushed core of a giant star that exploded.", "reveal"),
+            ("It packs more mass than our Sun into a ball about 20 km wide.", "stop"),
+            ("You could walk across it in about four hours.", "walk"),
+            ("Squeeze the whole Earth that hard, and it would be just 305 metres across.", "reveal"),
+            ("Its gravity is so strong, its tallest mountains are less than a millimetre high.", "cold"),
+            ("And some of them spin hundreds of times every second.", "payoff"),
+            ("Subscribe for more space.", "cta"),
+        ],
+        at=dict(name=1, size=2, walk=3, earth=4, mount=5, spin=6),
+        hook={"top": "ONE TEASPOON", "bottom": "= 900 PYRAMIDS", "badge": "NEUTRON STAR"},
+        facts={"Neutron star": ["one teaspoon", "about 900 times the mass of the Great Pyramid of Giza",
+                                "gravitationally collapsed core of a massive supergiant star",
+                                "radius on the order of 10 kilometers", "1.4 solar masses",
+                                "305 m in diameter", "fractions of a millimeter tall", "several hundred times per second"],
+               "Great Pyramid of Giza": ["6 million tonnes"],
+               "Arecibo Telescope": ["305 m"],
+               "Preferred walking speed": ["5.0 km/h"]},
+        derived="teaspoon 5.5e12 kg vs 900 x 6 million t = 5.4e12 kg; 20 km / 5.0 km/h = 4 h.",
+        query="neutron star",
+        title="One Teaspoon of This Star Weighs More Than 900 Pyramids 😳",
+        description=("A neutron star - the crushed core of a giant star that exploded as a supernova.\n\n"
+                     "- One teaspoon of it would weigh over 5.5 trillion kg - about 900 Great Pyramids (6 million tonnes each)\n"
+                     "- About 1.4 times the Sun's mass packed into a ball around 20 km across - a 4-hour walk at 5 km/h\n"
+                     "- At that density the whole Earth would be just 305 m wide - the size of the old Arecibo dish\n"
+                     "- Its 'mountains' may be only fractions of a millimetre tall\n"
+                     "- Newborn neutron stars can spin several hundred times per second\n\n"
+                     "The neutron star in this video is a shader drawn in code."),
+        tags=["neutron star", "densest star", "teaspoon of neutron star", "pulsar", "supernova",
+              "space facts", "space", "astronomy", "shorts"],
+    ),
     "sgra": dict(
         comp="GalaxyHeart", tone="surprising", seed=244,
         lines=[

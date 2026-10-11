@@ -34,7 +34,7 @@ const composition = {
 
 // compositions with a WebGL shader (ShaderSun) need Chrome's software GL;
 // the default headless mode has no WebGL at all
-const WEBGL = new Set(['ParkerSun', 'GalaxyHeart']);
+const WEBGL = new Set(['ParkerSun', 'GalaxyHeart', 'NeutronStar']);
 
 let last = -1;
 await renderMedia({

@@ -152,6 +152,14 @@
   "transparent": false
  },
  {
+  "id": "NeutronStar",
+  "durationInSeconds": 33,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
   "id": "NoSpin",
   "durationInSeconds": 42,
   "fps": 30,
