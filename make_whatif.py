@@ -604,7 +604,7 @@ SPECS = {
             ("Point Nemo. The place farthest from any land.", "reveal"),
             ("A spacecraft cemetery, where hundreds of old satellites lie.", "cold"),
             ("And the closest humans? Often astronauts on the ISS.", "payoff"),
-            ("Subscribe for more space.", "cta"),
+            ("But why crash it at all? Subscribe for part 2.", "cta"),
         ],
         at=dict(big=1, fast=2, down=3, push=3, nemo=4, grave=5, twist=6),
         hook={"top": "NASA WILL CRASH", "bottom": "THE SPACE STATION", "badge": "ON PURPOSE"},
@@ -646,7 +646,7 @@ SPECS = {
         derived="",
         query="why is nasa crashing the iss",
         title="Why NASA Is Crashing the Space Station Into the Ocean (Part 2) 🛰️",
-        description=("Why not just leave the ISS in orbit? Part 1: https://youtu.be/HoiQWFMw7AY\n\n"
+        description=("Why not just leave the ISS in orbit? Part 1: https://youtu.be/CK05yF0GTz0\n\n"
                      "- The station is ageing: air leaks and mold, and astronauts spend about half their time on maintenance\n"
                      "- Left alone it would fall anyway - NASA judged a random reentry an unacceptable risk\n"
                      "- Skylab fell on July 11, 1979, scattering debris across Western Australia; the Shire of Esperance "

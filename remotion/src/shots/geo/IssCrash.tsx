@@ -239,6 +239,14 @@ const IssCrash: React.FC<Partial<Props>> = ({ vo = [], hook = { top: '', bottom:
         );
       })()}
 
+      {/* follow-up teaser: part 2 explains why */}
+      {f >= cue(last) && f < END - 20 && (
+        <div style={{ position: 'absolute', top: 600, left: 0, right: 0, textAlign: 'center',
+          transform: `rotate(-4deg) scale(${lerp(1.5, 1, EASE_OUT(prog(f, cue(last), cue(last) + 10)))})`, opacity: EASE_OUT(prog(f, cue(last), cue(last) + 8)) }}>
+          <span style={{ display: 'inline-block', background: ROUTE, color: '#111', fontFamily: SANS, fontWeight: 800, fontSize: 70,
+            padding: '12px 34px', borderRadius: 20, border: '6px solid #000', boxShadow: '0 14px 40px #000' }}>PART 2 · WHY CRASH IT?</span>
+        </div>
+      )}
       <EndCard from={cue(last)} to={END - 14} text="" compact />
       <Captions lines={vo} y={1600} accent={ROUTE} maxWords={3} size={58} plate />
     </AbsoluteFill>
