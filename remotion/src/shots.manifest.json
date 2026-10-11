@@ -120,6 +120,14 @@
   "transparent": false
  },
  {
+  "id": "IssWhy",
+  "durationInSeconds": 31,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "transparent": false
+ },
+ {
   "id": "MoonGone",
   "durationInSeconds": 42,
   "fps": 30,

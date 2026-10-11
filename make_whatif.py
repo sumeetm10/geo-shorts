@@ -625,6 +625,37 @@ SPECS = {
         tags=["iss deorbit", "international space station", "point nemo", "spacecraft cemetery", "nasa iss",
               "space", "astronomy", "science", "shorts"],
     ),
+    "isspart2": dict(
+        comp="IssWhy", tone="urgent", seed=231,
+        lines=[
+            ("Why not just leave the space station up there?", "hook"),
+            ("Because it's old. Air leaks. Even mold.", "reveal"),
+            ("Astronauts spend half their time just fixing it.", "stop"),
+            ("And left alone, it would fall anyway. Like Skylab in 1979.", "walk"),
+            ("Skylab rained debris on Australia. A town fined NASA 400 dollars for littering.", "reveal"),
+            ("So SpaceX is building a tug with 46 thrusters to steer it down.", "walk"),
+            ("But some lawmakers now want NASA to study saving it instead.", "payoff"),
+            ("Crash it or save it? Tell me below.", "cta"),
+        ],
+        at=dict(old=1, half=2, fall=3, sky=4, tug=5, save=6),
+        hook={"top": "WHY CRASH", "bottom": "THE SPACE STATION?", "badge": "PART 2"},
+        facts={"International Space Station": ["air leaks", "mold", "half of their time on station maintenance",
+                                               "unacceptable risk", "46 Draco thrusters", "selected SpaceX",
+                                               "safe orbital harbor"],
+               "Skylab": ["July 11, 1979", "Western Australia", "fined NASA A$400 for littering"]},
+        derived="",
+        query="why is nasa crashing the iss",
+        title="Why NASA Is Crashing the Space Station Into the Ocean (Part 2) 🛰️",
+        description=("Why not just leave the ISS in orbit? Part 1: https://youtu.be/HoiQWFMw7AY\n\n"
+                     "- The station is ageing: air leaks and mold, and astronauts spend about half their time on maintenance\n"
+                     "- Left alone it would fall anyway - NASA judged a random reentry an unacceptable risk\n"
+                     "- Skylab fell on July 11, 1979, scattering debris across Western Australia; the Shire of Esperance "
+                     "fined NASA A$400 for littering\n"
+                     "- SpaceX is building the U.S. Deorbit Vehicle: a Dragon with 46 Draco thrusters\n"
+                     "- In 2026, US lawmakers asked NASA to study moving the ISS to a safe orbital harbor instead"),
+        tags=["why is nasa crashing the iss", "iss deorbit", "international space station", "skylab",
+              "space station crash", "nasa", "space", "science", "shorts"],
+    ),
 }
 
 
