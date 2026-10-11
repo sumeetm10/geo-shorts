@@ -34,6 +34,7 @@ import Shot30, { compositionConfig as cfg30 } from './shots/geo/WormholeTime';
 import Shot31, { compositionConfig as cfg31 } from './shots/geo/WormholeTravel';
 import Shot32, { compositionConfig as cfg32 } from './shots/geo/Zones';
 import Shot33, { compositionConfig as cfg33 } from './shots/short-walk/ShortWalkIndiaUsa';
+import Shot34, { compositionConfig as cfg34 } from './shots/thumb/Thumb';
 
 export const shots: { Comp: React.FC; config: any }[] = [
   { Comp: Shot0 as React.FC, config: cfg0 },
@@ -70,4 +71,5 @@ export const shots: { Comp: React.FC; config: any }[] = [
   { Comp: Shot31 as React.FC, config: cfg31 },
   { Comp: Shot32 as React.FC, config: cfg32 },
   { Comp: Shot33 as React.FC, config: cfg33 },
+  { Comp: Shot34 as React.FC, config: cfg34 },
 ];
