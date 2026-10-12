@@ -1,5 +1,5 @@
 {
-  "walk_next": 14,
+  "walk_next": 15,
   "question_next": 10,
   "history": [
     {
@@ -355,11 +355,30 @@
       "youtube_id": "0xldLZw5omA",
       "privacy": "public",
       "note": "recorded by hand: the run uploaded it but failed to save state"
+    },
+    {
+      "date": "2026-10-12 00:44",
+      "kind": "explore",
+      "title": "explore:Pole of inaccessibility",
+      "for_day": "2026-10-12",
+      "error": "build: AttributeError: 'list' object has no attribute 'get'"
+    },
+    {
+      "date": "2026-10-12 00:44",
+      "kind": "walk",
+      "title": "Can You Walk from Nepal to Thailand? 🌍🚶",
+      "for_day": "2026-10-12",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-12-walk-nepal-to-thailand.mp4",
+      "format": "globe-walk",
+      "youtube_id": "AWhhs8biyLY",
+      "privacy": "public",
+      "publish_at": "2026-10-12 05:15 UTC"
     }
   ],
   "fails": {
     "explore:Veryovkina Cave": 2,
-    "explore:Oymyakon": 3
+    "explore:Oymyakon": 3,
+    "explore:Pole of inaccessibility": 1
   },
   "explore": {
     "queue": [
@@ -411,6 +430,41 @@
         "angle": "How do you get to the bottom of Lake Baikal, the deepest lake on Earth?",
         "evidence": "What’s the deepest lake in the United States?",
         "added": "2026-10-05"
+      },
+      {
+        "wikipedia": "Olympus Mons",
+        "kind": "height",
+        "angle": "How do you climb the tallest volcano in the solar system?",
+        "evidence": "The Biggest Mountain in the Universe We've Found (Olympus Mons); Burj Khalifa vs Mount Everest vs Olympus Mons",
+        "added": "2026-10-12"
+      },
+      {
+        "wikipedia": "Mount Everest",
+        "kind": "height",
+        "angle": "How do you get to the highest point above sea level on Earth?",
+        "evidence": "Worlds Tallest Mountain Isn't Everest?; Highest mountain peaks of every continent 🏔️🏔️😱😱",
+        "added": "2026-10-12"
+      },
+      {
+        "wikipedia": "Death Valley",
+        "kind": "hot",
+        "angle": "How do you survive the hottest place on Earth?",
+        "evidence": "The Hottest Place on Earth Right Now #temperature #india #extreme",
+        "added": "2026-10-12"
+      },
+      {
+        "wikipedia": "Sardinia",
+        "kind": "depth",
+        "angle": "How do you explore the strangest underground ruins on Earth?",
+        "evidence": "Strangest Ruins on Earth\" The Sardinia Domas",
+        "added": "2026-10-12"
+      },
+      {
+        "wikipedia": "TON 618",
+        "kind": "depth",
+        "angle": "How do you measure the deepest abyss of space?",
+        "evidence": "I Captured TON 618 - The Biggest Black Hole Ever Found🤯 Quasar TON618 using Beginner Telescope #nasa; Flying to TON 618 🌌",
+        "added": "2026-10-12"
       }
     ],
     "done": [
@@ -424,7 +478,7 @@
       "Veryovkina Cave",
       "Oymyakon"
     ],
-    "seed_at": 12,
-    "last_research": "2026-10-05"
+    "seed_at": 0,
+    "last_research": "2026-10-12"
   }
 }
