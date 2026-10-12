@@ -1,5 +1,5 @@
 {
-  "walk_next": 13,
+  "walk_next": 14,
   "question_next": 10,
   "history": [
     {
@@ -346,21 +346,23 @@
       "youtube_id": "cA-CdvwvZvQ",
       "privacy": "public",
       "publish_at": "2026-10-11 05:15 UTC"
+    },
+    {
+      "date": "2026-10-11 22:15",
+      "kind": "walk",
+      "title": "Can You Walk from India to Brazil? 🌍🚶",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-11-walk-india-to-brazil.mp4",
+      "youtube_id": "0xldLZw5omA",
+      "privacy": "public",
+      "note": "recorded by hand: the run uploaded it but failed to save state"
     }
   ],
   "fails": {
     "explore:Veryovkina Cave": 2,
-    "explore:Oymyakon": 1
+    "explore:Oymyakon": 3
   },
   "explore": {
     "queue": [
-      {
-        "wikipedia": "Oymyakon",
-        "kind": "cold",
-        "angle": "How do you get to the coldest town on Earth?",
-        "evidence": "requeued after the 2026-10-04 fixes",
-        "added": "2026-10-04"
-      },
       {
         "wikipedia": "Pole of inaccessibility",
         "kind": "remote",
@@ -419,7 +421,8 @@
       "Yakutsk"
     ],
     "failed": [
-      "Veryovkina Cave"
+      "Veryovkina Cave",
+      "Oymyakon"
     ],
     "seed_at": 12,
     "last_research": "2026-10-05"

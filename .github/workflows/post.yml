@@ -112,7 +112,10 @@ jobs:
           git add data/state.json
           if ! git diff --cached --quiet; then
             git commit -q -m "state: ${{ steps.pick.outputs.kind }} $(date -u +%F)"
-            git pull -q --rebase && git push -q
+            # --autostash: the build leaves other tracked files modified (2026-10-11 both
+            # runs failed here with "cannot pull with rebase: You have unstaged changes",
+            # so the state was never saved and the next run rebuilt the same walk)
+            git pull -q --rebase --autostash && git push -q
           fi
 
       - name: Keep the video for a week
