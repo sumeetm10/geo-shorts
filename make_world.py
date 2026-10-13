@@ -40,6 +40,15 @@ def _cap(name):
     return name[0].upper() + name[1:]
 
 
+def _yrs(y):
+    """8.8 / 26 / 3,700 - as it would be said."""
+    if y < 20:
+        return f"{y:.1f}".rstrip("0").rstrip(".")
+    if y < 100:
+        return f"{round(y)}"
+    return f"{int(round(y, -2)):,}"
+
+
 def script(w):
     """(lines, kinds, numbers) for one world topic."""
     W = w["world"]
@@ -59,6 +68,20 @@ def script(w):
         ]
         nums = {"diameter": w["diameter"], "around": int(around), "days": days}
         at = {"land": 1, "size": 2, "gravity": 3, "extra": 4, "days": 5}
+    elif w["type"] == "to":
+        years = w["distance"] / KMH / HOURS / 365.25
+        nonstop = w["distance"] / KMH / 24 / 365.25
+        lines = [
+            (f"How long would it take to walk from Earth to {W}? Guess before the end.", "hook"),
+            ("Imagine a road through space. Atlas sets off from Earth.", "walk"),
+            (w["dist_line"], "reveal"),
+            (w["extra_line"], "walk"),
+            (f"Walking 8 hours a day, at a normal pace, it would take about {_yrs(years)} years.", "stop"),
+            (f"Even walking non-stop, day and night, it would still take about {_yrs(nonstop)} years.", "payoff"),
+            ("So next time someone asks you...", "cta"),
+        ]
+        nums = {"distance": w["distance"], "years": _yrs(years), "nonstop": _yrs(nonstop)}
+        at = {"road": 1, "dist": 2, "extra": 3, "years": 4, "nonstop": 5}
     else:
         kg = round(EARTH_KG * w["ratio"])
         jump = round(1 / w["ratio"], 1)
@@ -99,13 +122,15 @@ def make(topic_id, date=None, free=False, props_only=False):
     vo, voice = narrate.narrate(lines, kinds, job, style=None if free else "walk")
     secs = round(vo[-1]["end"] + 0.45, 2)
     W = w["world"]
-    if w["type"] == "around":
+    if w["type"] == "to":
+        hook = {"top": f"WALK TO {W.upper()}?", "badge": "GUESS BEFORE THE END"}
+    elif w["type"] == "around":
         hook = {"top": f"WALK AROUND {W.upper()}?", "badge": "GUESS BEFORE THE END"}
     else:
         hook = {"top": f"YOUR WEIGHT ON {W.upper()}?", "badge": "GUESS BEFORE THE END"}
     props = {"vo": vo, "durationInSeconds": secs, "type": w["type"], "world": W.upper(), "look": w["look"],
-             "hook": hook, "at": at, "nums": nums, "extraLabel": w.get("extra_label", ""),
-             "gravityLabel": (w["gravity"] or "").upper()}
+             "hook": hook, "at": at, "nums": nums, "extraLabel": w.get("extra_label", ""), "distLine": w.get("dist_line", ""),
+             "gravityLabel": (w.get("gravity") or "").upper()}
     (job / "props.json").write_text(json.dumps(props), encoding="utf-8")
     print(f"[render] {secs:.1f}s  {nums}")
     if props_only:
@@ -120,7 +145,11 @@ def make(topic_id, date=None, free=False, props_only=False):
     out = ROOT / "data" / "out" / f"{date}-world-{topic_id}.mp4"
     out.parent.mkdir(parents=True, exist_ok=True)
     mix.mix(silent, voice, bed, out)
-    if w["type"] == "around":
+    if w["type"] == "to":
+        title = f"How Long Would It Take to Walk to {_cap(W)}? 🚶🌌"
+        what = (f"- {w['dist_line']}\n- At 5 km/h, 8 hours a day, that's about {nums['years']} years on foot "
+                f"(about {nums['nonstop']} years walking non-stop)\n")
+    elif w["type"] == "around":
         title = f"Can You Walk All the Way Around {_cap(W)}? 🚶🪐"
         what = (f"- {_cap(W)} is about {w['diameter']:,} km wide, so the walk around its middle is about "
                 f"{nums['around']:,} km (pi x diameter)\n- At 5 km/h, 8 hours a day, that's about {nums['days']} days on foot\n")

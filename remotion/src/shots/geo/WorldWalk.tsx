@@ -27,9 +27,9 @@ export const compositionConfig = {
 };
 
 type Props = {
-  vo: VoLine[]; durationInSeconds: number; type: 'around' | 'weigh'; world: string; look: string;
+  vo: VoLine[]; durationInSeconds: number; type: 'around' | 'weigh' | 'to'; world: string; look: string;
   hook: { top: string; badge: string }; at: Record<string, number>;
-  nums: { diameter?: number; around?: number; days?: number; kgEarth?: number; kgThere?: number; jump?: number; ratio?: number };
+  nums: { diameter?: number; around?: number; days?: number; kgEarth?: number; kgThere?: number; jump?: number; ratio?: number; distance?: number; years?: string; nonstop?: string };
   extraLabel: string; gravityLabel: string;
 };
 
@@ -56,8 +56,32 @@ const WorldWalk: React.FC<Partial<Props>> = (p) => {
   const C = { x: 540, y: 1000 };
   const bounce = (k: number) => -Math.abs(Math.sin(f / 9)) * 70 * k;
 
+  // trips ("walk from Earth to the Moon"): Earth bottom-left, the world top-right, a road between
+  const E = { x: 280, y: 1500, R: 230 }; const T = { x: 820, y: 560, size: 760 };
+  const R0 = { x: E.x + 150, y: E.y - 175 }; const R1 = { x: T.x - 120, y: T.y + 120 };
+  const onRoad = (k: number) => ({ x: lerp(R0.x, R1.x, k), y: lerp(R0.y, R1.y, k) });
+  const yearsNum = parseFloat(String(nums.years ?? '0').replace(/,/g, ''));
+  const tripBase = (k: number, id: string) => (
+    <>
+      <SpaceBg />
+      <GlobeView id={id} cx={E.x} cy={E.y} R={E.R} lon0={80 - f * 0.3} lat0={20} />
+      <PlanetShader x={T.x} y={T.y} size={T.size} look={look} spin={0.08} res={300} />
+      <svg width={W} height={H} style={{ position: 'absolute', inset: 0 }}>
+        <line x1={R0.x} y1={R0.y} x2={R1.x} y2={R1.y} stroke="#ffffff" strokeWidth={4} strokeDasharray="10 14" opacity={0.35} />
+        <line x1={R0.x} y1={R0.y} x2={onRoad(k).x} y2={onRoad(k).y} stroke={ROUTE} strokeWidth={9} strokeDasharray="18 12" strokeLinecap="round" />
+      </svg>
+    </>
+  );
+
   // the opening frame (also the loop's last frame): spinning world, Atlas on top, the ring drawing
-  const hookScene = (t: number) => (
+  const hookScene = (t: number) => type === 'to' ? (
+    <>
+      {tripBase(EASE_OUT(Math.min(1, t * 1.6)), 'th')}
+      <svg width={W} height={H} style={{ position: 'absolute', inset: 0 }}>
+        {(() => { const q = onRoad(0.06 * Math.min(1, t)); return <g transform={`translate(${q.x} ${q.y})`}><Atlas x={0} y={0} s={1.2} t={f} walking={1} mood="walk" /></g>; })()}
+      </svg>
+    </>
+  ) : (
     <>
       <SpaceBg />
       <PlanetShader x={C.x} y={1080} size={2000} look={look} spin={0.08} res={400} />
@@ -197,6 +221,107 @@ const WorldWalk: React.FC<Partial<Props>> = (p) => {
           <div style={{ position: 'absolute', top: 400, left: 0, right: 0, textAlign: 'center', fontFamily: SANS, fontWeight: 700, fontSize: 24, color: '#9fb3c8' }}>at 5 km/h, 8 hours a day</div>
         </Scene>
         <Flash f={f} at={Math.round(lerp(cue(at.days), lineEnd(at.days), 0.75))} len={6} />
+      </> : type === 'to' ? <>
+        {/* a road through space */}
+        <Scene f={f} a={cue(at.road)} b={cue(at.dist)} kind="zoom">
+          <SpaceBg />
+          <PlanetShader x={540} y={500} size={360} look={look} spin={0.08} res={240} />
+          <svg width={W} height={H} style={{ position: 'absolute', inset: 0 }}>
+            <defs><linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#1b2233" stopOpacity={0.2} /><stop offset="1" stopColor="#2c3650" /></linearGradient></defs>
+            <polygon points="510,580 570,580 980,1920 100,1920" fill="url(#road)" />
+            <line x1={510} y1={580} x2={100} y2={1920} stroke={ROUTE} strokeWidth={5} opacity={0.8} />
+            <line x1={570} y1={580} x2={980} y2={1920} stroke={ROUTE} strokeWidth={5} opacity={0.8} />
+            {Array.from({ length: 12 }, (_, i) => { const z = ((i / 12) + f / 45) % 1; const y = lerp(600, 1920, z * z); const w = lerp(3, 26, z * z);
+              return <rect key={i} x={540 - w / 2} y={y} width={w} height={lerp(8, 90, z * z)} fill="#fff" opacity={0.75} />; })}
+            <g transform={`translate(540 ${1330 - Math.abs(Math.sin(f / 6)) * 12})`}><Atlas x={0} y={0} s={3.0} t={f} walking={1} mood="walk" /></g>
+          </svg>
+          <div style={{ position: 'absolute', top: 230, left: 0, right: 0, textAlign: 'center' }}>
+            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 34, letterSpacing: 5, color: ROUTE }}>IMAGINE</div>
+            <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 80, color: '#fff', textShadow: '0 6px 30px #000' }}>A ROAD IN SPACE</div>
+          </div>
+        </Scene>
+
+        {/* how far */}
+        <Scene f={f} a={cue(at.dist)} b={cue(at.extra)} kind="push">
+          {tripBase(1, 'td')}
+          <div style={{ position: 'absolute', top: 230, left: 0, right: 0, textAlign: 'center' }}>
+            <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: (nums.distance ?? 0) > 9999999 ? 84 : 104, color: '#fff', textShadow: '0 6px 30px #000' }}>
+              {Math.round((nums.distance ?? 0) * EASE_OUT(within(at.dist, 0.05, 0.6))).toLocaleString('en-US')} km</div>
+            <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 36, letterSpacing: 4, color: ROUTE }}>{(nums.distance ?? 0) > 9999999 ? 'AT ITS CLOSEST' : 'AWAY'}</div>
+          </div>
+        </Scene>
+
+        {/* the comparison */}
+        <Scene f={f} a={cue(at.extra)} b={cue(at.years)} kind="zoom">
+          <SpaceBg />
+          <svg width={W} height={H} style={{ position: 'absolute', inset: 0 }}>
+            <defs><radialGradient id="mini"><stop offset="0" stopColor="#8fd0ff" /><stop offset="1" stopColor="#1d5fa8" /></radialGradient></defs>
+            {look === 'moon' ? (() => { const n = Math.min(30, Math.floor(31 * EASE_INOUT(within(at.extra, 0.05, 0.85))));
+              return <g>
+                {Array.from({ length: n }, (_, i) => <circle key={i} cx={75 + i * 30} cy={1000} r={14} fill="url(#mini)" stroke="#0b2a4a" strokeWidth={2} />)}
+                <circle cx={1010} cy={1000} r={4} fill="#c9c9c9" />
+                <text x={1010} y={970} textAnchor="middle" fontFamily={SANS} fontWeight={800} fontSize={26} fill="#c9c9c9">MOON</text>
+                <text x={75} y={1060} textAnchor="middle" fontFamily={SANS} fontWeight={800} fontSize={26} fill="#8fd0ff">EARTH</text>
+                <text x={540} y={1160} textAnchor="middle" fontFamily={MONO} fontWeight={700} fontSize={90} fill={ROUTE}>×{n}</text>
+              </g>; })() : (() => { const x0 = 120, x1 = 960; const mx = (v: number) => lerp(x0, x1, v / 110); const k = (Math.sin(f / 20) + 1) / 2;
+              return <g>
+                <line x1={x0} y1={1000} x2={x1} y2={1000} stroke="#cfd6e3" strokeWidth={6} />
+                <circle cx={x0} cy={1000} r={22} fill="url(#mini)" />
+                <text x={x0} y={1060} textAnchor="middle" fontFamily={SANS} fontWeight={800} fontSize={26} fill="#8fd0ff">EARTH</text>
+                <rect x={mx(54)} y={984} width={mx(103) - mx(54)} height={32} rx={16} fill={ALERT} opacity={0.5 * EASE_OUT(within(at.extra, 0.1, 0.4))} />
+                {[54, 103].map((v) => <g key={v}><line x1={mx(v)} y1={960} x2={mx(v)} y2={1040} stroke="#fff" strokeWidth={5} />
+                  <text x={mx(v)} y={940} textAnchor="middle" fontFamily={MONO} fontWeight={700} fontSize={34} fill="#fff">{v}M km</text></g>)}
+                <circle cx={lerp(mx(54), mx(103), k)} cy={1000} r={18} fill="#c1440e" stroke="#000" strokeWidth={3} />
+              </g>; })()}
+          </svg>
+          <div style={{ position: 'absolute', top: 280, left: 40, right: 40, textAlign: 'center', opacity: EASE_OUT(within(at.extra, 0.0, 0.2)) }}>
+            <span style={{ display: 'inline-block', background: 'rgba(8,10,14,0.85)', border: `5px solid ${ROUTE}`, borderRadius: 20, padding: '14px 30px',
+              fontFamily: SANS, fontWeight: 800, fontSize: 60, color: '#fff' }}>{p.extraLabel}</span>
+          </div>
+        </Scene>
+
+        {/* 8 hours a day: the years tick by */}
+        <Scene f={f} a={cue(at.years)} b={cue(at.nonstop)} kind="whip">
+          {(() => { const k = EASE_INOUT(within(at.years, 0.05, 0.85)); const q = onRoad(k);
+            return <>
+              {tripBase(k, 'ty')}
+              <svg width={W} height={H} style={{ position: 'absolute', inset: 0 }}>
+                <g transform={`translate(${q.x} ${q.y})`}><Atlas x={0} y={0} s={1.2} t={f} walking={1} mood="walk" /></g>
+              </svg>
+              <div style={{ position: 'absolute', top: 210, left: 0, right: 0, textAlign: 'center' }}>
+                <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 120, color: '#fff', textShadow: '0 6px 30px #000' }}>{Math.round(yearsNum * k).toLocaleString('en-US')}</div>
+                <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 40, letterSpacing: 4, color: ROUTE }}>YEARS · 8 HOURS A DAY</div>
+              </div>
+            </>; })()}
+          {within(at.years, 0.85, 0.9) > 0 && (
+            <div style={{ position: 'absolute', top: 1330, left: 0, right: 0, textAlign: 'center', transform: `rotate(-4deg) scale(${lerp(1.5, 1, EASE_OUT(within(at.years, 0.85, 0.97)))})` }}>
+              <span style={{ display: 'inline-block', background: '#1fa55a', color: '#fff', fontFamily: SANS, fontWeight: 800, fontSize: 74, padding: '10px 34px',
+                borderRadius: 18, border: '5px solid #fff' }}>{nums.years} YEARS</span>
+            </div>
+          )}
+        </Scene>
+        <Flash f={f} at={Math.round(lerp(cue(at.years), lineEnd(at.years), 0.86))} len={6} />
+
+        {/* non-stop: day and night */}
+        <Scene f={f} a={cue(at.nonstop)} b={cue(last)} kind="zoom">
+          {(() => { const day = (Math.sin(f / 4) + 1) / 2;
+            return <AbsoluteFill style={{ background: `rgb(${lerp(5, 40, day)}, ${lerp(8, 70, day)}, ${lerp(20, 120, day)})` }} />; })()}
+          <SpaceBg starsO={0.6} />
+          <svg width={W} height={H} style={{ position: 'absolute', inset: 0 }}>
+            <g transform="translate(540 1000)">
+              <circle r={260} fill="#0b1224" stroke={ROUTE} strokeWidth={12} />
+              {Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * Math.PI * 2; return <line key={i} x1={Math.sin(a) * 200} y1={-Math.cos(a) * 200} x2={Math.sin(a) * 235} y2={-Math.cos(a) * 235} stroke="#cfd6e3" strokeWidth={8} />; })}
+              <line x1={0} y1={0} x2={Math.sin(f * 0.9) * 200} y2={-Math.cos(f * 0.9) * 200} stroke={ROUTE} strokeWidth={14} strokeLinecap="round" />
+              <line x1={0} y1={0} x2={Math.sin(f * 0.075) * 130} y2={-Math.cos(f * 0.075) * 130} stroke="#fff" strokeWidth={18} strokeLinecap="round" />
+              <circle r={16} fill="#fff" />
+            </g>
+          </svg>
+          <div style={{ position: 'absolute', top: 210, left: 0, right: 0, textAlign: 'center' }}>
+            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 36, letterSpacing: 5, color: ROUTE }}>NON-STOP, DAY AND NIGHT</div>
+            <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 120, color: '#fff', textShadow: '0 6px 30px #000' }}>{nums.nonstop}</div>
+            <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 44, color: '#fff' }}>YEARS</div>
+          </div>
+        </Scene>
       </> : <>
         {/* weigh: 70 kg on Earth */}
         <Scene f={f} a={cue(at.earth)} b={cue(at.gravity)} kind="zoom">
