@@ -391,6 +391,17 @@
       "youtube_id": "dDVzDmD1KX0",
       "privacy": "public",
       "publish_at": "2026-10-13 05:15 UTC"
+    },
+    {
+      "date": "2026-10-13 22:53",
+      "kind": "world",
+      "title": "Can You Walk All the Way Around Mars? 🚶🪐",
+      "for_day": "2026-10-14",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-13-world-mars-around.mp4",
+      "format": "atlas-worlds",
+      "youtube_id": "Ogo91h79mM4",
+      "privacy": "public",
+      "publish_at": "2026-10-14 02:15 UTC"
     }
   ],
   "fails": {
@@ -497,5 +508,6 @@
     ],
     "seed_at": 0,
     "last_research": "2026-10-12"
-  }
+  },
+  "world_next": 1
 }
