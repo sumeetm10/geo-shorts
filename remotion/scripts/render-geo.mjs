@@ -39,7 +39,9 @@ const isWebgl = (c) => WEBGL.has(c) || c.startsWith('BHL') || c === 'WorldWalk';
 
 let last = -1;
 await renderMedia({
-  ...(isWebgl(id) ? { chromiumOptions: { gl: 'angle' } } : {}),
+  // angle on the Windows laptop; Linux CI has no GPU, where only swangle (SwiftShader) draws -
+  // with 'angle' the cloud rendered the planet blank and said nothing (2026-10-13)
+  ...(isWebgl(id) ? { chromiumOptions: { gl: process.platform === 'win32' ? 'angle' : 'swangle' } } : {}),
   serveUrl,
   composition,
   codec: 'h264',

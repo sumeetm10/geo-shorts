@@ -76,6 +76,18 @@ def script(w):
     return [l for l, _ in lines], [k for _, k in lines], nums, at
 
 
+def _check_planet(video):
+    """The planet is a WebGL shader; if WebGL silently fails it renders blank (the first
+    cloud test, 2026-10-13). One second in, the middle of the frame must hold the planet."""
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-ss", "1", "-i", str(video), "-frames:v", "1",
+                          "-vf", "crop=600:600:240:780,scale=60:60,format=gray", "-f", "rawvideo", "-"],
+                         capture_output=True, check=True).stdout
+    mean = sum(raw) / max(1, len(raw))
+    if mean < 25:
+        raise RuntimeError(f"the planet did not render (centre brightness {mean:.0f}) - WebGL problem")
+    print(f"      [check] planet visible (centre brightness {mean:.0f})")
+
+
 def make(topic_id, date=None, free=False, props_only=False):
     w = next(x for x in worlds.WORLDS if x["id"] == topic_id)
     check_facts(w)
@@ -101,6 +113,7 @@ def make(topic_id, date=None, free=False, props_only=False):
     subprocess.run(["node", "scripts/gen-registry.mjs"], cwd=ROOT / "remotion", check=True, capture_output=True)
     silent = job / "silent.mp4"
     render("WorldWalk", job / "props.json", silent)
+    _check_planet(silent)
     bed = job / "score.wav"
     score.build_score(bed, secs + 0.5, tone="curious", seed=len(topic_id) * 7)
     date = date or datetime.now().strftime("%Y-%m-%d")
