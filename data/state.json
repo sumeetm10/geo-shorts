@@ -1,5 +1,5 @@
 {
-  "walk_next": 15,
+  "walk_next": 16,
   "question_next": 10,
   "history": [
     {
@@ -373,22 +373,33 @@
       "youtube_id": "AWhhs8biyLY",
       "privacy": "public",
       "publish_at": "2026-10-12 05:15 UTC"
+    },
+    {
+      "date": "2026-10-13 00:48",
+      "kind": "explore",
+      "title": "explore:Pole of inaccessibility",
+      "for_day": "2026-10-13",
+      "error": "build: RuntimeError: render failed: irectory\n        /home/runner/work/geo-shorts/geo-shorts/remotion/src/shots/geo/BornPlanets doesn't exist\n    at runWebpack (/home/runner/work/ge"
+    },
+    {
+      "date": "2026-10-13 00:51",
+      "kind": "walk",
+      "title": "Can You Walk from Morocco to India? 🌍🚶",
+      "for_day": "2026-10-13",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-13-walk-morocco-to-india.mp4",
+      "format": "globe-walk",
+      "youtube_id": "dDVzDmD1KX0",
+      "privacy": "public",
+      "publish_at": "2026-10-13 05:15 UTC"
     }
   ],
   "fails": {
     "explore:Veryovkina Cave": 2,
     "explore:Oymyakon": 3,
-    "explore:Pole of inaccessibility": 1
+    "explore:Pole of inaccessibility": 2
   },
   "explore": {
     "queue": [
-      {
-        "wikipedia": "Pole of inaccessibility",
-        "kind": "remote",
-        "angle": "How do you get to the loneliest place on Earth?",
-        "evidence": "requeued after the 2026-10-04 fixes",
-        "added": "2026-10-04"
-      },
       {
         "wikipedia": "Krubera Cave",
         "kind": "depth",
@@ -476,7 +487,8 @@
     ],
     "failed": [
       "Veryovkina Cave",
-      "Oymyakon"
+      "Oymyakon",
+      "Pole of inaccessibility"
     ],
     "seed_at": 0,
     "last_research": "2026-10-12"
