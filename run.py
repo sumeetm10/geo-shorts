@@ -165,6 +165,18 @@ def run(kind, test=False, publish_at=None, day=None):
            for h in s["history"]):
         print(f"[skip  ] the {SLOT[kind]} video for {day or today} is already up or scheduled")
         return 0
+    if publish_at is not None:
+        # the state file can miss an upload (a run that crashed after uploading);
+        # YouTube can't - never put two videos in one slot
+        try:
+            other = upload_geo.slot_taken(publish_at)
+        except Exception as e:
+            other = None
+            print(f"[warn  ] could not check the slot on YouTube: {type(e).__name__}: {str(e)[:100]}")
+        if other:
+            print(f"[skip  ] the {SLOT[kind]} slot ({publish_at:%Y-%m-%d %H:%M} UTC) already has "
+                  f"'{other['title']}' ({other['id']}, {other['at']})")
+            return 0
     if kind == "explore" and not explore_state(s)["queue"]:
         print("[none  ] no explore topic queued")
         return NOTHING

@@ -149,6 +149,31 @@ def existing_title(yt, title):
             return None
 
 
+def slot_taken(at, hours=3):
+    """A video already published or scheduled within `hours` of `at` (aware UTC
+    datetime), or None. Asks YouTube itself, not data/state.json: on 2026-10-12 two
+    walks went out in the same 11:00 slot because a crashed run's upload was
+    missing from the state file."""
+    import datetime as _dt
+    yt = build("youtube", "v3", credentials=_credentials())
+    pl = yt.channels().list(part="contentDetails", mine=True).execute()["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+    ids = [i["contentDetails"]["videoId"] for i in
+           yt.playlistItems().list(part="contentDetails", playlistId=pl, maxResults=50).execute()["items"]]
+    if not ids:
+        return None
+    for v in yt.videos().list(part="snippet,status", id=",".join(ids)).execute()["items"]:
+        st = v["status"]
+        if st.get("privacyStatus") == "unlisted" and not st.get("publishAt"):
+            continue                                # parked, never goes out
+        when = st.get("publishAt") or (v["snippet"]["publishedAt"] if st.get("privacyStatus") == "public" else None)
+        if not when:
+            continue
+        t = _dt.datetime.fromisoformat(when.replace("Z", "+00:00"))
+        if abs((t - at).total_seconds()) < hours * 3600:
+            return {"id": v["id"], "title": v["snippet"]["title"], "at": when}
+    return None
+
+
 def upload(path, meta, privacy="public", publish_at=None, replacing=None):
     """publish_at (aware UTC datetime): upload now as private and let YouTube
     make it public at exactly that minute. GitHub's timer ran 4.5 hours late
