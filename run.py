@@ -7,7 +7,7 @@
     python run.py research      look for viral topics and queue them (research.py)
     python run.py status        what has been made, what is next
     python run.py nightly       build BOTH of the coming Nepal day's videos and
-                                schedule them on YouTube for 11:00 and 19:00
+                                schedule them on YouTube for 08:00 and 19:00
     python run.py explore --test   build the next one, post nothing, move nothing on
 
 The morning slot tries an explore video first; if there is no topic, or the
@@ -90,8 +90,8 @@ def cleanup(days=3):
 
 
 NEPAL = timedelta(hours=5, minutes=45)
-PUBLISH = {"morning": (11, 0), "evening": (19, 0)}        # Nepal time, exact
-SLOT = {"explore": "morning", "walk": "morning", "question": "evening"}
+PUBLISH = {"morning": (8, 0), "evening": (19, 0)}         # Nepal time, exact (morning 11:00 -> 08:00 on 2026-10-14)
+SLOT = {"explore": "morning", "walk": "morning", "world": "morning", "question": "evening"}
 NOTHING = 4                                                # exit code: no topic to make
 
 
@@ -105,6 +105,11 @@ def build(kind, s):
         t = explore_state(s)["queue"][0]
         import make_explore
         return make_explore.make(t["wikipedia"], t["kind"], t.get("angle", "")), f"explore:{t['wikipedia']}"
+    if kind == "world":                            # Atlas on other worlds, from 2026-10-14
+        import make_world
+        import worlds
+        i = s.setdefault("world_next", 0)
+        return make_world.make(worlds.WORLDS[i]["id"]), f"world:{i}"
     pool = topics.WALKS if kind == "walk" else topics.QUESTIONS
     i = s["walk_next" if kind == "walk" else "question_next"]      # never wraps: see used_up()
     if kind == "walk":
@@ -118,6 +123,9 @@ def used_up(kind, s):
     """Every walk / question has been posted once. Repeats are not an option:
     the first repeat on 2026-10-03 got 11 views where the original had 1,500 -
     YouTube buries reused uploads. New topics go in topics.py."""
+    if kind == "world":
+        import worlds
+        return s.get("world_next", 0) >= len(worlds.WORLDS)
     if kind not in ("walk", "question"):
         return False
     pool = topics.WALKS if kind == "walk" else topics.QUESTIONS
@@ -131,8 +139,8 @@ def advance(kind, s, gave_up=False):
         t = ex["queue"].pop(0)
         (ex["failed"] if gave_up else ex["done"]).append(t["wikipedia"])
     else:
-        key = "walk_next" if kind == "walk" else "question_next"
-        s[key] = s[key] + 1
+        key = {"walk": "walk_next", "world": "world_next"}.get(kind, "question_next")
+        s[key] = s.get(key, 0) + 1
 
 
 def run(kind, test=False, publish_at=None, day=None):
@@ -187,6 +195,8 @@ def run(kind, test=False, publish_at=None, day=None):
     fails = s.setdefault("fails", {})
     if kind == "explore":
         fkey = f"explore:{explore_state(s)['queue'][0]['wikipedia']}"
+    elif kind == "world":
+        fkey = f"world:{s.get('world_next', 0)}"
     else:
         pool = topics.WALKS if kind == "walk" else topics.QUESTIONS
         fkey = f"{kind}:{s['walk_next' if kind == 'walk' else 'question_next']}"
@@ -254,10 +264,12 @@ def nightly():
     now = datetime.now(timezone.utc)
     day = (now + NEPAL).date()
     worst = 0
-    # 11:00 alternates walk and explore (2026-10-05); each falls back to the other
+    # the morning slot alternates Atlas-on-other-worlds and explore (2026-10-14: worlds
+    # replace the walks, whose viewers kept swiping away at ~50%); walks are now only
+    # the last fallback so the slot is never empty
     last = next((h["kind"] for h in reversed(load_state()["history"])
-                 if h.get("kind") in ("explore", "walk") and h.get("youtube_id")), "walk")
-    morning = ("explore", "walk") if last == "walk" else ("walk", "explore")
+                 if h.get("kind") in ("explore", "walk", "world") and h.get("youtube_id")), "walk")
+    morning = ("explore", "world", "walk") if last == "world" else ("world", "explore", "walk")
     for slot, kinds in (("morning", morning), ("evening", ("question",))):
         h, m = PUBLISH[slot]
         at = datetime(day.year, day.month, day.day, h, m, tzinfo=timezone.utc) - NEPAL

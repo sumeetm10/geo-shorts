@@ -35,7 +35,7 @@ const composition = {
 // compositions with a WebGL shader (ShaderSun) need Chrome's software GL;
 // the default headless mode has no WebGL at all
 const WEBGL = new Set(['ParkerSun', 'GalaxyHeart', 'NeutronStar', 'WormholeTravel', 'WormholeTime']);
-const isWebgl = (c) => WEBGL.has(c) || c.startsWith('BHL');      // long-form black-hole chapters
+const isWebgl = (c) => WEBGL.has(c) || c.startsWith('BHL') || c === 'WorldWalk';      // long-form black-hole chapters
 
 let last = -1;
 await renderMedia({

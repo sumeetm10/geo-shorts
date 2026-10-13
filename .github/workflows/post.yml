@@ -1,6 +1,6 @@
 name: post
 
-# Two Shorts a day, published at EXACTLY 11:00 (explore, or a walk if none passes
+# Two Shorts a day, published at EXACTLY 08:00 (Atlas on other worlds or explore; a walk if neither passes
 # the fact gate) and 19:00 (question) Nepal time.
 # GitHub's schedule is best-effort (one run never started; one day ran 4.5 h
 # late), so it does not decide the time: shortly after midnight Nepal time it
@@ -18,7 +18,7 @@ on:
       kind:
         description: "Which video"
         type: choice
-        options: [nightly, explore, walk, question, research, explore-example]
+        options: [nightly, world, explore, walk, question, research, explore-example]
         default: walk
       mode:
         description: "test = build only and keep the video as a download; post = build and upload; check = only confirm the YouTube login"
