@@ -130,7 +130,7 @@ const WorldWalk: React.FC<Partial<Props>> = (p) => {
         <Scene f={f} a={cue(at.gravity)} b={cue(at.extra)} kind="whip">
           <AbsoluteFill style={{ background: `linear-gradient(#000 0%, ${SKY[look] ?? '#000'} 100%)` }} />
           <SpaceBg starsO={look === 'titan' ? 0.15 : 0.8} />
-          <PlanetShader x={C.x - f * 0.6} y={2900} size={3600} radius={0.95} ground look={look} spin={0.015} res={460} />
+          <PlanetShader x={C.x - (f - cue(at.gravity)) * 0.5} y={2900} size={3600} radius={0.95} ground look={look} spin={0.015} res={460} />
           <svg width={W} height={H} style={{ position: 'absolute', inset: 0 }}>
             {(() => { const hop = Math.abs(Math.sin(f / 11)); return <g>
               <ellipse cx={C.x} cy={1200} rx={80 * (1 - hop * 0.6)} ry={16} fill="#000" opacity={0.3} />
