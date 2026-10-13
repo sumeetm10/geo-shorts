@@ -48,14 +48,6 @@
   "transparent": false
  },
  {
-  "id": "BornPlanets",
-  "durationInSeconds": 45,
-  "fps": 30,
-  "width": 1080,
-  "height": 1920,
-  "transparent": false
- },
- {
   "id": "DinoRock",
   "durationInSeconds": 40,
   "fps": 30,
@@ -141,14 +133,6 @@
   "fps": 30,
   "width": 1080,
   "height": 1920,
-  "transparent": false
- },
- {
-  "id": "LongBorn",
-  "durationInSeconds": 400,
-  "fps": 30,
-  "width": 1920,
-  "height": 1080,
   "transparent": false
  },
  {

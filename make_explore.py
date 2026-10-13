@@ -296,9 +296,30 @@ def _checked_by_model(spec, llm, cfg):
     prompt = ("For each pair, is the LINE fully supported by the QUOTE (same facts, no additions, "
               "numbers may be rounded)? Return ONLY JSON {\"results\": [{\"ok\": true|false, "
               "\"why\": \"\"}]} in the same order.\n\n" + json.dumps(pairs, ensure_ascii=False))
-    res = llm.run_json(cfg, prompt, temperature=0.0).get("results", [])
+    out = llm.run_json(cfg, prompt, temperature=0.0)
+    # the fallback models sometimes answer with the bare list (2026-10-12 crash:
+    # "'list' object has no attribute 'get'")
+    res = out if isinstance(out, list) else (out.get("results", []) if isinstance(out, dict) else [])
+    res = [r if isinstance(r, dict) else {} for r in res]
     bad = [f"'{p['line']}' ({r.get('why', '')})" for p, r in zip(pairs, res) if not r.get("ok")]
     return None if len(res) == len(pairs) and not bad else ("not supported: " + "; ".join(bad))[:300]
+
+
+def _places_problem(spec):
+    """Every map scene's places must have coordinates. Checked here, while the model
+    can still rewrite the script - found later (in build_props) it cost the whole
+    topic: Oymyakon failed 3 nights on 'Tomtor', a disambiguation page."""
+    for i, b in enumerate(spec.get("beats") or []):
+        if b.get("scene") != "map":
+            continue
+        for key in ("from", "to"):
+            name = str(b.get(key, "TARGET" if key == "to" else ""))
+            if key == "to" and name.upper() == "TARGET":
+                continue
+            if not name or not wiki.coords(name):
+                return (f"beat {i} map '{key}' place '{name}' has no coordinates on Wikipedia - use the exact "
+                        f"Wikipedia title of a town or city (e.g. 'Tomtor, Oymyakonsky District', not 'Tomtor')")
+    return None
 
 
 def write_spec(topic, page):
@@ -316,7 +337,12 @@ def write_spec(topic, page):
             continue
         problem = gate(spec, page, topic.get("kind"))
         if not problem:
-            problem = _checked_by_model(spec, llm, cfg)
+            problem = _places_problem(spec)
+        if not problem:
+            try:
+                problem = _checked_by_model(spec, llm, cfg)
+            except Exception as e:
+                problem = f"fact check failed ({type(e).__name__}) - try again"
         if not problem:
             return spec
         feedback = problem
@@ -416,14 +442,10 @@ def build_props(spec, page, target, vo, slug):
 
 
 # ------------------------------------------------------------------ build
-def _ensure_registry():
-    reg = REMOTION / "src" / "registry.gen.tsx"
-    if "Explore" not in reg.read_text(encoding="utf-8"):
-        subprocess.run(["node", "scripts/gen-registry.mjs"], cwd=REMOTION, check=True)
-
-
 def render(props_path, out_path):
-    _ensure_registry()
+    # always regenerate: a stale committed registry pointed at files that only existed on
+    # the laptop (BornPlanets) and broke the 2026-10-13 cloud render
+    subprocess.run(["node", "scripts/gen-registry.mjs"], cwd=REMOTION, check=True, capture_output=True)
     r = subprocess.run(["node", "scripts/render-geo.mjs", "Explore", str(props_path), str(out_path)],
                        cwd=REMOTION, capture_output=True, text=True)
     if r.returncode != 0 or not Path(out_path).exists():

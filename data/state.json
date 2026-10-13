@@ -395,11 +395,17 @@
   ],
   "fails": {
     "explore:Veryovkina Cave": 2,
-    "explore:Oymyakon": 3,
-    "explore:Pole of inaccessibility": 2
+    "explore:Oymyakon": 3
   },
   "explore": {
     "queue": [
+      {
+        "wikipedia": "Pole of inaccessibility",
+        "kind": "remote",
+        "angle": "How do you get to the loneliest place on Earth?",
+        "evidence": "requeued 2026-10-13: it failed on pipeline bugs (list reply, stale registry), not the topic",
+        "added": "2026-10-13"
+      },
       {
         "wikipedia": "Krubera Cave",
         "kind": "depth",
@@ -487,8 +493,7 @@
     ],
     "failed": [
       "Veryovkina Cave",
-      "Oymyakon",
-      "Pole of inaccessibility"
+      "Oymyakon"
     ],
     "seed_at": 0,
     "last_research": "2026-10-12"
