@@ -313,6 +313,6 @@ if __name__ == "__main__":
         import research
         research.research(dry="--dry" in sys.argv or "--test" in sys.argv)
         sys.exit(0)
-    if what not in ("explore", "walk", "question"):
-        sys.exit("usage: python run.py explore|walk|question|research|nightly|status [--test]")
+    if what not in ("world", "explore", "walk", "question"):
+        sys.exit("usage: python run.py world|explore|walk|question|research|nightly|status [--test]")
     sys.exit(run(what, test="--test" in sys.argv))
