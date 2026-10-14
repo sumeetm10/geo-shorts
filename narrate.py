@@ -87,6 +87,9 @@ def narrate(lines, kinds, out_dir, style=None):
     acted voice (acted.py); any problem there falls back to edge-tts below.
     """
     out_dir = Path(out_dir)
+    if style == "eleven":                 # ElevenLabs; no fallback - a video must not mix voices
+        import eleven
+        return eleven.perform(lines, out_dir)
     if style:
         import acted
         try:

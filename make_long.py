@@ -4,6 +4,7 @@
     python make_long.py blackhole --free           full render with the free voice (preview)
     python make_long.py blackhole                  acted voice per chapter + render
     python make_long.py blackhole --reuse          re-render, keeping each chapter's voice
+    python make_long.py <name> --eleven            ElevenLabs voice (eleven.py; needs ELEVENLABS_API_KEY/_VOICE_ID)
     python make_long.py blackhole --only 2,5 --strict-voice   re-voice + re-render chapters 2 and 5 (main TTS model only)
 
 Each chapter is its own 1920x1080 composition (remotion/src/shots/long/BHL*.tsx)
@@ -208,7 +209,8 @@ def main():
             acted.TTS_MODELS = acted.TTS_MODELS[:1]
             vo, voice = acted.perform(lines, "explore", job)          # raises rather than falling back
         else:
-            vo, voice = narrate.narrate(lines, [k for _, k in ch["lines"]], job, style=None if free else "explore")
+            style = None if free else ("eleven" if "--eleven" in sys.argv else "explore")
+            vo, voice = narrate.narrate(lines, [k for _, k in ch["lines"]], job, style=style)
         secs = round(vo[-1]["end"] + PAD, 2)
         props = {"vo": vo, "at": ch["at"], "durationInSeconds": secs, "chapter": i, "chapterName": ch["name"]}
         old.write_text(json.dumps(props), encoding="utf-8")
