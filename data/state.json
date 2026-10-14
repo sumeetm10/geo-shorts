@@ -402,6 +402,17 @@
       "youtube_id": "Ogo91h79mM4",
       "privacy": "public",
       "publish_at": "2026-10-14 02:15 UTC"
+    },
+    {
+      "date": "2026-10-14 21:47",
+      "kind": "explore",
+      "title": "How Do You Get to the Loneliest Place on Earth? 🌍",
+      "for_day": "2026-10-15",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-14-explore-pole-of-inaccessibility.mp4",
+      "format": "explore",
+      "youtube_id": "yP2TEn3gfww",
+      "privacy": "public",
+      "publish_at": "2026-10-15 02:15 UTC"
     }
   ],
   "fails": {
@@ -410,13 +421,6 @@
   },
   "explore": {
     "queue": [
-      {
-        "wikipedia": "Pole of inaccessibility",
-        "kind": "remote",
-        "angle": "How do you get to the loneliest place on Earth?",
-        "evidence": "requeued 2026-10-13: it failed on pipeline bugs (list reply, stale registry), not the topic",
-        "added": "2026-10-13"
-      },
       {
         "wikipedia": "Krubera Cave",
         "kind": "depth",
@@ -500,7 +504,8 @@
       "Mariana Trench",
       "Kola Superdeep Borehole",
       "Lut Desert",
-      "Yakutsk"
+      "Yakutsk",
+      "Pole of inaccessibility"
     ],
     "failed": [
       "Veryovkina Cave",
