@@ -49,51 +49,79 @@ def _yrs(y):
     return f"{int(round(y, -2)):,}"
 
 
+def style_of(w):
+    """0, 1 or 2 - fixed per topic (its place in the queue), so neighbours always differ.
+    Varies wording, titles and the opening visual; never the facts. Against YouTube's
+    'inauthentic / mass-produced content' policy (2025): no two uploads in a row may
+    share a template look."""
+    return [x["id"] for x in worlds.WORLDS].index(w["id"]) % 3
+
+
 def script(w):
     """(lines, kinds, numbers) for one world topic."""
     W = w["world"]
+    v = style_of(w)
     if w["type"] == "around":
         around = round(math.pi * w["diameter"], -2)
         days = round(around / KMH / HOURS)
         months = days / 30.4
         span = f"That's about {round(months)} months" if months < 22 else f"That's almost {round(days / 365, 1):g} years"
-        lines = [
-            (f"Can you walk all the way around {W}? Guess before the end.", "hook"),
-            (f"Atlas lands on {W}. {w['land']}", "walk"),
-            (f"{_cap(W)} is about {w['diameter']:,} km wide. So the walk around its middle is about {int(around):,} km.", "reveal"),
-            (w["gravity_line"], "walk"),
-            (w["extra_line"], "stop"),
-            (f"Walking 8 hours a day, at a normal pace, it would take about {days} days. {span}, just walking.", "payoff"),
-            ("So next time someone asks you...", "cta"),
-        ]
+        hook = [f"Can you walk all the way around {W}? Guess before the end.",
+                f"Atlas wants to walk around {W}. Weeks, months, or years? Guess now.",
+                f"How long is one lap of {W}, on foot? Lock in your guess."][v]
+        land = [f"Atlas lands on {W}. {w['land']}",
+                f"Touchdown on {W}. {w['land']}",
+                f"First step on {W}. {w['land']}"][v]
+        size = [f"{_cap(W)} is about {w['diameter']:,} km wide. So the walk around its middle is about {int(around):,} km.",
+                f"It's about {w['diameter']:,} km wide. That makes one lap of its middle about {int(around):,} km.",
+                f"One lap around the middle of {W} is about {int(around):,} km. It's {w['diameter']:,} km wide."][v]
+        pay = [f"Walking 8 hours a day, at a normal pace, it would take about {days} days. {span}, just walking.",
+               f"At a normal walking pace, 8 hours a day: about {days} days. {span}.",
+               f"So the answer: about {days} days of walking, 8 hours a day. {span}."][v]
+        end = ["So next time someone asks you...", "Was your guess close?", "Would you take that walk?"][v]
+        lines = [(hook, "hook"), (land, "walk"), (size, "reveal"), (w["gravity_line"], "walk"),
+                 (w["extra_line"], "stop"), (pay, "payoff"), (end, "cta")]
         nums = {"diameter": w["diameter"], "around": int(around), "days": days}
         at = {"land": 1, "size": 2, "gravity": 3, "extra": 4, "days": 5}
     elif w["type"] == "to":
         years = w["distance"] / KMH / HOURS / 365.25
         nonstop = w["distance"] / KMH / 24 / 365.25
-        lines = [
-            (f"How long would it take to walk from Earth to {W}? Guess before the end.", "hook"),
-            ("Imagine a road through space. Atlas sets off from Earth.", "walk"),
-            (w["dist_line"], "reveal"),
-            (w["extra_line"], "walk"),
-            (f"Walking 8 hours a day, at a normal pace, it would take about {_yrs(years)} years.", "stop"),
-            (f"Even walking non-stop, day and night, it would still take about {_yrs(nonstop)} years.", "payoff"),
-            ("So next time someone asks you...", "cta"),
-        ]
+        hook = [f"How long would it take to walk from Earth to {W}? Guess before the end.",
+                f"If there were a road to {W}, how long would the walk take? Guess first.",
+                f"Atlas is walking to {W}. Years, or a lifetime? Lock in your guess."][v]
+        road = ["Imagine a road through space. Atlas sets off from Earth.",
+                "Picture a straight road into space. Atlas takes the first step.",
+                "Say someone built a road from Earth. Atlas starts walking."][v]
+        y8 = [f"Walking 8 hours a day, at a normal pace, it would take about {_yrs(years)} years.",
+              f"At a normal pace, 8 hours a day: about {_yrs(years)} years.",
+              f"Eight hours of walking every day? About {_yrs(years)} years."][v]
+        ns = [f"Even walking non-stop, day and night, it would still take about {_yrs(nonstop)} years.",
+              f"And with no sleep at all, walking day and night, still about {_yrs(nonstop)} years.",
+              f"Even if Atlas never stopped, day or night, it's about {_yrs(nonstop)} years."][v]
+        end = ["So next time someone asks you...", "Was your guess close?", "Would you start walking?"][v]
+        lines = [(hook, "hook"), (road, "walk"), (w["dist_line"], "reveal"), (w["extra_line"], "walk"),
+                 (y8, "stop"), (ns, "payoff"), (end, "cta")]
         nums = {"distance": w["distance"], "years": _yrs(years), "nonstop": _yrs(nonstop)}
         at = {"road": 1, "dist": 2, "extra": 3, "years": 4, "nonstop": 5}
     else:
         kg = round(EARTH_KG * w["ratio"])
         jump = round(1 / w["ratio"], 1)
-        lines = [
-            (f"What would you weigh on {W}? Guess before the end.", "hook"),
-            (f"Say you weigh {EARTH_KG} kilograms here on Earth.", "walk"),
-            (f"Gravity on {W} is only {w['gravity']}.", "reveal"),
-            (f"So a bathroom scale would read about {kg} kilograms.", "stop"),
-            ("You're not any smaller. The planet just pulls on you less.", "walk"),
-            (f"Which means you could jump about {jump:g} times higher.", "payoff"),
-            ("So next time someone asks you...", "cta"),
-        ]
+        hook = [f"What would you weigh on {W}? Guess before the end.",
+                f"Step on a scale on {W}. What does it say? Guess first.",
+                f"Atlas brought a bathroom scale to {W}. What will it read?"][v]
+        start = [f"Say you weigh {EARTH_KG} kilograms here on Earth.",
+                 f"On Earth, the scale says {EARTH_KG} kilograms.",
+                 f"Start with {EARTH_KG} kilograms, here on Earth."][v]
+        reads = [f"So a bathroom scale would read about {kg} kilograms.",
+                 f"The scale drops to about {kg} kilograms.",
+                 f"Same person, same scale: about {kg} kilograms."][v]
+        same = ["You're not any smaller. The planet just pulls on you less.",
+                "Nothing about you changed. The pull did.",
+                "You didn't lose weight. The planet just pulls less."][v]
+        end = ["So next time someone asks you...", "Was your guess close?", "Would you try that jump?"][v]
+        lines = [(hook, "hook"), (start, "walk"), (f"Gravity on {W} is only {w['gravity']}.", "reveal"),
+                 (reads, "stop"), (same, "walk"), (f"Which means you could jump about {jump:g} times higher.", "payoff"),
+                 (end, "cta")]
         nums = {"kgEarth": EARTH_KG, "kgThere": kg, "jump": jump, "ratio": w["ratio"]}
         at = {"earth": 1, "gravity": 2, "scale": 3, "same": 4, "jump": 5}
     return [l for l, _ in lines], [k for _, k in lines], nums, at
@@ -115,6 +143,7 @@ def make(topic_id, date=None, free=False, props_only=False):
     w = next(x for x in worlds.WORLDS if x["id"] == topic_id)
     check_facts(w)
     lines, kinds, nums, at = script(w)
+    v = style_of(w)
     for i, l in enumerate(lines, 1):
         print(f"      {i:2d}. {l}")
     job = ROOT / "data" / "jobs" / f"world-{topic_id}"
@@ -123,13 +152,16 @@ def make(topic_id, date=None, free=False, props_only=False):
     secs = round(vo[-1]["end"] + 0.45, 2)
     W = w["world"]
     if w["type"] == "to":
-        hook = {"top": f"WALK TO {W.upper()}?", "badge": "GUESS BEFORE THE END"}
+        hook = {"top": [f"WALK TO {W.upper()}?", f"A ROAD TO {W.upper()}?", f"ON FOOT TO {W.upper()}?"][v],
+                "badge": ["GUESS BEFORE THE END", "YEARS OR A LIFETIME?", "LOCK IN YOUR GUESS"][v]}
     elif w["type"] == "around":
-        hook = {"top": f"WALK AROUND {W.upper()}?", "badge": "GUESS BEFORE THE END"}
+        hook = {"top": [f"WALK AROUND {W.upper()}?", f"ONE LAP OF {W.upper()}?", f"AROUND {W.upper()} ON FOOT?"][v],
+                "badge": ["GUESS BEFORE THE END", "WEEKS OR YEARS?", "LOCK IN YOUR GUESS"][v]}
     else:
-        hook = {"top": f"YOUR WEIGHT ON {W.upper()}?", "badge": "GUESS BEFORE THE END"}
+        hook = {"top": [f"YOUR WEIGHT ON {W.upper()}?", f"A SCALE ON {W.upper()}?", f"WEIGH IN ON {W.upper()}"][v],
+                "badge": ["GUESS BEFORE THE END", "GUESS THE NUMBER", "WHAT WILL IT READ?"][v]}
     props = {"vo": vo, "durationInSeconds": secs, "type": w["type"], "world": W.upper(), "look": w["look"],
-             "hook": hook, "at": at, "nums": nums, "extraLabel": w.get("extra_label", ""), "distLine": w.get("dist_line", ""),
+             "hook": hook, "at": at, "nums": nums, "variant": style_of(w), "extraLabel": w.get("extra_label", ""), "distLine": w.get("dist_line", ""),
              "gravityLabel": (w.get("gravity") or "").upper()}
     (job / "props.json").write_text(json.dumps(props), encoding="utf-8")
     print(f"[render] {secs:.1f}s  {nums}")
@@ -146,15 +178,18 @@ def make(topic_id, date=None, free=False, props_only=False):
     out.parent.mkdir(parents=True, exist_ok=True)
     mix.mix(silent, voice, bed, out)
     if w["type"] == "to":
-        title = f"How Long Would It Take to Walk to {_cap(W)}? 🚶🌌"
+        title = [f"How Long Would It Take to Walk to {_cap(W)}? 🚶🌌", f"If There Were a Road to {_cap(W)}, How Long Would the Walk Take? 🌌",
+                 f"Walking From Earth to {_cap(W)} Would Take HOW Long? 🚶"][v]
         what = (f"- {w['dist_line']}\n- At 5 km/h, 8 hours a day, that's about {nums['years']} years on foot "
                 f"(about {nums['nonstop']} years walking non-stop)\n")
     elif w["type"] == "around":
-        title = f"Can You Walk All the Way Around {_cap(W)}? 🚶🪐"
+        title = [f"Can You Walk All the Way Around {_cap(W)}? 🚶🪐", f"How Long Is One Lap of {_cap(W)} on Foot? 🪐",
+                 f"Walking Around {_cap(W)} Would Take HOW Long? 🚶"][v]
         what = (f"- {_cap(W)} is about {w['diameter']:,} km wide, so the walk around its middle is about "
                 f"{nums['around']:,} km (pi x diameter)\n- At 5 km/h, 8 hours a day, that's about {nums['days']} days on foot\n")
     else:
-        title = f"What Would You Weigh on {_cap(W)}? ⚖️🪐"
+        title = [f"What Would You Weigh on {_cap(W)}? ⚖️🪐", f"Step on a Scale on {_cap(W)} - What Does It Read? ⚖️",
+                 f"Your Weight on {_cap(W)} Would Surprise You ⚖️🪐"][v]
         what = (f"- Gravity on {W} is {w['gravity']}\n- A 70 kg person would read about {nums['kgThere']} kg on a "
                 f"bathroom scale there, and could jump about {nums['jump']:g} times higher\n")
     sources = ", ".join(w["facts"].keys())

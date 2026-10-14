@@ -30,7 +30,7 @@ type Props = {
   vo: VoLine[]; durationInSeconds: number; type: 'around' | 'weigh' | 'to'; world: string; look: string;
   hook: { top: string; badge: string }; at: Record<string, number>;
   nums: { diameter?: number; around?: number; days?: number; kgEarth?: number; kgThere?: number; jump?: number; ratio?: number; distance?: number; years?: string; nonstop?: string };
-  extraLabel: string; gravityLabel: string;
+  extraLabel: string; gravityLabel: string; variant?: number;
 };
 
 const SKY: Record<string, string> = { mars: '#2a1410', moon: '#000000', mercury: '#050404', titan: '#3a2508' };
@@ -46,6 +46,7 @@ const Scale: React.FC<{ x: number; y: number; kg: number; s?: number }> = ({ x, 
 
 const WorldWalk: React.FC<Partial<Props>> = (p) => {
   const f = useCurrentFrame();
+  const variant = p.variant ?? 0;
   const { vo = [], durationInSeconds = 30, type = 'around', world = 'MARS', look = 'mars', hook = { top: '', badge: '' }, at, nums = {} } = p;
   if (!at) return <AbsoluteFill style={{ background: '#000' }} />;
   const END = Math.round(durationInSeconds * 30);
@@ -57,8 +58,11 @@ const WorldWalk: React.FC<Partial<Props>> = (p) => {
   const bounce = (k: number) => -Math.abs(Math.sin(f / 9)) * 70 * k;
 
   // trips ("walk from Earth to the Moon"): Earth bottom-left, the world top-right, a road between
-  const E = { x: 280, y: 1500, R: 230 }; const T = { x: 820, y: 560, size: 760 };
-  const R0 = { x: E.x + 150, y: E.y - 175 }; const R1 = { x: T.x - 120, y: T.y + 120 };
+  // style 1 mirrors the trip (Earth bottom-right, the world top-left) - see make_world.style_of
+  const E = variant === 1 ? { x: 800, y: 1500, R: 230 } : { x: 280, y: 1500, R: 230 };
+  const T = variant === 1 ? { x: 260, y: 560, size: 760 } : { x: 820, y: 560, size: 760 };
+  const dir = T.x > E.x ? 1 : -1;
+  const R0 = { x: E.x + 150 * dir, y: E.y - 175 }; const R1 = { x: T.x - 120 * dir, y: T.y + 120 };
   const onRoad = (k: number) => ({ x: lerp(R0.x, R1.x, k), y: lerp(R0.y, R1.y, k) });
   const yearsNum = parseFloat(String(nums.years ?? '0').replace(/,/g, ''));
   const tripBase = (k: number, id: string) => (
@@ -81,6 +85,18 @@ const WorldWalk: React.FC<Partial<Props>> = (p) => {
         {(() => { const q = onRoad(0.06 * Math.min(1, t)); return <g transform={`translate(${q.x} ${q.y})`}><Atlas x={0} y={0} s={1.2} t={f} walking={1} mood="walk" /></g>; })()}
       </svg>
     </>
+  ) : variant === 2 ? (
+    <>
+      <AbsoluteFill style={{ background: 'linear-gradient(#000 0%, #0b0b14 100%)' }} />
+      <SpaceBg starsO={0.8} />
+      <PlanetShader x={C.x} y={2900} size={3600} radius={0.95} ground look={look} spin={0.012} res={460} />
+      <svg width={W} height={H} style={{ position: 'absolute', inset: 0 }}>
+        <text x={C.x} y={860} textAnchor="middle" fontFamily={SANS} fontWeight={800} fontSize={300} fill={ROUTE} stroke="#000" strokeWidth={8}
+          transform={`rotate(${6 * Math.sin(f / 6)} ${C.x} 760) scale(${1 + 0.05 * Math.sin(f / 4)})`} style={{ transformOrigin: '540px 760px' }}>?</text>
+        {type === 'weigh' && <g transform={`translate(${C.x + 230} 1150)`}><Scale x={0} y={0} kg={Math.round(lerp(70, 0, (Math.sin(f / 5) + 1) / 2)) || 0} s={1.0} /></g>}
+        <g transform={`translate(${C.x - (type === 'weigh' ? 120 : 0)} ${1180 + bounce(0.6)})`}><Atlas x={0} y={0} s={2.4} t={f} walking={1} mood="walk" /></g>
+      </svg>
+    </>
   ) : (
     <>
       <SpaceBg />
@@ -94,7 +110,14 @@ const WorldWalk: React.FC<Partial<Props>> = (p) => {
           </g>; })() : (
           <g transform={`rotate(${-6 + 4 * Math.sin(f / 6)} ${C.x} 1250)`}><Scale x={C.x} y={1250} kg={Math.round(lerp(70, 0, (Math.sin(f / 5) + 1) / 2)) || 0} s={1.3} /></g>
         )}
-        <g transform={`translate(${C.x} ${1080 - 420 + bounce(0.4)})`}><Atlas x={0} y={0} s={1.5} t={f} walking={1} mood="walk" /></g>
+        {variant === 1 ? (() => { const d = EASE_OUT(Math.min(1, t * 2.2)); const y = lerp(-200, 660, d);
+          return <g>
+            {d < 1 && <line x1={C.x} y1={y - 260} x2={C.x} y2={y - 40} stroke="#ffffff" strokeWidth={6} opacity={0.5} />}
+            {d >= 1 && [-1, 1].map((k) => <ellipse key={k} cx={C.x + k * 70 * Math.min(1, t * 4 - 1.8)} cy={662} rx={50} ry={12} fill="#c9b9a8" opacity={0.5 * Math.max(0, 1 - (t * 4 - 1.8))} />)}
+            <g transform={`translate(${C.x} ${y}) rotate(${d < 1 ? (1 - d) * 360 : 0})`}><Atlas x={0} y={0} s={1.5} t={f} walking={d < 1 ? 0 : 1} mood={d < 1 ? 'shocked' : 'cheer'} /></g>
+          </g>; })() : (
+          <g transform={`translate(${C.x} ${1080 - 420 + bounce(0.4)})`}><Atlas x={0} y={0} s={1.5} t={f} walking={1} mood="walk" /></g>
+        )}
       </svg>
     </>
   );
@@ -394,7 +417,8 @@ const WorldWalk: React.FC<Partial<Props>> = (p) => {
         return <>
           <div style={{ position: 'absolute', top: 150, left: 30, right: 30, textAlign: 'center', fontFamily: SANS, fontWeight: 800,
             fontSize: hook.top.length > 16 ? 84 : 96, lineHeight: 1.0, color: '#fff', textShadow: '0 10px 40px rgba(0,0,0,0.95)', opacity: o }}>
-            {hook.top.split(' ').slice(0, -1).join(' ')}<br /><span style={{ color: ROUTE }}>{hook.top.split(' ').slice(-1)[0]}</span>
+            {(() => { const w = hook.top.split(' '); let k = -1; w.forEach((x, i) => { if (i > 0 && ['THE', 'ON', 'TO', 'OF'].includes(x)) k = i; }); if (k < 0) k = w.length - 1;
+              return <>{w.slice(0, k).join(' ')}<br /><span style={{ color: ROUTE }}>{w.slice(k).join(' ')}</span></>; })()}
           </div>
           <div style={{ position: 'absolute', top: 1420, left: 0, right: 0, textAlign: 'center', opacity: o, transform: `rotate(-3deg) scale(${1 + 0.05 * Math.sin(f / 4)})` }}>
             <span style={{ display: 'inline-block', background: ALERT, color: '#fff', fontFamily: SANS, fontWeight: 800, fontSize: 52,
