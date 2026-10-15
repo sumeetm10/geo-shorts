@@ -413,21 +413,33 @@
       "youtube_id": "yP2TEn3gfww",
       "privacy": "public",
       "publish_at": "2026-10-15 02:15 UTC"
+    },
+    {
+      "date": "2026-10-15 21:30",
+      "kind": "world",
+      "title": "world:1",
+      "for_day": "2026-10-16",
+      "error": "build: RuntimeError: the planet did not render (centre brightness 23) - WebGL problem"
+    },
+    {
+      "date": "2026-10-15 21:36",
+      "kind": "explore",
+      "title": "How Do You Get to the Bottom of Krubera Cave? 🌍",
+      "for_day": "2026-10-16",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-15-explore-krubera-cave.mp4",
+      "format": "explore",
+      "youtube_id": "2iUbIqfmSVY",
+      "privacy": "public",
+      "publish_at": "2026-10-16 02:15 UTC"
     }
   ],
   "fails": {
     "explore:Veryovkina Cave": 2,
-    "explore:Oymyakon": 3
+    "explore:Oymyakon": 3,
+    "world:1": 1
   },
   "explore": {
     "queue": [
-      {
-        "wikipedia": "Krubera Cave",
-        "kind": "depth",
-        "angle": "How do you get to the bottom of Krubera Cave, one of the deepest places on Earth?",
-        "evidence": "The Deepest Cave on Earth 😱 | Krubera Cave",
-        "added": "2026-10-05"
-      },
       {
         "wikipedia": "Tristan da Cunha",
         "kind": "remote",
@@ -505,7 +517,8 @@
       "Kola Superdeep Borehole",
       "Lut Desert",
       "Yakutsk",
-      "Pole of inaccessibility"
+      "Pole of inaccessibility",
+      "Krubera Cave"
     ],
     "failed": [
       "Veryovkina Cave",
