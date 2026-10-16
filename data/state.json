@@ -431,22 +431,33 @@
       "youtube_id": "2iUbIqfmSVY",
       "privacy": "public",
       "publish_at": "2026-10-16 02:15 UTC"
+    },
+    {
+      "date": "2026-10-16 21:20",
+      "kind": "world",
+      "title": "world:1",
+      "for_day": "2026-10-17",
+      "error": "build: RuntimeError: the planet did not render (centre brightness 23) - WebGL problem"
+    },
+    {
+      "date": "2026-10-16 21:24",
+      "kind": "explore",
+      "title": "How Do You Get to Tristan da Cunha? 🌍",
+      "for_day": "2026-10-17",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-16-explore-tristan-da-cunha.mp4",
+      "format": "explore",
+      "youtube_id": "uYHVmGlHVCQ",
+      "privacy": "public",
+      "publish_at": "2026-10-17 02:15 UTC"
     }
   ],
   "fails": {
     "explore:Veryovkina Cave": 2,
     "explore:Oymyakon": 3,
-    "world:1": 1
+    "world:1": 2
   },
   "explore": {
     "queue": [
-      {
-        "wikipedia": "Tristan da Cunha",
-        "kind": "remote",
-        "angle": "How do you get to Tristan da Cunha, the most isolated inhabited island on Earth?",
-        "evidence": "¿Cómo viven las personas más aisladas del planeta? #tristandacunha",
-        "added": "2026-10-05"
-      },
       {
         "wikipedia": "Ilha da Queimada Grande",
         "kind": "remote",
@@ -518,7 +529,8 @@
       "Lut Desert",
       "Yakutsk",
       "Pole of inaccessibility",
-      "Krubera Cave"
+      "Krubera Cave",
+      "Tristan da Cunha"
     ],
     "failed": [
       "Veryovkina Cave",
@@ -527,5 +539,5 @@
     "seed_at": 0,
     "last_research": "2026-10-12"
   },
-  "world_next": 1
+  "world_next": 2
 }
