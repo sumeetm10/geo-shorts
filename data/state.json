@@ -449,6 +449,17 @@
       "youtube_id": "uYHVmGlHVCQ",
       "privacy": "public",
       "publish_at": "2026-10-17 02:15 UTC"
+    },
+    {
+      "date": "2026-10-17 20:43",
+      "kind": "world",
+      "title": "Walking Around The Moon Would Take HOW Long? 🚶",
+      "for_day": "2026-10-18",
+      "file": "/home/runner/work/geo-shorts/geo-shorts/data/out/2026-10-17-world-moon-around.mp4",
+      "format": "atlas-worlds",
+      "youtube_id": "65rPoagHjWc",
+      "privacy": "public",
+      "publish_at": "2026-10-18 01:56 UTC"
     }
   ],
   "fails": {
@@ -539,5 +550,5 @@
     "seed_at": 0,
     "last_research": "2026-10-12"
   },
-  "world_next": 2
+  "world_next": 3
 }
