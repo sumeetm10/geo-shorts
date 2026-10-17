@@ -7,7 +7,7 @@
     python run.py research      look for viral topics and queue them (research.py)
     python run.py status        what has been made, what is next
     python run.py nightly       build BOTH of the coming Nepal day's videos and
-                                schedule them on YouTube for 08:00 and 19:00
+                                schedule them on YouTube at a random time 07:00-08:59 and 19:00-20:59
     python run.py explore --test   build the next one, post nothing, move nothing on
 
 The morning slot tries an explore video first; if there is no topic, or the
@@ -90,7 +90,20 @@ def cleanup(days=3):
 
 
 NEPAL = timedelta(hours=5, minutes=45)
-PUBLISH = {"morning": (8, 0), "evening": (19, 0)}         # Nepal time, exact (morning 11:00 -> 08:00 on 2026-10-14)
+# Nepal time. Since 2026-10-17 each slot gets a random minute inside a two-hour window
+# (morning 07:00-08:59, evening 19:00-20:59) so posts don't land at the same clock time every day.
+# The minute is seeded by date + slot: a retry run the same night picks the same time.
+PUBLISH = {"morning": (7, 0), "evening": (19, 0)}
+WINDOW_MIN = 120
+
+
+def publish_time(day, slot):
+    """(hour, minute) Nepal time for this day's slot."""
+    import random
+    h, m = PUBLISH[slot]
+    extra = random.Random(f"{day.isoformat()}-{slot}").randrange(WINDOW_MIN)
+    total = h * 60 + m + extra
+    return total // 60, total % 60
 SLOT = {"explore": "morning", "walk": "morning", "world": "morning", "question": "evening"}
 NOTHING = 4                                                # exit code: no topic to make
 
@@ -271,7 +284,7 @@ def nightly():
                  if h.get("kind") in ("explore", "walk", "world") and h.get("youtube_id")), "walk")
     morning = ("explore", "world", "walk") if last == "world" else ("world", "explore", "walk")
     for slot, kinds in (("morning", morning), ("evening", ("question",))):
-        h, m = PUBLISH[slot]
+        h, m = publish_time(day, slot)
         at = datetime(day.year, day.month, day.day, h, m, tzinfo=timezone.utc) - NEPAL
         if slot == "morning":
             maybe_research()
