@@ -95,6 +95,7 @@ NEPAL = timedelta(hours=5, minutes=45)
 # The minute is seeded by date + slot: a retry run the same night picks the same time.
 PUBLISH = {"morning": (7, 0), "evening": (19, 0)}
 WINDOW_MIN = 120
+MORNING_TEMPLATES = False      # explore/world/walk auto-builds for the morning slot (paused 2026-10-18)
 
 
 def publish_time(day, slot):
@@ -283,6 +284,12 @@ def nightly():
     last = next((h["kind"] for h in reversed(load_state()["history"])
                  if h.get("kind") in ("explore", "walk", "world") and h.get("youtube_id")), "walk")
     morning = ("explore", "world", "walk") if last == "world" else ("world", "explore", "walk")
+    # 2026-10-18: template mornings paused. Viewers called them out ("this video has zero context",
+    # Krubera Cave) and the owner wants only researched, hand-made Shorts at 07-09: those are
+    # uploaded scheduled ahead of time, and slot_taken() makes this run skip that day. With no
+    # hand-made video queued, the morning stays empty rather than posting a weak one.
+    if not MORNING_TEMPLATES:
+        morning = ()
     for slot, kinds in (("morning", morning), ("evening", ("question",))):
         h, m = publish_time(day, slot)
         at = datetime(day.year, day.month, day.day, h, m, tzinfo=timezone.utc) - NEPAL
