@@ -531,6 +531,48 @@
         "angle": "How do you measure the deepest abyss of space?",
         "evidence": "I Captured TON 618 - The Biggest Black Hole Ever Found🤯 Quasar TON618 using Beginner Telescope #nasa; Flying to TON 618 🌌",
         "added": "2026-10-12"
+      },
+      {
+        "wikipedia": "Vostok Station",
+        "kind": "cold",
+        "angle": "How do you get to Vostok Station, the coldest recorded place on Earth?",
+        "evidence": "The Coldest Place on Earth 😱🤯 #kannadafacts #kannada #facts #shorts #viral",
+        "added": "2026-10-19"
+      },
+      {
+        "wikipedia": "Dead Sea",
+        "kind": "depth",
+        "angle": "How do you get to the Dead Sea, the lowest land point on Earth?",
+        "evidence": "The Surprising Physics of the Dead Sea.",
+        "added": "2026-10-19"
+      },
+      {
+        "wikipedia": "Danakil Depression",
+        "kind": "hot",
+        "angle": "How do you get to the Danakil Depression, the hottest inhabited place on Earth?",
+        "evidence": "Tempat Terpanas di Bumi Bisa Mencapai 80°C 🥵🔥",
+        "added": "2026-10-19"
+      },
+      {
+        "wikipedia": "Bouvet Island",
+        "kind": "remote",
+        "angle": "How do you get to Bouvet Island, the most remote island on Earth?",
+        "evidence": "The World's Most Remote Island",
+        "added": "2026-10-19"
+      },
+      {
+        "wikipedia": "Lake Vostok",
+        "kind": "depth",
+        "angle": "How do you get to Lake Vostok, liquid water buried 4 kilometers under Antarctic ice?",
+        "evidence": "Earth’s Deepest Hole 😱 | What Did Scientists Find 12 KM Underground #shorts",
+        "added": "2026-10-19"
+      },
+      {
+        "wikipedia": "Perth",
+        "kind": "remote",
+        "angle": "How do you get to Perth, the most isolated major city on Earth?",
+        "evidence": "The World’s Most Isolated Major City?",
+        "added": "2026-10-19"
       }
     ],
     "done": [
@@ -547,8 +589,8 @@
       "Veryovkina Cave",
       "Oymyakon"
     ],
-    "seed_at": 0,
-    "last_research": "2026-10-12"
+    "seed_at": 6,
+    "last_research": "2026-10-19"
   },
   "world_next": 3
 }
